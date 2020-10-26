@@ -15,6 +15,7 @@ AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src/main.cpp])
 
+AC_CANONICAL_HOST
 AC_PROG_CXX
 
 AC_CHECK_HEADER([readline/readline.h])
