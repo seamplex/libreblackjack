@@ -22,34 +22,39 @@
 
 #include <iostream>
 
+#include "base.h"
 #include "blackjack.h"
 #include "stdinout.h"
 
 int main(int argc, char **argv) {
   
-  // TODO: read args/conf to see what dealer we need to play
+  Dealer *dealer = nullptr;
+  Player *player = nullptr;
   
+  // TODO: read the args/conf to know what kind of dealer and player we are having
   // TODO: pass args/conf to the constructor
-  Blackjack dealer;
-  StdInOut player;
+  dealer = new Blackjack();
+  player = new StdInOut();
   
   std::cout << "Let's play" << std::endl;
-  dealer.setNextAction(DealerAction::StartNewHand);
+  dealer->setNextAction(DealerAction::StartNewHand);
   
-  Command command = Command::None;
+  Command command{Command::None};
   
-  while (!dealer.finished()) {
-    dealer.setInputNeeded(false);
-    // TODO: clean buffers
-    dealer.deal();
-    if (dealer.getInputNeeded()) {
+  while (!dealer->finished()) {
+    dealer->setInputNeeded(false);
+    dealer->deal();
+    if (dealer->getInputNeeded()) {
       do {
         // TODO: check for too many errors meaning dealer and player do not understand each other
-        player.play(&command, nullptr);        
-      } while (dealer.process(command) <= 0);
+        player->play(&command, nullptr);        
+      } while (dealer->process(command) <= 0);
     }
   }
   
   // TODO: write report
+  
+  delete player;
+  delete dealer;
   
 }

@@ -2,7 +2,7 @@
 #define STDINOUT_H
 #include "blackjack.h"
 
-class StdInOut : Player {
+class StdInOut : public Player {
   public:  
     StdInOut() { };
     ~StdInOut() { };

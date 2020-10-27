@@ -25,15 +25,15 @@
 #include "blackjack.h"
 
 Blackjack::Blackjack() {
-  std::cout << "I'm your dealer" << std::endl;
+  std::cout << "I'm your Blackjack dealer!" << std::endl;
 }
 
 Blackjack::~Blackjack() {
-  std::cout << "Bye bye" << std::endl;
+  std::cout << "Bye bye! We'll play Blackjack again next time." << std::endl;
 }
 
 void Blackjack::deal() {
-  std::cout << "here are your cards" << std::endl;
+  std::cout << "Here are your cards" << std::endl;
   setInputNeeded(true);
 }
 

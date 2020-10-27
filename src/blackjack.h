@@ -22,108 +22,13 @@
 
 #ifndef BLACKJACK_H
 #define BLACKJACK_H
-
-enum class DealerAction {
-  None,
-  StartNewHand,
-  AskForBets,
-  DealPlayerFirstCard,
-  DealDealerHoleCard,
-  AskForInsurance,
-  CheckforBlackjacks,
-  PayOrTakeInsuranceBets,
-  AskForPlay,
-  MoveOnToNextHand,
-  HitDealerHand,
-  Payout
-};
-
-enum class PlayerAction {
-  None,
-  Bet,
-  Insurance,
-  Play
-};
-
-enum class Command {
-  None,
-// common  
-  Quit,
-  Help,
-  Count,
-  UpcardValue,
-  Bankroll,
-  Hands,
-  Table,
-// particular  
-  Bet,
-  Yes,
-  No,
-  Stand,
-  Double,
-  Split,
-  Hit,
-};
-
-class Blackjack {
-  public:
+#include "base.h"
+class Blackjack : public Dealer {
+  public:  
     Blackjack();
     ~Blackjack();
-    // delete copy and move constructors
-    Blackjack(Blackjack&) = delete;
-    Blackjack(const Blackjack&) = delete;
-    Blackjack(Blackjack &&) = delete;
-    Blackjack(const Blackjack &&) = delete;
-
-    void deal();
-    void ask();
-    int process(Command);
     
-   
-    void setNextAction(DealerAction a) {
-      next_action = a;
-    }
-    
-    bool getInputNeeded(void) {
-      return input_needed;
-    }
-    
-    void setInputNeeded(bool flag) {
-      input_needed = flag;
-    }
-
-    bool finished(void) {
-      return done;
-    }
-    
-    bool finished(bool d) {
-      return (done = d);
-    }
-    
-  private:
-    
-    bool done = false;
-    bool input_needed = false;
-    DealerAction next_action = DealerAction::None;
-    PlayerAction player_action = PlayerAction::None;
-    
-    Command player_command = Command::None;
-    
-    double insurance = 0;
-    int bet = 0;
+    void deal() override;
+    int process(Command) override;
 };
-
-class Player {
-  public:
-    Player() = default;
-    ~Player() = default;
-    // delete copy and move constructors
-    Player(Player&) = delete;
-    Player(const Player&) = delete;
-    Player(Player &&) = delete;
-    Player(const Player &&) = delete;
-    
-    virtual int play(Command *, int *) = 0;
-};
-
 #endif
