@@ -20,6 +20,9 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 
+#ifndef BLACKJACK_H
+#define BLACKJACK_H
+
 enum class DealerAction {
   None,
   StartNewHand,
@@ -74,7 +77,7 @@ class Blackjack {
 
     void deal();
     void ask();
-    int process();
+    int process(Command);
     
    
     void setNextAction(DealerAction a) {
@@ -108,12 +111,19 @@ class Blackjack {
     
     double insurance = 0;
     int bet = 0;
-    
-    
-    
-    
-    
-    
-    
 };
 
+class Player {
+  public:
+    Player() = default;
+    ~Player() = default;
+    // delete copy and move constructors
+    Player(Player&) = delete;
+    Player(const Player&) = delete;
+    Player(Player &&) = delete;
+    Player(const Player &&) = delete;
+    
+    virtual int play(Command *, int *) = 0;
+};
+
+#endif

@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include "blackjack.h"
+#include "stdinout.h"
 
 int main(int argc, char **argv) {
   
@@ -30,9 +31,12 @@ int main(int argc, char **argv) {
   
   // TODO: pass args/conf to the constructor
   Blackjack dealer;
+  StdInOut player;
   
   std::cout << "Let's play" << std::endl;
   dealer.setNextAction(DealerAction::StartNewHand);
+  
+  Command command = Command::None;
   
   while (!dealer.finished()) {
     dealer.setInputNeeded(false);
@@ -41,8 +45,8 @@ int main(int argc, char **argv) {
     if (dealer.getInputNeeded()) {
       do {
         // TODO: check for too many errors meaning dealer and player do not understand each other
-        dealer.ask();
-      } while (dealer.process() <= 0);
+        player.play(&command, nullptr);        
+      } while (dealer.process(command) <= 0);
     }
   }
   

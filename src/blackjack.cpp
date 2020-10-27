@@ -37,25 +37,12 @@ void Blackjack::deal() {
   setInputNeeded(true);
 }
 
-void Blackjack::ask() {
-  std::string input_buffer;
-  std::cout << "what do you want to do?" << std::endl;
-  std::cin >> input_buffer;
-  
-  if (input_buffer == "hit" || input_buffer == "h") {
-    player_command = Command::Hit;
-  } else {
-    player_command = Command::None;
-  }
-  
-}
-
 // returns zero if it is a common command and we need to ask again
 // returns positive if what was asked was answered
 // returns negative if what was aked was not asnwered or the command does not apply
-int Blackjack::process() {
+int Blackjack::process(Command command) {
   
-  switch (player_command) {
+  switch (command) {
     case Command::Hit:
       std::cout << "ok, you hit" << std::endl;
       finished(true);

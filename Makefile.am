@@ -17,4 +17,5 @@ blackjack_LDADD = $(all_libraries)
 
 blackjack_SOURCES = \
  src/main.cpp \
- src/blackjack.cpp
+ src/blackjack.cpp \
+ src/stdinout.cpp
