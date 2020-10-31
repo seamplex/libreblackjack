@@ -23,6 +23,11 @@
 #ifndef BASE_H
 #define BASE_H
 
+#include <string>
+#include <list>
+
+// TODO: namespace
+
 enum class DealerAction {
   None,
   StartNewHand,
@@ -38,14 +43,14 @@ enum class DealerAction {
   Payout
 };
 
-enum class PlayerAction {
+enum class PlayerActionRequired {
   None,
   Bet,
   Insurance,
   Play
 };
 
-enum class Command {
+enum class PlayerActionTaken {
   None,
 // common  
   Quit,
@@ -57,12 +62,86 @@ enum class Command {
   Table,
 // particular  
   Bet,
-  Yes,
-  No,
+  Insure,
+  DontInsure,
   Stand,
   Double,
   Split,
   Hit,
+};
+
+
+#define CARD_ART_LINES 6
+#define CARD_TYPES     5
+#define CARD_SIZE      16
+
+class Card {
+  public:
+    int tag;
+    int value;
+  
+  private:
+    std::string token[CARD_TYPES];
+    std::string text;
+    std::string art[CARD_ART_LINES];
+    
+};
+
+class Hand {
+  public:
+    bool insured;
+    bool soft;
+    bool blackjack;
+    bool busted;
+    bool holeCardShown; // maybe we need a separate class for dealer and for player?
+    int bet;
+    int count;
+    
+    std::list<Card> cards;
+  
+  private:
+  
+};
+
+class Player {
+  public:
+    Player() = default;
+    ~Player() = default;
+    // delete copy and move constructors
+    Player(Player&) = delete;
+    Player(const Player&) = delete;
+    Player(Player &&) = delete;
+    Player(const Player &&) = delete;
+
+/*    
+    PlayerAction getNextAction() {
+      return nextAction;
+    }
+    
+    void setNextAction(PlayerAction a) {
+      nextAction = a;
+    }
+*/    
+    virtual int play() = 0;
+    
+    PlayerActionRequired actionRequired = PlayerActionRequired::None;
+    PlayerActionTaken    actionTaken    = PlayerActionTaken::None;
+    
+    bool hasSplit = false;
+    bool hasDoubled = false;
+
+    int flatBet = 0;
+    int currentBet = 0;
+    int n_hands = 0;  // this is different from the dealer's due to splitting
+    
+    double total_money_waged = 0;
+    double current_result = 0;
+    double mean = 0;
+    double M2 = 0;
+    double variance = 0;
+    
+    std::list<Hand> hands;
+    std::list<Hand>::iterator currentHand;
 };
 
 class Dealer {
@@ -75,12 +154,15 @@ class Dealer {
     Dealer(Dealer &&) = delete;
     Dealer(const Dealer &&) = delete;
 
-    virtual void deal() = 0;
-//    virtual void ask() = 0;
-    virtual int process(Command) = 0;
+    virtual void deal(Player *) = 0;
+    virtual int process(Player *) = 0;
     
    
     void setNextAction(DealerAction a) {
+      next_action = a;
+    }
+
+    void getNextAction(DealerAction a) {
       next_action = a;
     }
     
@@ -100,30 +182,14 @@ class Dealer {
       return (done = d);
     }
     
-  private:
-    
     bool done = false;
     bool input_needed = false;
     DealerAction next_action = DealerAction::None;
-    PlayerAction player_action = PlayerAction::None;
     
-    Command player_command = Command::None;
+    // TODO: most of the games will have a single element, but maybe
+    // there are games where the dealer has more than one hand
+    std::list <Hand> hands;
     
-    double insurance = 0;
-    int bet = 0;
-};
-
-class Player {
-  public:
-    Player() = default;
-    ~Player() = default;
-    // delete copy and move constructors
-    Player(Player&) = delete;
-    Player(const Player&) = delete;
-    Player(Player &&) = delete;
-    Player(const Player &&) = delete;
-    
-    virtual int play(Command *, int *) = 0;
 };
 
 #endif

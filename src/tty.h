@@ -1,16 +1,23 @@
-#ifndef STDINOUT_H
-#define STDINOUT_H
+#ifndef TTY_H
+#define TTY_H
 #include "blackjack.h"
 
-class StdInOut : public Player {
+class Tty : public Player {
   public:  
-    StdInOut();
-    ~StdInOut() { };
+    Tty();
+    ~Tty() { };
     
-    int play(void) override;
+    int play() override;
     
   private:
-    std::string input_buffer;
+    
+#ifdef HAVE_LIBREADLINE
+  char *input_buffer;
+#else
+  std::string input_buffer;
+#endif
+  
+    std::string prompt;
 
     std::string black   = "\x1B[0m";
     std::string red     = "\x1B[31m";
@@ -21,7 +28,6 @@ class StdInOut : public Player {
     std::string cyan    = "\x1B[36m";
     std::string white   = "\x1B[37m";
     std::string reset   = "\033[0m";
-    
       
 };
 #endif

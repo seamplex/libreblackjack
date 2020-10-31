@@ -28,7 +28,20 @@ class Blackjack : public Dealer {
     Blackjack();
     ~Blackjack();
     
-    void deal() override;
-    int process(Command) override;
+    void deal(Player *) override;
+    int process(Player *) override;
+    
+  private:
+    bool lastPass = false;
+    
+    int n_hands = 0;
+    int n_hand = 0;
+    
+    int max_bet = 0;
+    int number_of_burnt_cards = 0;
+    int infinite_decks_card_number_for_arranged_ones = 0;
+    
+    double insurance = 0;
+      
 };
 #endif

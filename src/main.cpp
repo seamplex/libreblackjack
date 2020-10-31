@@ -21,9 +21,11 @@
  */
 
 #include <iostream>
+#include <unistd.h>
 
 #include "base.h"
 #include "blackjack.h"
+#include "tty.h"
 #include "stdinout.h"
 
 int main(int argc, char **argv) {
@@ -34,21 +36,23 @@ int main(int argc, char **argv) {
   // TODO: read the args/conf to know what kind of dealer and player we are having
   // TODO: pass args/conf to the constructor
   dealer = new Blackjack();
-  player = new StdInOut();
-  
-  std::cout << "Let's play" << std::endl;
+  if (isatty(1)) {
+    player = new Tty();
+  } else {
+    player = new StdInOut();
+  }
+  // TODO: player strategy from file
+      
   dealer->setNextAction(DealerAction::StartNewHand);
-  
-  Command command{Command::None};
   
   while (!dealer->finished()) {
     dealer->setInputNeeded(false);
-    dealer->deal();
+    dealer->deal(player);
     if (dealer->getInputNeeded()) {
       do {
         // TODO: check for too many errors meaning dealer and player do not understand each other
-        player->play(&command, nullptr);        
-      } while (dealer->process(command) <= 0);
+        player->play();
+      } while (dealer->process(player) <= 0);
     }
   }
   
