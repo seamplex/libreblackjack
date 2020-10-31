@@ -46,8 +46,16 @@ int Tty::play() {
     break;
     
     case PlayerActionRequired::Play:
+        
+      // TODO: sort by higher-expected response first
       if (strcmp(input_buffer, "h") == 0 || strcmp(input_buffer, "hit") == 0) {
         actionTaken = PlayerActionTaken::Hit;
+      } else if (strcmp(input_buffer, "s") == 0 || strcmp(input_buffer, "stand") == 0) {
+        actionTaken = PlayerActionTaken::Stand;
+      } else if (strcmp(input_buffer, "d") == 0 || strcmp(input_buffer, "double") == 0) {
+        actionTaken = PlayerActionTaken::Stand;
+      } else if (strcmp(input_buffer, "p") == 0 || strcmp(input_buffer, "pair") == 0 || strcmp(input_buffer, "split") == 0) {
+        actionTaken = PlayerActionTaken::Split;
       } else {
         actionTaken = PlayerActionTaken::None;
       }

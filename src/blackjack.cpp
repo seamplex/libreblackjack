@@ -43,6 +43,8 @@ Blackjack::~Blackjack() {
 
 void Blackjack::deal(Player *player) {
   
+  int playerTotal = 0;
+  bool playerBlackack = false;
   // let's start by assuming the player does not need to do anything
   setInputNeeded(false);    
     
@@ -156,6 +158,7 @@ void Blackjack::deal(Player *player) {
           player->actionRequired = PlayerActionRequired::Insurance;
           setNextAction(DealerAction::AskForInsurance);
           setInputNeeded(true);
+          std::cout << "next ask insurance" << std::endl;
           return;
         
         } else if (player->always_insure) {
@@ -173,10 +176,12 @@ void Blackjack::deal(Player *player) {
       }
       
       // step 7.b. if either the dealer or the player has a chance to have a blackjack, check
-      if ((card[upCard].value == 10 || card[upCard].value == 11) || player->currentHand->total() == 21) {
+      playerTotal = player->currentHand->total();
+      if ((card[upCard].value == 10 || card[upCard].value == 11) || playerTotal == 21) {
         player->actionRequired = PlayerActionRequired::None;
         setNextAction(DealerAction::CheckforBlackjacks);
         setInputNeeded(false);
+        std::cout << "next check BJs" << std::endl;
         return;
       }
 
@@ -184,16 +189,95 @@ void Blackjack::deal(Player *player) {
       player->actionRequired = PlayerActionRequired::Play;
       setNextAction(DealerAction::AskForPlay);
       setInputNeeded(true);
+      std::cout << "dealer upcard is " << card[upCard].utf8() << std::endl;
+      std::cout << "your total is " << playerTotal << std::endl;
+      std::cout << "play please" << std::endl;
       return;
     break;
     
     case DealerAction::AskForInsurance:
-      std::cout << "hola" << std::endl;  
+      std::cout << "next action do you want insurance?" << std::endl;  
+      return;
     break;
     
-/*    
     case DealerAction::CheckforBlackjacks:
+      // step 8. check if there are any blackjack
+      playerBlackack = player->currentHand->blackjack();
+      if (hand.blackjack()) {
+        std::cout << "card_dealer_hole" << card[holeCard].utf8() << std::endl;
+        std::cout << "blackjack_dealer" << std::endl;
+	player->dealer_blackjacks++;
+        // print_hand_art (blackjack.dealer_hand);
+
+        if (player->currentHand->insured) {
+          std::cout << "player_wins_insurance " << player->currentHand->bet << std::endl;
+          player->current_result += player->currentHand->bet;
+          player->bankroll += player->currentHand->bet;
+          player->insured_wins++;
+	}
+
+	if (playerBlackack) {
+          std::cout << "blackjack_player_also" << std::endl;
+          player->player_blackjacks++;
+	  if (player->hasSplit) {
+            std::cout << "player_pushes " << player->currentHand->bet << " #" << player->currentHand->id << std::endl;
+          } else {
+            std::cout << "player_pushes " << player->currentHand->bet << std::endl;
+          }
+          player->pushes++;
+          
+          //  print_hand_art (player->current_hand);
+        } else {
+	  if (player->hasSplit) {
+            std::cout << "player_losses " << player->currentHand->bet << " #" << player->currentHand->id << std::endl;
+          } else {
+            std::cout << "player_losses " << player->currentHand->bet << std::endl;
+          }
+	  player->current_result -= player->currentHand->bet;
+	  player->bankroll -= player->currentHand->bet;
+	  if (player->bankroll < player->worst_bankroll) {
+            player->worst_bankroll = player->bankroll;
+	  }
+	  player->losses++;
+	}
+
+        setNextAction(DealerAction::StartNewHand);
+        player->actionRequired = PlayerActionRequired::None;
+        setInputNeeded(false);
+        std::cout << "next start a new hand";
+        return;
+        
+      } else if (playerBlackack) {
+	std::cout << "blackjack_player" << std::endl;
+	player->current_result += blackjack_pays * player->currentHand->bet;
+	player->bankroll += blackjack_pays * player->currentHand->bet;
+	player->player_blackjacks++;
+          
+	std::cout << "player_wins " << blackjack_pays * player->currentHand->bet << std::endl;
+	player->wins++;
+        player->blackjack_wins++;
+
+        setNextAction(DealerAction::StartNewHand);
+        player->actionRequired = PlayerActionRequired::None;
+        setInputNeeded(false);
+        std::cout << "next start a new hand";
+        return;
+        
+      } else {
+	// only if the dealer had the chance to have a blackjack we say "no_blackjacks"
+	if (card[upCard].value == 10 || card[upCard].value == 11) {
+          std::cout << "no_blackjacks" << std::endl;
+        }
+        
+        setNextAction(DealerAction::AskForPlay);
+        player->actionRequired = PlayerActionRequired::Play;
+        setInputNeeded(true);
+        std::cout << "prepare to play";
+        return;
+      }        
     break;
+    
+/*
     case DealerAction::PayOrTakeInsuranceBets:
     break;
     case DealerAction::AskForPlay:
@@ -281,12 +365,23 @@ int Blackjack::process(Player *player) {
     break;
 
     case PlayerActionTaken::Insure:
+      // TODO: allow insurance for less than one half of the original bet
       player->currentHand->insured = true;
+      player->current_result -= 0.5 * player->currentHand->bet;
+      player->bankroll -= 0.5 * player->currentHand->bet;
+      player->n_insured_hands++;
+         
+      player->actionRequired = PlayerActionRequired::None;
+      setNextAction(DealerAction::CheckforBlackjacks);
+      setInputNeeded(false);
       return 1;
     break;
 
     case PlayerActionTaken::DontInsure:
       player->currentHand->insured = false;
+      player->actionRequired = PlayerActionRequired::None;
+      setNextAction(DealerAction::CheckforBlackjacks);
+      setInputNeeded(false);
       return 1;
     break;
       
@@ -319,21 +414,22 @@ void Blackjack::shuffle() {
 
 int Blackjack::dealCard(Hand *hand) {
     
-  int dealt_tag = 0;
+  unsigned int tag = 0;
 
   if (n_decks == -1) {
       
     // TODO: arranged cards
     int random_integer = random();
-    dealt_tag = (random_integer % 32) + (random_integer % 16) + (random_integer % 4);
+    tag = (random_integer % 32) + (random_integer % 16) + (random_integer % 4);
     
   } else {
-    dealt_tag = 1;
+    // TODO: shoes
+    tag = 0;
   }
     
   if (hand != nullptr) {
-      
+    hand->cards.push_back(tag);
   }
   
-  return dealt_tag;
+  return tag;
 }

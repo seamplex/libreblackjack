@@ -50,6 +50,7 @@ class Blackjack : public Dealer {
     unsigned int infinite_decks_card_number_for_arranged_ones = 0;
     
     double insurance = 0;
+    double blackjack_pays = 1.5;
       
 };
 #endif

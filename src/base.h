@@ -118,6 +118,7 @@ extern Card card[52];
 // TODO: base + daugthers, para diferenciar entre dealer y player y otros juegos
 class Hand {
   public:
+    int id = 0;
     bool insured = false;
     bool holeCardShown = false;
     int bet = 0;
@@ -193,15 +194,25 @@ class Player {
     bool hasSplit = false;
     bool hasDoubled = false;
 
-    int flatBet = 0;
-    int currentBet = 0;
-    int n_hands = 0;  // this is different from the dealer's due to splitting
-    int n_insured_hands = 0;
+    unsigned int flatBet = 0;
+    unsigned int currentBet = 0;
+    unsigned int n_hands = 0;  // this is different from the dealer's due to splitting
+    unsigned int n_insured_hands = 0;
+    unsigned int player_blackjacks = 0;
 
+    unsigned int dealer_blackjacks = 0;
+    unsigned int insured_wins = 0;
+    unsigned int pushes = 0;
+    unsigned int losses = 0;
+    unsigned int wins = 0;
+    unsigned int blackjack_wins = 0;
+    // TODO: blackjack_pushes?
+    
     bool no_insurance = false;
     bool always_insure = false;
   
     double bankroll = 0;
+    double worst_bankroll = 0;
     double total_money_waged = 0;
     double current_result = 0;
     double mean = 0;
