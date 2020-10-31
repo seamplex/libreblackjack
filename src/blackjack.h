@@ -28,18 +28,26 @@ class Blackjack : public Dealer {
     Blackjack();
     ~Blackjack();
     
+    void shuffle() override;
+    int dealCard(Hand *) override;
     void deal(Player *) override;
     int process(Player *) override;
     
   private:
     bool lastPass = false;
     
-    int n_hands = 0;
-    int n_hand = 0;
+    unsigned int upCard;
+    unsigned int holeCard;
+    unsigned int playerFirstCard;
+    unsigned int playerSecondCard;
     
-    int max_bet = 0;
-    int number_of_burnt_cards = 0;
-    int infinite_decks_card_number_for_arranged_ones = 0;
+    int n_decks = -1;
+    unsigned long int n_hands = 0;
+    unsigned long int n_hand = 0;
+    
+    unsigned int max_bet = 0;
+    unsigned int number_of_burnt_cards = 0;
+    unsigned int infinite_decks_card_number_for_arranged_ones = 0;
     
     double insurance = 0;
       

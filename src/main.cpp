@@ -46,7 +46,6 @@ int main(int argc, char **argv) {
   dealer->setNextAction(DealerAction::StartNewHand);
   
   while (!dealer->finished()) {
-    dealer->setInputNeeded(false);
     dealer->deal(player);
     if (dealer->getInputNeeded()) {
       do {

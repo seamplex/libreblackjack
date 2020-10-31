@@ -33,7 +33,6 @@ enum class DealerAction {
   StartNewHand,
   AskForBets,
   DealPlayerFirstCard,
-  DealDealerHoleCard,
   AskForInsurance,
   CheckforBlackjacks,
   PayOrTakeInsuranceBets,
@@ -70,38 +69,102 @@ enum class PlayerActionTaken {
   Hit,
 };
 
+// alphabetically-sorted
+enum class Suit {
+  Clubs    = 0,
+  Diamonds = 1,
+  Hearts   = 2,
+  Spades   = 3
+};
 
-#define CARD_ART_LINES 6
-#define CARD_TYPES     5
-#define CARD_SIZE      16
 
 class Card {
   public:
-    int tag;
-    int value;
-  
-  private:
-    std::string token[CARD_TYPES];
-    std::string text;
-    std::string art[CARD_ART_LINES];
+    Card(unsigned int);
+    ~Card() { };
+    // TODO: delete copy & move
     
+    // TODO: decidir si conviene usar getters o public members
+/*    
+    Suit getSuit()           { return suit; };
+    unsigned int getNumber() { return number; };
+    unsigned int getValue()  { return value; };
+ */
+//    std::string get
+    
+    Suit suit;
+    unsigned int number;
+    unsigned int value;
+    
+    std::string ascii() {
+      return valueASCII + suitASCII;
+    }
+    std::string utf8() {
+      return valueASCII + suitUTF8;
+    }
+    std::string text();
+    
+  private:
+    std::string valueASCII;
+    std::string suitASCII;
+    std::string suitUTF8;
+    std::string suitName;
 };
 
+
+extern Card card[52];
+
+
+// TODO: base + daugthers, para diferenciar entre dealer y player y otros juegos
 class Hand {
   public:
-    bool insured;
-    bool soft;
-    bool blackjack;
-    bool busted;
-    bool holeCardShown; // maybe we need a separate class for dealer and for player?
-    int bet;
-    int count;
+    bool insured = false;
+    bool holeCardShown = false;
+    int bet = 0;
+    std::list<unsigned int> cards;
     
-    std::list<Card> cards;
+    int total() {
+      unsigned int soft = 0;
+      unsigned int n = 0;
+      unsigned int value = 0;
+      for (auto tag : cards) {
+        value = card[tag].value;
+        n += value;
+        soft += (value == 11);
+      }
+     
+      while (n > 21 && soft > 0){
+	      n -= 10;
+	      soft--;
+      }
+      
+      return (soft)?(-n):(n);
+    };
+    
+    bool blackjack() {
+      return (total() == 21 && cards.size() == 2);
+    };
+    
+    bool busted() {
+      return (total() > 21);
+    }
+
+  private:
+  
+};
+
+class dealerHand {
+  public:
+    std::list<unsigned int> cards;
+    
+    unsigned int total() {
+      return 0;
+    }
   
   private:
   
 };
+
 
 class Player {
   public:
@@ -133,7 +196,12 @@ class Player {
     int flatBet = 0;
     int currentBet = 0;
     int n_hands = 0;  // this is different from the dealer's due to splitting
-    
+    int n_insured_hands = 0;
+
+    bool no_insurance = false;
+    bool always_insure = false;
+  
+    double bankroll = 0;
     double total_money_waged = 0;
     double current_result = 0;
     double mean = 0;
@@ -154,7 +222,10 @@ class Dealer {
     Dealer(Dealer &&) = delete;
     Dealer(const Dealer &&) = delete;
 
+    // maybe this first one does not need to be deleted
+    virtual void shuffle() = 0;
     virtual void deal(Player *) = 0;
+    virtual int dealCard(Hand * = nullptr) = 0;
     virtual int process(Player *) = 0;
     
    
@@ -188,7 +259,9 @@ class Dealer {
     
     // TODO: most of the games will have a single element, but maybe
     // there are games where the dealer has more than one hand
-    std::list <Hand> hands;
+//    std::list <Hand> hands;
+    Hand hand;
+    
     
 };
 
