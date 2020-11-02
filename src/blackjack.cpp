@@ -28,12 +28,13 @@
 
 #include "blackjack.h"
 
-Blackjack::Blackjack() {
+Blackjack::Blackjack() : mt19937(dev_random()), fiftyTwoCards(0, 51) {
   std::cout << "I'm your Blackjack dealer!" << std::endl;
   
-  // TODO: better RNGs 
-  // https://codeforces.com/blog/entry/61587
-  srand((int)time(0));
+  // TODO: seed instead of dev_random
+  std::random_device random_device;
+  std::mt19937 random_engine(random_device());
+  std::uniform_int_distribution<int> distribution_1_100(1, 100);
 
 }
 
@@ -419,8 +420,7 @@ int Blackjack::dealCard(Hand *hand) {
   if (n_decks == -1) {
       
     // TODO: arranged cards
-    int random_integer = random();
-    tag = (random_integer % 32) + (random_integer % 16) + (random_integer % 4);
+    tag = fiftyTwoCards(mt19937);
     
   } else {
     // TODO: shoes

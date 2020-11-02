@@ -34,6 +34,11 @@ class Blackjack : public Dealer {
     int process(Player *) override;
     
   private:
+    
+    std::random_device dev_random;
+    std::mt19937 mt19937;
+    std::uniform_int_distribution<int> fiftyTwoCards;
+    
     bool lastPass = false;
     
     unsigned int upCard;
