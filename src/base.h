@@ -100,8 +100,8 @@ class Card {
     std::string ascii() {
       return numberASCII + suitASCII;
     }
-    std::string utf8() {
-      return numberASCII + suitUTF8;
+    std::string utf8(bool single = false) {
+      return single ? singleUTF8 : numberASCII + suitUTF8;
     }
     std::string text();
     
@@ -110,6 +110,7 @@ class Card {
     std::string suitASCII;
     std::string suitUTF8;
     std::string suitName;
+    std::string singleUTF8;
 };
 
 

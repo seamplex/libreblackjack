@@ -31,6 +31,69 @@ Card::Card(unsigned int tag) {
       suitUTF8 = "♠";
     break;
   }
+  
+  
+  // https://en.wikipedia.org/wiki/Playing_cards_in_Unicode
+  // yes, I could loop and compute the code for each card and
+  // it would be hacky but hard to understand for humans
+  // UNIX rule of representation!
+  switch(tag) {
+    case 0: singleUTF8 = "🃑"; break;
+    case 1: singleUTF8 = "🃒"; break;
+    case 2: singleUTF8 = "🃓"; break;
+    case 3: singleUTF8 = "🃔"; break;
+    case 4: singleUTF8 = "🃕"; break;
+    case 5: singleUTF8 = "🃖"; break;
+    case 6: singleUTF8 = "🃗"; break;
+    case 7: singleUTF8 = "🃘"; break;
+    case 8: singleUTF8 = "🃙"; break;
+    case 9: singleUTF8 = "🃚"; break;
+    case 10: singleUTF8 = "🃛"; break;
+    case 11: singleUTF8 = "🃝"; break;
+    case 12: singleUTF8 = "🃞"; break;
+
+    case 13: singleUTF8 = "🃁"; break;
+    case 14: singleUTF8 = "🃂"; break;
+    case 15: singleUTF8 = "🃃"; break;
+    case 16: singleUTF8 = "🃄"; break;
+    case 17: singleUTF8 = "🃅"; break;
+    case 18: singleUTF8 = "🃆"; break;
+    case 19: singleUTF8 = "🃇"; break;
+    case 20: singleUTF8 = "🃈"; break;
+    case 21: singleUTF8 = "🃉"; break;
+    case 22: singleUTF8 = "🃊"; break;
+    case 23: singleUTF8 = "🃋"; break;
+    case 24: singleUTF8 = "🃍"; break;
+    case 25: singleUTF8 = "🃍"; break;
+    
+    case 26: singleUTF8 = "🂱"; break;
+    case 27: singleUTF8 = "🂲"; break;
+    case 28: singleUTF8 = "🂳"; break;
+    case 29: singleUTF8 = "🂴"; break;
+    case 30: singleUTF8 = "🂵"; break;
+    case 31: singleUTF8 = "🂶"; break;
+    case 32: singleUTF8 = "🂷"; break;
+    case 33: singleUTF8 = "🂸"; break;
+    case 34: singleUTF8 = "🂹"; break;
+    case 35: singleUTF8 = "🂺"; break;
+    case 36: singleUTF8 = "🂻"; break;
+    case 37: singleUTF8 = "🂽"; break;
+    case 38: singleUTF8 = "🂾"; break;
+    
+    case 39: singleUTF8 = "🂡"; break;
+    case 40: singleUTF8 = "🂢"; break;
+    case 41: singleUTF8 = "🂣"; break;
+    case 42: singleUTF8 = "🂤"; break;
+    case 43: singleUTF8 = "🂥"; break;
+    case 44: singleUTF8 = "🂦"; break;
+    case 45: singleUTF8 = "🂧"; break;
+    case 46: singleUTF8 = "🂨"; break;
+    case 47: singleUTF8 = "🂩"; break;
+    case 48: singleUTF8 = "🂪"; break;
+    case 49: singleUTF8 = "🂫"; break;
+    case 50: singleUTF8 = "🂭"; break;
+    case 51: singleUTF8 = "🂮"; break;
+  }    
 };
 
 std::string Card::text() {
