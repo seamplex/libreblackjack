@@ -98,15 +98,15 @@ class Card {
     unsigned int value;
     
     std::string ascii() {
-      return valueASCII + suitASCII;
+      return numberASCII + suitASCII;
     }
     std::string utf8() {
-      return valueASCII + suitUTF8;
+      return numberASCII + suitUTF8;
     }
     std::string text();
     
   private:
-    std::string valueASCII;
+    std::string numberASCII;
     std::string suitASCII;
     std::string suitUTF8;
     std::string suitName;
@@ -119,12 +119,9 @@ extern Card card[52];
 // TODO: base + daugthers, para diferenciar entre dealer y player y otros juegos
 class Hand {
   public:
-    int id = 0;
-    bool insured = false;
-    bool holeCardShown = false;
-    int bet = 0;
     std::list<unsigned int> cards;
-    
+
+    // inline on purpose
     int total() {
       unsigned int soft = 0;
       unsigned int n = 0;
@@ -135,36 +132,40 @@ class Hand {
         soft += (value == 11);
       }
      
+      // this loop should be only executed once if everything works fine
       while (n > 21 && soft > 0){
-	      n -= 10;
-	      soft--;
+        n -= 10;
+        soft--;
       }
       
       return (soft)?(-n):(n);
     };
     
+    // inline on purpose
     bool blackjack() {
       return (total() == 21 && cards.size() == 2);
     };
     
+    // inline on purpose
     bool busted() {
       return (total() > 21);
     }
-
-  private:
-  
+    
+    void draw();
+};    
+    
+class PlayerHand : public Hand {
+  public:
+    std::list<unsigned int> cards;  
+    int bet = 0;
+    int id = 0;
+    bool insured = false;
 };
 
-class dealerHand {
+class DealerHand : public Hand {
   public:
     std::list<unsigned int> cards;
-    
-    unsigned int total() {
-      return 0;
-    }
-  
-  private:
-  
+    bool holeCardShown = false;
 };
 
 
@@ -220,8 +221,8 @@ class Player {
     double M2 = 0;
     double variance = 0;
     
-    std::list<Hand> hands;
-    std::list<Hand>::iterator currentHand;
+    std::list<PlayerHand> hands;
+    std::list<PlayerHand>::iterator currentHand;
 };
 
 class Dealer {
@@ -272,7 +273,7 @@ class Dealer {
     // TODO: most of the games will have a single element, but maybe
     // there are games where the dealer has more than one hand
 //    std::list <Hand> hands;
-    Hand hand;
+    DealerHand hand;
     
     
 };

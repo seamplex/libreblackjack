@@ -66,8 +66,8 @@ void Blackjack::deal(Player *player) {
       if (n_hand != 0) {
         double delta = player->current_result - player->mean;
         player->mean += delta / (double)(n_hand);
-	player->M2 += delta * (player->current_result - player->mean);
-	player->variance = player->M2 / (double)(n_hand);
+        player->M2 += delta * (player->current_result - player->mean);
+        player->variance = player->M2 / (double)(n_hand);
       }
 
       infinite_decks_card_number_for_arranged_ones = 0;
@@ -79,7 +79,7 @@ void Blackjack::deal(Player *player) {
 
       // erase all the player's, create one, add and make it the current one
       player->hands.clear();
-      player->hands.push_back(std::move(Hand()));
+      player->hands.push_back(std::move(PlayerHand()));
       player->currentHand = player->hands.begin();
       
       // state that the player did not win anything nor splitted nor doubled down
@@ -134,13 +134,13 @@ void Blackjack::deal(Player *player) {
       player->total_money_waged += player->currentHand->bet;
 
       playerFirstCard = dealCard(&(*player->currentHand));
-      std::cout << "card_player_first " << card[playerFirstCard].ascii() << std::endl;
-      std::cout << "card_player_first " << card[playerFirstCard].text() << std::endl;
+//       std::cout << "card_player_first " << card[playerFirstCard].ascii() << std::endl;
+//       std::cout << "card_player_first " << card[playerFirstCard].text() << std::endl;
       std::cout << "card_player_first " << card[playerFirstCard].utf8() << std::endl;
       
       // step 4. show dealer's upcard
       upCard = dealCard(&hand);
-      std::cout << "card_dealer_up " << card[upCard].text() << std::endl;
+      std::cout << "card_dealer_up " << card[upCard].utf8() << std::endl;
 
       // step 5. deal the second card to each player
       playerSecondCard = dealCard(&(*player->currentHand));
@@ -245,7 +245,7 @@ void Blackjack::deal(Player *player) {
         setNextAction(DealerAction::StartNewHand);
         player->actionRequired = PlayerActionRequired::None;
         setInputNeeded(false);
-        std::cout << "next start a new hand";
+        std::cout << "next start a new hand" << std::endl;
         return;
         
       } else if (playerBlackack) {
@@ -261,7 +261,7 @@ void Blackjack::deal(Player *player) {
         setNextAction(DealerAction::StartNewHand);
         player->actionRequired = PlayerActionRequired::None;
         setInputNeeded(false);
-        std::cout << "next start a new hand";
+        std::cout << "next start a new hand" << std::endl;
         return;
         
       } else {
@@ -273,7 +273,7 @@ void Blackjack::deal(Player *player) {
         setNextAction(DealerAction::AskForPlay);
         player->actionRequired = PlayerActionRequired::Play;
         setInputNeeded(true);
-        std::cout << "prepare to play";
+        std::cout << "prepare to play" << std::endl;
         return;
       }        
     break;

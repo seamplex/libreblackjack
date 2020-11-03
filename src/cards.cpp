@@ -7,7 +7,7 @@ Card::Card(unsigned int tag) {
   number = 1 + (tag % 13);
   suit = static_cast<Suit>(tag/13);
   value = (number == 1) ? 11 : ((number > 10) ? 10 : number);
-  valueASCII = (number < 11) ? std::to_string(number) : TJQK[number-10];
+  numberASCII = (number == 1) ? "A" : ((number < 11) ? std::to_string(number) : TJQK[number-10]);
       
   switch (suit){
     case Suit::Clubs:
