@@ -86,12 +86,12 @@ class Card {
     // TODO: delete copy & move
     
     // TODO: decidir si conviene usar getters o public members
-/*    
     Suit getSuit()           { return suit; };
     unsigned int getNumber() { return number; };
     unsigned int getValue()  { return value; };
- */
-//    std::string get
+
+    std::string getNumberASCII() { return numberASCII; };
+    std::string getSuitUTF8()    { return suitUTF8;    };
     
     Suit suit;
     unsigned int number;
@@ -152,7 +152,7 @@ class Hand {
       return (total() > 21);
     }
     
-    void draw();
+    void draw(bool = true);
 };    
     
 class PlayerHand : public Hand {

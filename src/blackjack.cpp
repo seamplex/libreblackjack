@@ -151,7 +151,8 @@ void Blackjack::deal(Player *player) {
       holeCard = dealCard(&hand);
       std::cout << "card_dealer_hole" << std::endl;
 
-      // TODO: print (draw) the hand
+      hand.draw(hand.holeCardShown);
+      player->currentHand->draw();
 
       // step 7.a. if the upcard is an ace ask for insurance
       if (card[upCard].value == 11) {
