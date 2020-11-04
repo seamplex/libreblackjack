@@ -36,7 +36,6 @@ enum class DealerAction {
   DealPlayerFirstCard,
   AskForInsurance,
   CheckforBlackjacks,
-  PayOrTakeInsuranceBets,
   AskForPlay,
   MoveOnToNextHand,
   HitDealerHand,
@@ -144,15 +143,15 @@ class Hand {
     
     // inline on purpose
     bool blackjack() {
-      return (total() == 21 && cards.size() == 2);
+      return (abs(total()) == 21 && cards.size() == 2);
     };
     
     // inline on purpose
     bool busted() {
-      return (total() > 21);
+      return (abs(total()) > 21);
     }
     
-    void draw(bool = true);
+    void render(bool = true);
 };    
     
 class PlayerHand : public Hand {
@@ -161,6 +160,7 @@ class PlayerHand : public Hand {
     int bet = 0;
     int id = 0;
     bool insured = false;
+    bool doubled = false;
 };
 
 class DealerHand : public Hand {
@@ -173,7 +173,7 @@ class DealerHand : public Hand {
 class Player {
   public:
     Player() = default;
-    ~Player() = default;
+    virtual ~Player() = default;
     // delete copy and move constructors
     Player(Player&) = delete;
     Player(const Player&) = delete;
@@ -196,19 +196,26 @@ class Player {
     
     bool hasSplit = false;
     bool hasDoubled = false;
+    bool bustedAllHands = false;
 
-    unsigned int flatBet = 0;
+    unsigned int flatBet = 1;
     unsigned int currentBet = 0;
     unsigned int n_hands = 0;  // this is different from the dealer's due to splitting
-    unsigned int n_insured_hands = 0;
-    unsigned int player_blackjacks = 0;
+    
+    unsigned int handsInsured = 0;
+    unsigned int blackjacksPlayer = 0;
+    unsigned int blackjacksDealer = 0;
 
-    unsigned int dealer_blackjacks = 0;
-    unsigned int insured_wins = 0;
+    unsigned int bustsPlayer = 0;
+    unsigned int bustsDealer = 0;
+    
+    unsigned int wins = 0;
+    unsigned int winsInsured = 0;
+    unsigned int winsDoubled = 0;
+    unsigned int winsBlackjack = 0;
+    
     unsigned int pushes = 0;
     unsigned int losses = 0;
-    unsigned int wins = 0;
-    unsigned int blackjack_wins = 0;
     // TODO: blackjack_pushes?
     
     bool no_insurance = false;
@@ -228,8 +235,8 @@ class Player {
 
 class Dealer {
   public:
-    Dealer() {};
-    ~Dealer() {};
+    Dealer() = default;
+    virtual ~Dealer() = default;
     // delete copy and move constructors
     Dealer(Dealer&) = delete;
     Dealer(const Dealer&) = delete;
@@ -250,15 +257,16 @@ class Dealer {
     void getNextAction(DealerAction a) {
       next_action = a;
     }
-    
+
+/*    
     bool getInputNeeded(void) {
       return input_needed;
     }
-    
+
     void setInputNeeded(bool flag) {
       input_needed = flag;
     }
-
+*/
     bool finished(void) {
       return done;
     }

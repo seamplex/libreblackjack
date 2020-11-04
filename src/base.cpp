@@ -1,7 +1,7 @@
 #include <iostream>
 #include "base.h"
 
-void Hand::draw(bool holeCardShown) {
+void Hand::render(bool holeCardShown) {
  
   for (auto it : cards) {
     std::cout << " _____   ";

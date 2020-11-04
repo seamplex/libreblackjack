@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
   
   while (!dealer->finished()) {
     dealer->deal(player);
-    if (dealer->getInputNeeded()) {
+    if (player->actionRequired != PlayerActionRequired::None) {
       do {
         // TODO: check for too many errors meaning dealer and player do not understand each other
         player->play();

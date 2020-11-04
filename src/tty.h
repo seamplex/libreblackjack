@@ -5,7 +5,9 @@
 class Tty : public Player {
   public:  
     Tty();
-    ~Tty() { };
+    ~Tty() {
+      std::cout << "bye!" << std::endl;
+    };
     
     int play() override;
     

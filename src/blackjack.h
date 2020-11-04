@@ -53,6 +53,7 @@ class Blackjack : public Dealer {
     unsigned int max_bet = 0;
     unsigned int number_of_burnt_cards = 0;
     unsigned int infinite_decks_card_number_for_arranged_ones = 0;
+    bool hit_soft_17 = true;
     
     double insurance = 0;
     double blackjack_pays = 1.5;
