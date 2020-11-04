@@ -29,7 +29,7 @@ class Blackjack : public Dealer {
     ~Blackjack();
     
     void shuffle() override;
-    int dealCard(Hand *) override;
+    unsigned int drawCard(Hand *) override;
     void deal(Player *) override;
     int process(Player *) override;
     

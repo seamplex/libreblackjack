@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
   }
   // TODO: player strategy from file
       
-  dealer->setNextAction(DealerAction::StartNewHand);
+  dealer->nextAction = DealerAction::StartNewHand;
   
   while (!dealer->finished()) {
     dealer->deal(player);

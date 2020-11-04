@@ -22,7 +22,7 @@
 
 #include <iostream>
 #include <utility>
-//#include <random>
+#include <random>
 #include <cstdlib>
 #include <ctime>
 
@@ -50,7 +50,7 @@ void Blackjack::deal(Player *player) {
   // let's start by assuming the player does not need to do anything
   player->actionRequired = PlayerActionRequired::None;
     
-  switch(next_action) {
+  switch(nextAction) {
     // -------------------------------------------------------------------------  
     case DealerAction::StartNewHand:
         
@@ -85,8 +85,8 @@ void Blackjack::deal(Player *player) {
       
       // state that the player did not win anything nor splitted nor doubled down
       player->current_result = 0;
-      player->hasSplit = 0;
-      player->hasDoubled = 0;
+      player->currentSplits = 0;
+//      player->hasDoubled = 0;
       
       if (lastPass) {
         // TODO: send informative messages to the player
@@ -99,16 +99,16 @@ void Blackjack::deal(Player *player) {
         // TODO: reset card counting systems
         // burn as many cards as asked
         for (int i = 0; i < number_of_burnt_cards; i++) {
-//          dealCard();
+//          drawCard();
         }
         lastPass = false;
       }
       
       if (player->flatBet) {
         player->currentHand->bet = player->flatBet;
-        setNextAction(DealerAction::DealPlayerFirstCard);
+        nextAction = DealerAction::DealPlayerFirstCard;
       } else {
-        setNextAction(DealerAction::AskForBets);
+        nextAction = DealerAction::AskForBets;
       }
 
       std::cout << "new_hand" << std::endl;
@@ -133,22 +133,22 @@ void Blackjack::deal(Player *player) {
       player->n_hands++;        // splits are counted as a single hand
       player->total_money_waged += player->currentHand->bet;
 
-      playerFirstCard = dealCard(&(*player->currentHand));
+      playerFirstCard = drawCard(&(*player->currentHand));
 //       std::cout << "card_player_first " << card[playerFirstCard].ascii() << std::endl;
 //       std::cout << "card_player_first " << card[playerFirstCard].text() << std::endl;
       std::cout << "card_player_first " << card[playerFirstCard].utf8() << std::endl;
       
       // step 4. show dealer's upcard
-      upCard = dealCard(&hand);
+      upCard = drawCard(&hand);
       std::cout << "card_dealer_up " << card[upCard].utf8() << std::endl;
 
       // step 5. deal the second card to each player
-      playerSecondCard = dealCard(&(*player->currentHand));
+      playerSecondCard = drawCard(&(*player->currentHand));
       std::cout << "card_player_second " << card[playerSecondCard].utf8() << std::endl;
       
       
       // step 6. deal the dealer's hole card 
-      holeCard = dealCard(&hand);
+      holeCard = drawCard(&hand);
       std::cout << "card_dealer_hole" << std::endl;
 
       hand.render(hand.holeCardShown);
@@ -158,7 +158,7 @@ void Blackjack::deal(Player *player) {
       if (card[upCard].value == 11) {
         if (player->no_insurance == false && player->always_insure == false) {
           player->actionRequired = PlayerActionRequired::Insurance;
-          setNextAction(DealerAction::AskForInsurance);
+          nextAction = DealerAction::AskForInsurance;
           std::cout << "next ask insurance" << std::endl;
           return;
         
@@ -170,23 +170,22 @@ void Blackjack::deal(Player *player) {
           player->handsInsured++;
           
           player->actionRequired = PlayerActionRequired::None;
-          setNextAction(DealerAction::CheckforBlackjacks);
+          nextAction = DealerAction::CheckforBlackjacks;
           return;
         }
       }
       
       // step 7.b. if either the dealer or the player has a chance to have a blackjack, check
       playerTotal = player->currentHand->total();
-      if ((card[upCard].value == 10 || card[upCard].value == 11) || playerTotal == 21) {
+      if ((card[upCard].value == 10 || card[upCard].value == 11) || abs(playerTotal) == 21) {
         player->actionRequired = PlayerActionRequired::None;
-        setNextAction(DealerAction::CheckforBlackjacks);
-        std::cout << "next check BJs" << std::endl;
+        nextAction = DealerAction::CheckforBlackjacks;
         return;
       }
 
       // step 7.c. ask the player to play
       player->actionRequired = PlayerActionRequired::Play;
-      setNextAction(DealerAction::AskForPlay);
+      nextAction = DealerAction::AskForPlay;
       std::cout << "dealer upcard is " << card[upCard].utf8() << std::endl;
       std::cout << "your total is " << playerTotal << std::endl;
       std::cout << "play please" << std::endl;
@@ -217,20 +216,12 @@ void Blackjack::deal(Player *player) {
         if (playerBlackack) {
           std::cout << "blackjack_player_also" << std::endl;
           player->blackjacksPlayer++;
-          if (player->hasSplit) {
-            std::cout << "player_pushes " << player->currentHand->bet << " #" << player->currentHand->id << std::endl;
-          } else {
-            std::cout << "player_pushes " << player->currentHand->bet << std::endl;
-          }
+          std::cout << "player_pushes " << player->currentHand->bet << std::endl;
           player->pushes++;
           
           //  print_hand_art (player->current_hand);
         } else {
-          if (player->hasSplit) {
-            std::cout << "player_losses " << player->currentHand->bet << " #" << player->currentHand->id << std::endl;
-          } else {
-            std::cout << "player_losses " << player->currentHand->bet << std::endl;
-          }
+          std::cout << "player_losses " << player->currentHand->bet << std::endl;
           player->current_result -= player->currentHand->bet;
           player->bankroll -= player->currentHand->bet;
           if (player->bankroll < player->worst_bankroll) {
@@ -239,7 +230,7 @@ void Blackjack::deal(Player *player) {
           player->losses++;
         }
 
-        setNextAction(DealerAction::StartNewHand);
+        nextAction = DealerAction::StartNewHand;
         player->actionRequired = PlayerActionRequired::None;
         std::cout << "next start a new hand" << std::endl;
         return;
@@ -254,7 +245,7 @@ void Blackjack::deal(Player *player) {
         player->wins++;
         player->winsBlackjack++;
 
-        setNextAction(DealerAction::StartNewHand);
+        nextAction = DealerAction::StartNewHand;
         player->actionRequired = PlayerActionRequired::None;
         std::cout << "next start a new hand" << std::endl;
         return;
@@ -265,9 +256,9 @@ void Blackjack::deal(Player *player) {
           std::cout << "no_blackjacks" << std::endl;
         }
         
-        setNextAction(DealerAction::AskForPlay);
+        nextAction = DealerAction::AskForPlay;
         player->actionRequired = PlayerActionRequired::Play;
-        std::cout << "prepare to play" << std::endl;
+//        std::cout << "prepare to play" << std::endl;
         return;
       }        
     break;
@@ -279,7 +270,7 @@ void Blackjack::deal(Player *player) {
     case DealerAction::AskForPlay:
 
       player->actionRequired = PlayerActionRequired::Play;
-      setNextAction(DealerAction::AskForPlay);
+      nextAction = DealerAction::AskForPlay;
       
       hand.render(hand.holeCardShown);
       player->currentHand->render();
@@ -292,8 +283,8 @@ void Blackjack::deal(Player *player) {
     case DealerAction::MoveOnToNextHand:
       // see if we finished all the player's hands
       if (++player->currentHand != player->hands.end()) {
-        unsigned int playerCard = dealCard(&(*player->currentHand));
-        if (player->hasSplit && player->currentHand->cards.size() == 2) {
+        unsigned int playerCard = drawCard(&(*player->currentHand));
+        if (player->currentSplits > 0 && player->currentHand->cards.size() == 2) {
           std::cout << "card_player_second " << card[playerCard].utf8() << std::endl;
         } else {
           std::cout << "card_player " << card[playerCard].utf8() << std::endl;
@@ -302,11 +293,11 @@ void Blackjack::deal(Player *player) {
 
         if (player->currentHand->total() == 21) {
           player->actionRequired = PlayerActionRequired::None;
-          setNextAction(DealerAction::MoveOnToNextHand);
+          nextAction = DealerAction::MoveOnToNextHand;
           return;
         }  else  {
           player->actionRequired = PlayerActionRequired::Play;
-          setNextAction(DealerAction::AskForPlay);
+          nextAction = DealerAction::AskForPlay;
           return;
         }
       } else {
@@ -320,7 +311,7 @@ void Blackjack::deal(Player *player) {
         }
 
         if (player->bustedAllHands) {
-          std::cout << "player_bustd_all_hands" << std::endl;
+          std::cout << "player_busted_all_hands" << std::endl;
           std::cout << "card_dealer_hole " << card[holeCard].utf8() << std::endl;
           hand.holeCardShown = true;
           std::cout << "dealer_hand" << std::endl;
@@ -329,11 +320,11 @@ void Blackjack::deal(Player *player) {
           // TODO: no tengo que sacarle todo el dinero?
           
           player->actionRequired = PlayerActionRequired::None;
-          setNextAction(DealerAction::StartNewHand);
+          nextAction = DealerAction::StartNewHand;
           return;
         }  else {
           player->actionRequired = PlayerActionRequired::None;
-          setNextAction(DealerAction::HitDealerHand);
+          nextAction = DealerAction::HitDealerHand;
           return;
         }
       }        
@@ -352,7 +343,7 @@ void Blackjack::deal(Player *player) {
       // hit if count is less than 17 (or equalt to soft 17 if hit_soft_17 is true)
       dealerTotal = hand.total();
       while (((abs(dealerTotal) < 17 || (hit_soft_17 && dealerTotal == -17))) && hand.busted() == 0) {
-        unsigned int dealerCard = dealCard(&hand);
+        unsigned int dealerCard = drawCard(&hand);
         std::cout << "card_dealer " << card[dealerCard].utf8() << std::endl;
         hand.render(hand.holeCardShown);
                 
@@ -416,7 +407,7 @@ void Blackjack::deal(Player *player) {
                
 
       player->actionRequired = PlayerActionRequired::None;
-      setNextAction(DealerAction::StartNewHand);
+      nextAction = DealerAction::StartNewHand;
       return;
     break;
 
@@ -432,6 +423,10 @@ void Blackjack::deal(Player *player) {
 // returns negative if what was aked was not asnwered or the command does not apply
 int Blackjack::process(Player *player) {
   
+  unsigned int playerCard;
+  unsigned int firstCard;
+  unsigned int secondCard;
+    
   switch (player->actionTaken) {
 
    // TODO: maybe we have to call a basic method with common commands?   
@@ -452,22 +447,34 @@ int Blackjack::process(Player *player) {
 ///ig+help+desc Ask for help
 ///ig+help+detail A succinct help message is written on the standard output.
 ///ig+help+detail This command makes sense only when issued by a human player.
-      // TODO
+    // TODO
     case PlayerActionTaken::Help:
       std::cout << "help yourself" << std::endl;
       return 0;
     break;  
       
-    // TODO:
     case PlayerActionTaken::Count:
+      std::cout << "count " << (*player->currentHand).total() <<std::endl;
+      return 0;
     break;
     case PlayerActionTaken::UpcardValue:
+      std::cout << "upcard " << card[upCard].utf8() <<std::endl;
+      return 0;
     break;
     case PlayerActionTaken::Bankroll:
+      std::cout << "bankroll " << player->bankroll <<std::endl;
+      return 0;
     break;
     case PlayerActionTaken::Hands:
+      std::cout << "hands " << player->n_hands <<std::endl;
+      return 0;
     break;
     case PlayerActionTaken::Table:
+      hand.render(hand.holeCardShown);
+      for (auto playerHand : player->hands) {
+        playerHand.render();
+      }
+      return 0;
     break;
     case PlayerActionTaken::None:
       return 0;
@@ -489,7 +496,7 @@ int Blackjack::process(Player *player) {
       } else {
         // ok, valid bet
         player->currentHand->bet = player->currentBet;
-        setNextAction(DealerAction::DealPlayerFirstCard);
+        nextAction = DealerAction::DealPlayerFirstCard;
         return 1;
       }
     break;
@@ -502,21 +509,189 @@ int Blackjack::process(Player *player) {
       player->handsInsured++;
          
       player->actionRequired = PlayerActionRequired::None;
-      setNextAction(DealerAction::CheckforBlackjacks);
+      nextAction = DealerAction::CheckforBlackjacks;
       return 1;
     break;
 
     case PlayerActionTaken::DontInsure:
       player->currentHand->insured = false;
       player->actionRequired = PlayerActionRequired::None;
-      setNextAction(DealerAction::CheckforBlackjacks);
+      nextAction = DealerAction::CheckforBlackjacks;
       return 1;
+    break;
+
+///ip+stand+name stand
+///ip+stand+desc Stand on the current hand
+///ip+stand+detail When the player stands on a hand, the dealer moves on to
+///ip+stand+detail the next one. If the player had split, a new card is
+///ip+stand+detail dealt to the next split hand if there is one.
+///ip+stand+detail Otherwise the dealer reveals his hole card and deals
+///ip+stand+detail himself more cards if needed.
+///ip+stand+detail This command can be abbreviated as `s`.
+    case PlayerActionTaken::Stand:
+      player->actionRequired = PlayerActionRequired::None;
+      nextAction = DealerAction::MoveOnToNextHand;
+      return 1;
+    break;  
+    
+///ip+double+name double
+///ip+double+desc Double down on the current hand
+///ip+double+detail The player adds the same amount waged on the current hand
+///ip+double+detail and in exchange she receives only one hand.
+///ip+double+detail Doubling down is allowed only after receiving the first
+///ip+double+detail two cards.
+///ip+double+detail This command can be abbreviated as `d`.
+    case PlayerActionTaken::Double:
+      if (player->currentHand->cards.size() == 2) {
+        std::cout << "double_down" << std::endl;
+
+        // TODO: check bankroll
+	player->total_money_waged += player->currentHand->bet;
+        player->currentHand->bet *= 2;
+	player->currentHand->doubled = true;
+        player->handsDoubled++;
+
+        playerCard = drawCard(&(*player->currentHand));
+        unsigned int playerTotal = player->currentHand->total();
+        std::cout << "card_player" << card[playerCard].utf8() << std::endl;
+        player->currentHand->render();
+        
+        std::cout << "player_total " << playerTotal << std::endl;
+
+        if (player->currentHand->busted()) {
+          std::cout << "player_busted" << std::endl;
+          player->current_result -= player->currentHand->bet;
+          player->bankroll -= player->currentHand->bet;
+          player->bustsPlayer++;
+          player->losses++;
+	}
+
+        player->actionRequired = PlayerActionRequired::None;
+        nextAction = DealerAction::MoveOnToNextHand;
+        return 1;
+        
+      } else {
+          
+        std::cout << "cannot_double" << std::endl;
+        return -1;
+          
+      }
+    break;  
+
+///ip+split+name split
+///ip+split+desc Split the current hand
+///ip+split+detail 
+///ip+split+detail This command can be abbreviated as `p` (for pair).
+    case PlayerActionTaken::Split:
+
+      firstCard  = *(player->currentHand->cards.begin());
+      secondCard = *(++player->currentHand->cards.begin());
+      
+      // up to three splits (i.e. four hands)
+      // TODO: choose
+      if (player->currentSplits < 3 &&	 player->currentHand->cards.size() == 2 &&
+              card[firstCard].value == card[secondCard].value) {
+        // mark that we split to put ids in the hands and to limi the number of spltis
+        player->currentSplits++;
+
+        // the first hand is id=1, then we add one
+        if (player->currentHand == player->hands.begin()) {
+          player->currentHand->id = 1;
+        }
+        
+        // create a new hand
+        PlayerHand newHand;
+        newHand.id = player->currentHand->id + 1;
+        // TODO: check bankroll
+        newHand.bet = player->currentHand->bet;
+        player->total_money_waged += player->currentHand->bet;
+        
+        // remove second the card from the first hand
+        player->currentHand->cards.pop_back();
+        
+        // and put it into the second hand
+        newHand.cards.push_back(secondCard);
+
+        // add the new hand to the list of hands        
+        player->hands.push_back(std::move(newHand));
+
+        // deal a card to the first hand
+        playerCard = drawCard(&(*player->currentHand));
+        std::cout << "card_player_second " << card[playerCard].utf8() << std::endl;
+        player->currentHand->render();
+
+        // aces get dealt only one card
+        // also, if the player gets 21 then we move on to the next hand
+        if (card[*player->currentHand->cards.begin()].value == 11 || abs(player->currentHand->total()) == 21) {
+          if (++player->currentHand != player->hands.end()) {
+            playerCard = drawCard(&(*player->currentHand));
+            std::cout << "card_player_second " << card[playerCard].utf8() << std::endl;
+            player->currentHand->render();
+
+            // if the player got an ace or 21 again, we are done
+            if (card[*player->currentHand->cards.begin()].value == 11 || abs(player->currentHand->total()) == 21) {
+              player->actionRequired = PlayerActionRequired::None;
+              nextAction = DealerAction::MoveOnToNextHand;
+              return 1;
+            } else {
+              player->actionRequired = PlayerActionRequired::Play;
+              nextAction = DealerAction::AskForPlay;
+              return 1;
+            }
+          } else {
+            player->actionRequired = PlayerActionRequired::None;
+            nextAction = DealerAction::MoveOnToNextHand;
+            return 1;
+          }  
+        } else {
+          player->actionRequired = PlayerActionRequired::Play;
+          nextAction = DealerAction::AskForPlay;
+          return 1;
+        }
+      } else {
+
+        std::cout << "cannot_split" << std::endl;
+        return -1;
+          
+      }
     break;
       
     case PlayerActionTaken::Hit:
-      std::cout << "ok, you hit" << std::endl;
-      finished(true);
-      return 1;
+        
+///ip+hit+name hit
+///ip+hit+desc Hit on the current hand
+///ip+hit+detail 
+///ip+hit+detail This command can be abbreviated as `h`.
+      playerCard = drawCard(&(*player->currentHand));        
+      std::cout << "card_player " << card[playerCard].utf8() << std::endl;
+      player->currentHand->render();
+
+      if (player->currentHand->busted()) {
+        std::cout << "busted_player " << player->currentHand->total() << std::endl;
+        player->current_result -= player->currentHand->bet;
+        player->bankroll -= player->currentHand->bet;
+        player->bustsPlayer++;
+        player->losses++;
+
+        player->actionRequired = PlayerActionRequired::None;
+        nextAction = DealerAction::MoveOnToNextHand;
+        return 1;
+      } else if (abs(player->currentHand->total()) == 21) {
+        player->actionRequired = PlayerActionRequired::None;
+        nextAction = DealerAction::MoveOnToNextHand;
+        return 1;
+      } else {
+        player->actionRequired = PlayerActionRequired::Play;
+        nextAction = DealerAction::AskForPlay;
+        return 1;
+      }
+    break;
+    
+    default:
+
+      std::cout << "invalid_command" << std::endl;
+      return -1;
+  
     break;
   }
   
@@ -540,9 +715,9 @@ void Blackjack::shuffle() {
 }
 
 
-int Blackjack::dealCard(Hand *hand) {
+unsigned int Blackjack::drawCard(Hand *hand) {
     
-  unsigned int tag = 0;
+  unsigned int tag = 0; 
 
   if (n_decks == -1) {
       

@@ -180,6 +180,7 @@ class Player {
     Player(Player &&) = delete;
     Player(const Player &&) = delete;
 
+    // TODO: public or getter/setter?
 /*    
     PlayerAction getNextAction() {
       return nextAction;
@@ -194,15 +195,17 @@ class Player {
     PlayerActionRequired actionRequired = PlayerActionRequired::None;
     PlayerActionTaken    actionTaken    = PlayerActionTaken::None;
     
-    bool hasSplit = false;
-    bool hasDoubled = false;
+//    bool hasDoubled = false;
     bool bustedAllHands = false;
 
+    unsigned int currentSplits = 0;
+    
     unsigned int flatBet = 1;
     unsigned int currentBet = 0;
     unsigned int n_hands = 0;  // this is different from the dealer's due to splitting
     
     unsigned int handsInsured = 0;
+    unsigned int handsDoubled = 0;
     unsigned int blackjacksPlayer = 0;
     unsigned int blackjacksDealer = 0;
 
@@ -246,10 +249,10 @@ class Dealer {
     // maybe this first one does not need to be deleted
     virtual void shuffle() = 0;
     virtual void deal(Player *) = 0;
-    virtual int dealCard(Hand * = nullptr) = 0;
+    virtual unsigned int drawCard(Hand * = nullptr) = 0;
     virtual int process(Player *) = 0;
     
-   
+/*    
     void setNextAction(DealerAction a) {
       next_action = a;
     }
@@ -257,16 +260,7 @@ class Dealer {
     void getNextAction(DealerAction a) {
       next_action = a;
     }
-
-/*    
-    bool getInputNeeded(void) {
-      return input_needed;
-    }
-
-    void setInputNeeded(bool flag) {
-      input_needed = flag;
-    }
-*/
+*/    
     bool finished(void) {
       return done;
     }
@@ -276,14 +270,12 @@ class Dealer {
     }
     
     bool done = false;
-    bool input_needed = false;
-    DealerAction next_action = DealerAction::None;
+    DealerAction nextAction = DealerAction::None;
     
     // TODO: most of the games will have a single element, but maybe
     // there are games where the dealer has more than one hand
 //    std::list <Hand> hands;
     DealerHand hand;
-    
     
 };
 
