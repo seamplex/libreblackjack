@@ -2,7 +2,7 @@
 #include "base.h"
 
 void Hand::render(bool holeCardShown) {
- 
+
   for (auto it : cards) {
     std::cout << " _____   ";
   }

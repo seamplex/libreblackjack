@@ -77,8 +77,15 @@ void Blackjack::deal(Player *player) {
       // clear dealer's hand
       hand.holeCardShown = false;
       hand.cards.clear();
+      for (auto card : hand.cards) {
+        std::cout << card << std::endl;
+      }
+      std::cout << hand.cards.size() << std::endl;
 
-      // erase all the player's, create one, add and make it the current one
+      // erase all the player's hands, create one, add and make it the current one
+      for (auto playerHand : player->hands) {
+        playerHand.cards.clear();
+      }
       player->hands.clear();
       player->hands.push_back(std::move(PlayerHand()));
       player->currentHand = player->hands.begin();
@@ -134,8 +141,6 @@ void Blackjack::deal(Player *player) {
       player->total_money_waged += player->currentHand->bet;
 
       playerFirstCard = drawCard(&(*player->currentHand));
-//       std::cout << "card_player_first " << card[playerFirstCard].ascii() << std::endl;
-//       std::cout << "card_player_first " << card[playerFirstCard].text() << std::endl;
       std::cout << "card_player_first " << card[playerFirstCard].utf8() << std::endl;
       
       // step 4. show dealer's upcard

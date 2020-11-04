@@ -156,7 +156,6 @@ class Hand {
     
 class PlayerHand : public Hand {
   public:
-    std::list<unsigned int> cards;  
     int bet = 0;
     int id = 0;
     bool insured = false;
@@ -165,7 +164,6 @@ class PlayerHand : public Hand {
 
 class DealerHand : public Hand {
   public:
-    std::list<unsigned int> cards;
     bool holeCardShown = false;
 };
 
