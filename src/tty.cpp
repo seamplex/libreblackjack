@@ -52,7 +52,7 @@ int Tty::play() {
       switch (actionRequired) {
 
         case PlayerActionRequired::Bet:
-          currentBet = atoi(input_buffer);
+          currentBet = std::stoi(input_buffer);
           actionTaken = PlayerActionTaken::Bet;
         break;
 

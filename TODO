@@ -1,7 +1,9 @@
+ * version and copyright
+ * messages implemented on the player's side
+ * configuration files as map of strings to strings https://www.walletfox.com/course/parseconfigfile.php
  * arranged shoes
  * multithreading
  * deterministic seeds
- * better RNGs
  * ENHC
  * blackjack switch
  * siete y medio

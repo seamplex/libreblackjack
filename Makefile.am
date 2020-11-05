@@ -17,6 +17,7 @@ blackjack_LDADD = $(all_libraries)
 
 blackjack_SOURCES = \
  src/main.cpp \
+ src/conf.cpp \
  src/base.cpp \
  src/blackjack.cpp \
  src/cards.cpp \
