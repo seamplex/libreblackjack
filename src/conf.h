@@ -29,8 +29,13 @@ class Configuration {
   public:  
     Configuration(std::string = "", bool = false);  
     ~Configuration();
-    
+
+    bool exists(std::string key) { return !(data.find(key) == data.end()); }
+
     void show(void);
+    bool getBool(std::string);
+    int getInt(std::string);
+    std::string getString(std::string);
     
   private:
     std::map<std::string, std::string> data;

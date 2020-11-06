@@ -6,10 +6,18 @@
 #include <readline/history.h>
 #endif
 
+#include "conf.h"
 #include "blackjack.h"
 #include "tty.h"
 
-Tty::Tty(void) {
+Tty::Tty(Configuration &conf) {
+    
+  if (conf.exists("flat_bet")) {
+    flat_bet = conf.getInt("flat_bet");
+  } else if (conf.exists("flat_bet")) {
+    flat_bet = conf.getInt("flat_bet");
+  }
+    
 #ifdef HAVE_LIBREADLINE
   prompt = cyan + " > " + reset;
 #endif

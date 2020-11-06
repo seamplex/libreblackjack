@@ -35,18 +35,18 @@ int main(int argc, char **argv) {
   Player *player = nullptr;
   
   Configuration conf;
-  conf.show();
+//  conf.show();
   
   // TODO: read the args/conf to know what kind of dealer and player we are having
   // TODO: pass args/conf to the constructor
-  dealer = new Blackjack();
+  dealer = new Blackjack(conf);
   if (isatty(1)) {
-    player = new Tty();
+    player = new Tty(conf);
   } else {
     player = new StdInOut();
   }
   // TODO: player strategy from file
-      
+
   dealer->nextAction = DealerAction::StartNewHand;
   
   while (!dealer->finished()) {

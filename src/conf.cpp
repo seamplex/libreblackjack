@@ -29,6 +29,7 @@ Configuration::Configuration(std::string filePath, bool mandatory) {
         name = line.substr(0, delimiterPos);
         value = line.substr(delimiterPos + 1);
         data[name] = value;
+        // TODO: add another map of string to bools to mark wheter the option was used or not
       }
     }
   } else {
@@ -44,6 +45,10 @@ void Configuration::show(void) {
     
 }
 
+int Configuration::getInt(std::string key) {
+  auto it = data.find(key);
+  return (it != data.end()) ? std::stoi(it->second) : 0;
+}
 
 Configuration::~Configuration() {
   data.clear();

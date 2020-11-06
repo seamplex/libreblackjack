@@ -22,10 +22,13 @@
 
 #ifndef BLACKJACK_H
 #define BLACKJACK_H
+
 #include "base.h"
+#include "conf.h"
+
 class Blackjack : public Dealer {
   public:  
-    Blackjack();
+    Blackjack(Configuration &);
     ~Blackjack();
     
     void shuffle() override;

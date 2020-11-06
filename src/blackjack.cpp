@@ -28,8 +28,13 @@
 
 #include "blackjack.h"
 
-Blackjack::Blackjack() : mt19937(dev_random()), fiftyTwoCards(0, 51) {
-  std::cout << "I'm your Blackjack dealer!" << std::endl;
+Blackjack::Blackjack(Configuration &conf) : mt19937(dev_random()), fiftyTwoCards(0, 51) {
+
+  if (conf.exists("n_hands")) {
+    n_hands = conf.getInt("n_hands");
+  } else if (conf.exists("hands")) {
+    n_hands = conf.getInt("hands");
+  }
   
   // TODO: seed instead of dev_random
   std::random_device random_device;
@@ -111,8 +116,8 @@ void Blackjack::deal(Player *player) {
         lastPass = false;
       }
       
-      if (player->flatBet) {
-        player->currentHand->bet = player->flatBet;
+      if (player->flat_bet) {
+        player->currentHand->bet = player->flat_bet;
         nextAction = DealerAction::DealPlayerFirstCard;
       } else {
         nextAction = DealerAction::AskForBets;

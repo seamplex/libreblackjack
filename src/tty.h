@@ -4,7 +4,7 @@
 
 class Tty : public Player {
   public:  
-    Tty();
+    Tty(Configuration &);
     ~Tty() {
       std::cout << "bye!" << std::endl;
     };

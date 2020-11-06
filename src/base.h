@@ -193,15 +193,13 @@ class Player {
     PlayerActionRequired actionRequired = PlayerActionRequired::None;
     PlayerActionTaken    actionTaken    = PlayerActionTaken::None;
     
-//    bool hasDoubled = false;
     bool bustedAllHands = false;
 
     unsigned int currentSplits = 0;
     
-    unsigned int flatBet = 1;
     unsigned int currentBet = 0;
     unsigned int n_hands = 0;  // this is different from the dealer's due to splitting
-    
+
     unsigned int handsInsured = 0;
     unsigned int handsDoubled = 0;
     unsigned int blackjacksPlayer = 0;
@@ -219,6 +217,7 @@ class Player {
     unsigned int losses = 0;
     // TODO: blackjack_pushes?
     
+    unsigned int flat_bet = 1;
     bool no_insurance = false;
     bool always_insure = false;
   
