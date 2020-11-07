@@ -21,7 +21,6 @@
  */
 
 #include <iostream>
-#include <unistd.h>
 
 #include "base.h"
 #include "conf.h"
@@ -35,24 +34,37 @@ int main(int argc, char **argv) {
   Player *player = nullptr;
   
   Configuration conf(argc, argv);
-  
-  // TODO: read the args/conf to know what kind of dealer and player we are having
-  // TODO: pass args/conf to the constructor
-  dealer = new Blackjack(conf);
-  if (isatty(1)) {
-    player = new Tty(conf);
-  } else {
-    player = new StdInOut();
-  }
-  // TODO: player strategy from file
 
-  dealer->nextAction = DealerAction::StartNewHand;
+  if (conf.getDealerName() == "blackjack") {
+    dealer = new Blackjack(conf);
+  } else {
+    std::cerr << "Unknown dealer for '" << conf.getDealerName() <<"' game." << std::endl;
+    return -1;
+  }
+
+  if (conf.getPlayerName() == "tty") {
+    player = new Tty(conf);
+  } else if (conf.getPlayerName() == "stdinout") {
+    player = new StdInOut();
+    
+  // TODO: player strategy from file
+  } else {
+    std::cerr << "Unknown player '" << conf.getPlayerName() <<".'" << std::endl;
+    return -1;
+  }
+
   
+  // let the action begin!
+  int unknownCommands = 0;
+  dealer->nextAction = DealerAction::StartNewHand;
   while (!dealer->finished()) {
     dealer->deal(player);
     if (player->actionRequired != PlayerActionRequired::None) {
       do {
-        // TODO: check for too many errors meaning dealer and player do not understand each other
+        if (unknownCommands++ > conf.max_incorrect_commands) {
+          std::cerr << "Too many unknown commands." << std::endl;
+          return -2;
+        }
         player->play();
       } while (dealer->process(player) <= 0);
     }
@@ -63,4 +75,5 @@ int main(int argc, char **argv) {
   delete player;
   delete dealer;
   
+  return 0;
 }

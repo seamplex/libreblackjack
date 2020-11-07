@@ -54,13 +54,24 @@ class Blackjack : public Dealer {
     unsigned long int n_hands = 0;
     unsigned long int n_hand = 0;
     
+    bool hit_soft_17 = true;
+    bool double_after_split = true;
+    bool shuffle_every_hand = false;
+    
+    std::vector<unsigned int> arranged_cards;
+
     unsigned int max_bet = 0;
     unsigned int number_of_burnt_cards = 0;
     unsigned int infinite_decks_card_number_for_arranged_ones = 0;
-    bool hit_soft_17 = true;
+    
+    
     
     double insurance = 0;
     double blackjack_pays = 1.5;
+    
+    double penetration = 0.75;
+    double penetration_sigma = 0;
+    
       
 };
 #endif

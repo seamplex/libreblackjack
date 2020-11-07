@@ -41,6 +41,7 @@ class Configuration {
     bool set(unsigned int *, std::list<std::string>);
     bool set(long unsigned int *, std::list<std::string>);
     bool set(double *, std::list<std::string>);
+    bool set(std::string &, std::list<std::string>);
     
 
     void show(void);
@@ -48,15 +49,28 @@ class Configuration {
     int getInt(std::string);
     std::string getString(std::string);
     
+    std::string getDealerName(void) { return dealer; };
+    std::string getPlayerName(void) { return player; };
+
+    unsigned int max_incorrect_commands = 10;
+    std::string yaml_report_path;
+
+    unsigned int hands_per_char = false;
+    
+    double error_standard_deviations;
+    
   private:
-    std::string configFilePath = "./blackjack.conf";  
+    std::map<std::string, std::string> data;
+    std::string configFilePath = "./blackjack.conf";
     bool explicitConfigFile = false;
+    
+    std::string dealer;
+    std::string player;
+    
     bool show_help = false;
     bool show_version = false;
-    bool show_bar = false;
-    bool bar_already_alloced = false;
-    std::map<std::string, std::string> data;
-    unsigned int hands_per_char = false;
+//    bool show_bar = false;
+//    bool bar_already_alloced = false;
     
 };
 #endif

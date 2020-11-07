@@ -4,7 +4,9 @@
 #include <fstream>
 #include <algorithm>
 #include <map>
+
 #include <getopt.h>
+#include <unistd.h>
 
 // source https://www.walletfox.com/course/parseconfigfile.php
 
@@ -100,6 +102,29 @@ Configuration::Configuration(int argc, char **argv) {
   if (default_file.good()) {
     readConfigFile(configFilePath, explicitConfigFile);
   }
+  
+  
+  if (set(dealer, {"dealer", "game"}) == false) {
+    // we play old-school blackjack by default      
+    dealer = "blackjack";
+  }
+  
+  if (set(player, {"player"}) == false) {
+    // if we are on an interactive terminal we play through tty otherwise stdinout
+    if (isatty(1)) {
+      player = "tty";
+    } else {
+      player = "stdinout";
+    }
+  }
+  
+  // common settings to all dealers and players
+  set(&max_incorrect_commands, {"max_incorrect_commands"});
+  set(&error_standard_deviations, {"error_standard_deviations"});
+  set(yaml_report_path, {"yaml_report", "yaml_report_path"});
+  
+  
+
     
 }
 
@@ -187,6 +212,16 @@ bool Configuration::set(unsigned long int *value, std::list<std::string> key) {
   return false;
 }
 
+bool Configuration::set(std::string &value, std::list<std::string> key) {
+  for (auto it : key) {
+    if (exists(*(&it))) {
+      value = data[*(&it)];
+      return true;
+    }
+  }
+  return false;
+}
+
 bool Configuration::set(double *value, std::list<std::string> key) {
   for (auto it : key) {
     if (exists(*(&it))) {
@@ -208,6 +243,11 @@ void Configuration::show(void) {
 int Configuration::getInt(std::string key) {
   auto it = data.find(key);
   return (it != data.end()) ? std::stoi(it->second) : 0;
+}
+
+std::string Configuration::getString(std::string key) {
+  auto it = data.find(key);
+  return (it != data.end()) ? it->second : "";
 }
 
 Configuration::~Configuration() {

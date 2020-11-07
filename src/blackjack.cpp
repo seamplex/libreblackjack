@@ -26,6 +26,13 @@
 #include <cstdlib>
 #include <ctime>
 
+
+
+#include <sstream>
+#include <algorithm>
+#include <iterator>
+#include <list>
+
 #include "blackjack.h"
 
 Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(0, 51) {
@@ -35,10 +42,24 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(0, 
 
   conf.set(&max_bet, {"max_bet", "maxbet"});
   conf.set(&hit_soft_17, {"h17", "hit_soft_17"});
+  conf.set(&double_after_split, {"das", "double_after_split"});
   conf.set(&blackjack_pays, {"blackjack_pays"});
   
   
   conf.set(&number_of_burnt_cards, {"number_of_burnt_cards", "n_burnt_cards", "burnt_cards"});
+  conf.set(&penetration, {"penetration"});
+  conf.set(&penetration_sigma, {"penetration_sigma", "penetration_dispersion"});
+  conf.set(&shuffle_every_hand, {"shuffle_every_hand"});
+  
+  if (conf.exists("arranged_cards")) {
+    std::istringstream x(conf.getString("arranged_cads"));
+    std::list<std::string> chunks;
+    std::copy(std::istream_iterator<std::string>(x), std::istream_iterator<std::string>(), std::back_inserter(chunks));
+    for (auto it : chunks)  {
+      arranged_cards.push_back(std::stoi(it));
+    }
+  }
+  
   // TODO: what's this?
   conf.set(&infinite_decks_card_number_for_arranged_ones, {"infinite_decks_card_number_for_arranged_ones"});
 
@@ -48,11 +69,6 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(0, 
   if (explicit_seed) {
     rng = std::mt19937(rng_seed);
   }
-/*  
-  std::random_device random_device;
-  std::mt19937 random_engine(random_device());
-  std::uniform_int_distribution<int> distribution_1_100(1, 100);
-*/
 }
 
 Blackjack::~Blackjack() {
