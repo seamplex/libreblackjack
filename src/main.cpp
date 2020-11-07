@@ -34,8 +34,7 @@ int main(int argc, char **argv) {
   Dealer *dealer = nullptr;
   Player *player = nullptr;
   
-  Configuration conf;
-//  conf.show();
+  Configuration conf(argc, argv);
   
   // TODO: read the args/conf to know what kind of dealer and player we are having
   // TODO: pass args/conf to the constructor

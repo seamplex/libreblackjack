@@ -30,9 +30,10 @@ class Configuration {
     Configuration(int, char **);  
     ~Configuration();
 
-    int readConfigFile(std::string);
+    int readConfigFile(std::string, bool = false);
     
-    bool exists(std::string key) { return !(data.find(key) == data.end()); }
+//    bool exists(std::string key) { return !(data.find(key) == data.end()); }
+    bool exists(std::string key) { return (data.count(key) != 0); }
     
 
     void show(void);
@@ -41,11 +42,13 @@ class Configuration {
     std::string getString(std::string);
     
   private:
-    std::map<std::string, std::string> data;
+    std::string configFilePath = "./blackjack.conf";  
+    bool explicitConfigFile = false;
     bool show_help = false;
     bool show_version = false;
     bool show_bar = false;
     bool bar_already_alloced = false;
+    std::map<std::string, std::string> data;
     unsigned int hands_per_char = false;
     
 };

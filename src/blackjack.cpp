@@ -273,10 +273,6 @@ void Blackjack::deal(Player *player) {
       }        
     break;
     
-/*
-    case DealerAction::PayOrTakeInsuranceBets:
-    break;
- */
     case DealerAction::AskForPlay:
 
       player->actionRequired = PlayerActionRequired::Play;
@@ -286,10 +282,11 @@ void Blackjack::deal(Player *player) {
       player->currentHand->render();
       
       std::cout << "dealer upcard is " << card[upCard].utf8() << std::endl;
-      std::cout << "your total is " << playerTotal << std::endl;
+      std::cout << "your total is " << player->currentHand->total() << std::endl;
       std::cout << "play please" << std::endl;
       return;
     break;
+    
     case DealerAction::MoveOnToNextHand:
       // see if we finished all the player's hands
       if (++player->currentHand != player->hands.end()) {
