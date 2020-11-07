@@ -28,19 +28,31 @@
 
 #include "blackjack.h"
 
-Blackjack::Blackjack(Configuration &conf) : mt19937(dev_random()), fiftyTwoCards(0, 51) {
+Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(0, 51) {
 
-  if (conf.exists("n_hands")) {
-    n_hands = conf.getInt("n_hands");
-  } else if (conf.exists("hands")) {
-    n_hands = conf.getInt("hands");
-  }
+  conf.set(&n_hands, {"n_hands", "hands"});  
+  conf.set(&n_decks, {"decks", "n_decks"});
+
+  conf.set(&max_bet, {"max_bet", "maxbet"});
+  conf.set(&hit_soft_17, {"h17", "hit_soft_17"});
+  conf.set(&blackjack_pays, {"blackjack_pays"});
+  
+  
+  conf.set(&number_of_burnt_cards, {"number_of_burnt_cards", "n_burnt_cards", "burnt_cards"});
+  // TODO: what's this?
+  conf.set(&infinite_decks_card_number_for_arranged_ones, {"infinite_decks_card_number_for_arranged_ones"});
+
+  bool explicit_seed = conf.set(&rng_seed, {"rng_seed", "seed"});
   
   // TODO: seed instead of dev_random
+  if (explicit_seed) {
+    rng = std::mt19937(rng_seed);
+  }
+/*  
   std::random_device random_device;
   std::mt19937 random_engine(random_device());
   std::uniform_int_distribution<int> distribution_1_100(1, 100);
-
+*/
 }
 
 Blackjack::~Blackjack() {
@@ -729,7 +741,7 @@ unsigned int Blackjack::drawCard(Hand *hand) {
   if (n_decks == -1) {
       
     // TODO: arranged cards
-    tag = fiftyTwoCards(mt19937);
+    tag = fiftyTwoCards(rng);
     
   } else {
     // TODO: shoes

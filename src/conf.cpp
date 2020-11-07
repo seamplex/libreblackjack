@@ -141,6 +141,62 @@ int Configuration::readConfigFile(std::string filePath, bool mandatory) {
   
 }
 
+bool Configuration::set(bool *value, std::list<std::string> key) {
+  for (auto it : key) {
+    if (exists(*(&it))) {
+      if (data[*(&it)] == "true") {
+        *value = true;  
+      } else if (data[*(&it)] == "false") {
+        *value = false; 
+      } else {
+        *value = std::stoi(data[*(&it)]);
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Configuration::set(int *value, std::list<std::string> key) {
+  for (auto it : key) {
+    if (exists(*(&it))) {
+      *value = std::stoi(data[*(&it)]);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Configuration::set(unsigned int *value, std::list<std::string> key) {
+  for (auto it : key) {
+    if (exists(*(&it))) {
+      *value = std::stoi(data[*(&it)]);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Configuration::set(unsigned long int *value, std::list<std::string> key) {
+  for (auto it : key) {
+    if (exists(*(&it))) {
+      *value = std::stoi(data[*(&it)]);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Configuration::set(double *value, std::list<std::string> key) {
+  for (auto it : key) {
+    if (exists(*(&it))) {
+      *value = std::stof(data[*(&it)]);
+      return true;
+    }
+  }
+  return false;
+}
+
 void Configuration::show(void) {
     
   for (auto &it : data) {

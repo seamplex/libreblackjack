@@ -23,6 +23,8 @@
 #ifndef CONF_H
 #define CONF_H
 
+#include <string>
+#include <list>
 #include <map>
 
 class Configuration {
@@ -32,8 +34,13 @@ class Configuration {
 
     int readConfigFile(std::string, bool = false);
     
-//    bool exists(std::string key) { return !(data.find(key) == data.end()); }
     bool exists(std::string key) { return (data.count(key) != 0); }
+
+    bool set(bool *, std::list<std::string>);
+    bool set(int *, std::list<std::string>);
+    bool set(unsigned int *, std::list<std::string>);
+    bool set(long unsigned int *, std::list<std::string>);
+    bool set(double *, std::list<std::string>);
     
 
     void show(void);

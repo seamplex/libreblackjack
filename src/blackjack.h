@@ -38,9 +38,10 @@ class Blackjack : public Dealer {
     
   private:
     
+    unsigned int rng_seed;
     std::random_device dev_random;
-    std::mt19937 mt19937;
-    std::uniform_int_distribution<int> fiftyTwoCards;
+    std::mt19937 rng;
+    std::uniform_int_distribution<unsigned int> fiftyTwoCards;
     
     bool lastPass = false;
     
