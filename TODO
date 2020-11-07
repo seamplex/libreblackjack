@@ -1,7 +1,6 @@
  * version and copyright
  * messages implemented on the player's side
  * arranged shoes
- * deterministic seeds
  * name of the game the dealer deals
  * name of the games the player can play
  * delays?
@@ -10,10 +9,20 @@
    * blackjack switch
    * blackjack under?
    * siete y medio
- *  
-
+ * players
+   * tty
+   * stdio
+     - yes
+     - awk
+     - bash
+     - perl
+     - python
+   * internal
+     - strategy from file
+     - reko
+   * runtime-linked in a shared object
+ 
  * multithreading
  * use of const and restrict 
- * runtime-linked players in shared objects
  
  
