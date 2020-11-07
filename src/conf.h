@@ -27,10 +27,13 @@
 
 class Configuration {
   public:  
-    Configuration(std::string = "", bool = false);  
+    Configuration(int, char **);  
     ~Configuration();
 
+    int readConfigFile(std::string);
+    
     bool exists(std::string key) { return !(data.find(key) == data.end()); }
+    
 
     void show(void);
     bool getBool(std::string);
@@ -39,5 +42,11 @@ class Configuration {
     
   private:
     std::map<std::string, std::string> data;
+    bool show_help = false;
+    bool show_version = false;
+    bool show_bar = false;
+    bool bar_already_alloced = false;
+    unsigned int hands_per_char = false;
+    
 };
 #endif

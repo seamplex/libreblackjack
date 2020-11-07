@@ -7,10 +7,20 @@
 
 // source https://www.walletfox.com/course/parseconfigfile.php
 
-Configuration::Configuration(std::string filePath, bool mandatory) {
+Configuration::Configuration(int argc, char **argv) {
+  
+  int i, optc;
+  int option_index = 0;
+  
+  // TODO: if blackjack.conf exists parse it
+  parseConfigFile();
     
+}
+
+int Configuration::parseConfigFile(std::string filePath) {
+  
   // std::ifstream is RAII, i.e. no need to call close
-  std::ifstream fileStream((filePath != "") ? filePath : "./blackjack.conf");
+  std::ifstream fileStream(filePath);
     
   std::size_t delimiterPos;
   std::string name;
@@ -24,17 +34,23 @@ Configuration::Configuration(std::string filePath, bool mandatory) {
         continue;
       }
                 
+      // TODO: comments on the same line
       delimiterPos = line.find("=");
       if (delimiterPos != std::string::npos) {
         name = line.substr(0, delimiterPos);
         value = line.substr(delimiterPos + 1);
         data[name] = value;
         // TODO: add another map of string to bools to mark wheter the option was used or not
+      } else {
+        // TODO: warning?
       }
     }
   } else {
-    std::cerr << "Couldn't open config file for reading.\n";
+    return -1;
   }
+  
+  return 0;
+  
 }
 
 void Configuration::show(void) {

@@ -1,13 +1,19 @@
  * version and copyright
  * messages implemented on the player's side
- * configuration files as map of strings to strings https://www.walletfox.com/course/parseconfigfile.php
  * arranged shoes
- * multithreading
  * deterministic seeds
- * ENHC
- * blackjack switch
- * siete y medio
  * name of the game the dealer deals
  * name of the games the player can play
  * delays?
+ * dealers
+   * ENHC
+   * blackjack switch
+   * blackjack under?
+   * siete y medio
+ *  
+
+ * multithreading
+ * use of const and restrict 
+ * runtime-linked players in shared objects
+ 
  
