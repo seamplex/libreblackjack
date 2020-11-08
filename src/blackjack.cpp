@@ -65,14 +65,13 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(0, 
 
   bool explicit_seed = conf.set(&rng_seed, {"rng_seed", "seed"});
   
-  // TODO: seed instead of dev_random
   if (explicit_seed) {
     rng = std::mt19937(rng_seed);
   }
 }
 
 Blackjack::~Blackjack() {
-  std::cout << "Bye bye! We'll play Blackjack again next time." << std::endl;
+  return;    
 }
 
 void Blackjack::deal(Player *player) {
@@ -110,10 +109,6 @@ void Blackjack::deal(Player *player) {
       // clear dealer's hand
       hand.holeCardShown = false;
       hand.cards.clear();
-      for (auto card : hand.cards) {
-        std::cout << card << std::endl;
-      }
-      std::cout << hand.cards.size() << std::endl;
 
       // erase all the player's hands, create one, add and make it the current one
       for (auto playerHand : player->hands) {
@@ -129,17 +124,14 @@ void Blackjack::deal(Player *player) {
 //      player->hasDoubled = 0;
       
       if (lastPass) {
-        // TODO: send informative messages to the player
-        // tell people we are shuffling
-        //  bjcall (blackjack.current_player->write (player, "shuffling"));
+        player->info(Info::Shuffle);
           
         // shuffle the cards          
         shuffle();        
           
-        // TODO: reset card counting systems
         // burn as many cards as asked
         for (int i = 0; i < number_of_burnt_cards; i++) {
-//          drawCard();
+          drawCard();
         }
         lastPass = false;
       }
@@ -151,7 +143,7 @@ void Blackjack::deal(Player *player) {
         nextAction = DealerAction::AskForBets;
       }
 
-      std::cout << "new_hand" << std::endl;
+      player->info(Info::NewHand, n_hand);
       return;
       
     break;
@@ -160,9 +152,6 @@ void Blackjack::deal(Player *player) {
     // -------------------------------------------------------------------------  
     case DealerAction::AskForBets:
       // step 1. ask for bets
-      // TODO: use an output buffer to re-ask in case no number comes back
-      std::cout << "bet?" << std::endl;
-      // TODO: setter
       player->actionRequired = PlayerActionRequired::Bet;
       return;
     break;

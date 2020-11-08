@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstring>
+#include <thread>
+#include <chrono>
 
 #ifdef HAVE_LIBREADLINE
 #include <readline/readline.h>
@@ -12,15 +14,36 @@
 
 Tty::Tty(Configuration &conf) {
     
-  if (conf.exists("flat_bet")) {
-    flat_bet = conf.getInt("flat_bet");
-  } else if (conf.exists("flat_bet")) {
-    flat_bet = conf.getInt("flat_bet");
-  }
-    
+  conf.set(&flat_bet, {"flat_bet", "flatbet"});  
+  conf.set(&no_insurance, {"no_insurance", "dont_insure"});  
+
 #ifdef HAVE_LIBREADLINE
   prompt = cyan + " > " + reset;
 #endif
+}
+
+void Tty::info(Info msg, int intData) {
+  std::string s;  
+  switch (msg) {
+    case Info::NewHand:
+//      s = "new_hand";  
+      s = "Starting new hand #" + std::to_string(intData);
+    break;
+    case Info::Shuffle:
+//      s = "shuffle";  
+      s = "Deck needs to be shuffled.";
+    break;
+    case Info::Bye:
+//      s = "bye";  
+      s = "Bye bye! We'll play Blackjack again next time.";
+    break;
+  }
+  
+  if (delay > 0) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+  }  
+  std::cout << green << s << reset << std::endl;
+  return;
 }
 
 int Tty::play() {

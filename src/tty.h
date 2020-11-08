@@ -5,11 +5,11 @@
 class Tty : public Player {
   public:  
     Tty(Configuration &);
-    ~Tty() {
-      std::cout << "bye!" << std::endl;
-    };
+    ~Tty() { };
     
     int play() override;
+    void info(Info = Info::None, int = 0) override;
+
     
   private:
     
@@ -18,8 +18,11 @@ class Tty : public Player {
 #else
   std::string input_buffer;
 #endif
-  
+
+    std::string arrow;
     std::string prompt;
+    
+    int delay = 200;
 
     std::string black   = "\x1B[0m";
     std::string red     = "\x1B[31m";

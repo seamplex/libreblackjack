@@ -26,13 +26,14 @@
 #include "base.h"
 #include "conf.h"
 
+
 class Blackjack : public Dealer {
   public:  
     Blackjack(Configuration &);
     ~Blackjack();
     
     void shuffle() override;
-    unsigned int drawCard(Hand *) override;
+    unsigned int drawCard(Hand * = nullptr) override;
     void deal(Player *) override;
     int process(Player *) override;
     

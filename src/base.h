@@ -69,6 +69,13 @@ enum class PlayerActionTaken {
   Hit,
 };
 
+enum class Info {
+  None,
+  NewHand,
+  Shuffle,
+  Bye,
+};
+
 // alphabetically-sorted
 enum class Suit {
   Clubs    = 0,
@@ -112,11 +119,9 @@ class Card {
     std::string singleUTF8;
 };
 
-
+// TODO: static inside a class
 extern Card card[52];
 
-
-// TODO: base + daugthers, para diferenciar entre dealer y player y otros juegos
 class Hand {
   public:
     std::list<unsigned int> cards;
@@ -189,6 +194,7 @@ class Player {
     }
 */    
     virtual int play() = 0;
+    virtual void info(Info = Info::None, int = 0) = 0;
     
     PlayerActionRequired actionRequired = PlayerActionRequired::None;
     PlayerActionTaken    actionTaken    = PlayerActionTaken::None;

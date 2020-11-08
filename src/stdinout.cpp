@@ -12,6 +12,9 @@
 StdInOut::StdInOut(void) {
 }
 
+void StdInOut::info(Info msg, int data) {
+  return;
+}
 
 int StdInOut::play() {
   

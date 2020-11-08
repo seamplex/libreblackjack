@@ -8,6 +8,7 @@ class StdInOut : public Player {
     ~StdInOut() { };
     
     int play(void) override;
+    void info(Info = Info::None, int = 0) override;
     
   private:
     std::string input_buffer;
