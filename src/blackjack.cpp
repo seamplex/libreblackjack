@@ -283,8 +283,8 @@ void Blackjack::deal(Player *player) {
       player->actionRequired = PlayerActionRequired::Play;
       nextAction = DealerAction::AskForPlay;
       
-      hand.render(hand.holeCardShown);
-      player->currentHand->render();
+//      hand.render(hand.holeCardShown);
+//      player->currentHand->render();
       
       std::cout << "dealer upcard is " << card[upCard].utf8() << std::endl;
       std::cout << "your total is " << player->currentHand->total() << std::endl;
@@ -301,7 +301,7 @@ void Blackjack::deal(Player *player) {
         } else {
           std::cout << "card_player " << card[playerCard].utf8() << std::endl;
         }  
-        player->currentHand->render();
+//        player->currentHand->render();
 
         if (player->currentHand->total() == 21) {
           player->actionRequired = PlayerActionRequired::None;
@@ -327,7 +327,7 @@ void Blackjack::deal(Player *player) {
           std::cout << "card_dealer_hole " << card[holeCard].utf8() << std::endl;
           hand.holeCardShown = true;
           std::cout << "dealer_hand" << std::endl;
-          hand.render(hand.holeCardShown); 
+//          hand.render(hand.holeCardShown); 
           
           // TODO: no tengo que sacarle todo el dinero?
           
@@ -347,7 +347,7 @@ void Blackjack::deal(Player *player) {
       std::cout << "card_dealer_hole" << card[holeCard].utf8() << std::endl;
       hand.holeCardShown = true;
 
-      hand.render(hand.holeCardShown);
+//      hand.render(hand.holeCardShown);
 
       // TODO: print "soft"
       std::cout << "dealer_count " << hand.total() << std::endl;
@@ -357,7 +357,7 @@ void Blackjack::deal(Player *player) {
       while (((abs(dealerTotal) < 17 || (hit_soft_17 && dealerTotal == -17))) && hand.busted() == 0) {
         unsigned int dealerCard = drawCard(&hand);
         std::cout << "card_dealer " << card[dealerCard].utf8() << std::endl;
-        hand.render(hand.holeCardShown);
+//        hand.render(hand.holeCardShown);
                 
         dealerTotal = abs(hand.total());
         std::cout << "dealer_count " << dealerTotal << std::endl;

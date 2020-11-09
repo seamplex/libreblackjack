@@ -1,5 +1,5 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  Libre Blackjack - standard blackjack dealer
+ *  Libre Blackjack - configuration handling
  *
  *  Copyright (C) 2020 jeremy theler
  *

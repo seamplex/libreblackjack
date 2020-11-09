@@ -1,5 +1,5 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  Libre Blackjack - standard blackjack dealer
+ *  Libre Blackjack - base classes
  *
  *  Copyright (C) 2020 jeremy theler
  *
@@ -196,16 +196,6 @@ class Player {
     Player(Player &&) = delete;
     Player(const Player &&) = delete;
 
-    // TODO: public or getter/setter?
-/*    
-    PlayerAction getNextAction() {
-      return nextAction;
-    }
-    
-    void setNextAction(PlayerAction a) {
-      nextAction = a;
-    }
-*/    
     virtual int play() = 0;
     virtual void info(Info = Info::None, int = 0) = 0;
     
@@ -250,6 +240,9 @@ class Player {
     
     std::list<PlayerHand> hands;
     std::list<PlayerHand>::iterator currentHand;
+
+    DealerHand dealerHand;
+    
 };
 
 class Dealer {

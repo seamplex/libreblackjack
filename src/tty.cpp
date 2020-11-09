@@ -1,3 +1,25 @@
+/*------------ -------------- -------- --- ----- ---   --       -            -
+ *  Libre Blackjack - tty interactive player
+ *
+ *  Copyright (C) 2020 jeremy theler
+ *
+ *  This file is part of Libre Blackjack.
+ *
+ *  Libre Blackjack is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Libre Blackjack is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Libre Blackjack.  If not, see <http://www.gnu.org/licenses/>.
+ *------------------- ------------  ----    --------  --     -       -         -
+ */
+
 #include <iostream>
 #include <cstring>
 #include <thread>
@@ -17,18 +39,21 @@ Tty::Tty(Configuration &conf) {
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
   conf.set(&no_insurance, {"no_insurance", "dont_insure"});  
 
-#ifdef HAVE_LIBREADLINE
+  // TODO: check conf for colors
   prompt = cyan + " > " + reset;
-#endif
 }
 
 void Tty::info(Info msg, int intData) {
   std::string s;
   
+  // TODO: choose utf8 or other representation
+  
   switch (msg) {
     case Info::NewHand:
 //      s = "new_hand";  
       s = "Starting new hand #" + std::to_string(intData);
+      dealerHand.cards.clear();
+      
     break;
     case Info::Shuffle:
 //      s = "shuffle";  
@@ -41,6 +66,7 @@ void Tty::info(Info msg, int intData) {
     case Info::CardDealerUp:
 //      s = "card_dealer_up";
       s = "Dealer's up card " + card[intData].utf8();
+      dealerHand.cards.push_back(intData);
     break;
     case Info::CardPlayerSecond:
 //      s = "card_player_second";
@@ -53,6 +79,7 @@ void Tty::info(Info msg, int intData) {
     case Info::CardDealerHoleRevealed:
 //      s = "card_dealer_hole";
       s = "Dealer's hole card was " + card[intData].utf8();
+      dealerHand.cards.push_back(intData);
     break;
     case Info::DealerBlackjack:
 //      s = "dealer_blackjack";
@@ -108,7 +135,7 @@ void Tty::info(Info msg, int intData) {
   
   
   if (msg == Info::CardDealerHoleDealt) {
-  //  hand.render(hand.holeCardShown);
+    dealerHand.render();      
     currentHand->render();      
   }
   
