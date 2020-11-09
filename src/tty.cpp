@@ -75,11 +75,12 @@ void Tty::info(Info msg, int intData) {
     case Info::CardDealerHoleDealt:
 //      s = "card_dealer_hole";
       s = "Dealer's hole card is dealt";
+      dealerHand.cards.push_back(-1);
     break;
     case Info::CardDealerHoleRevealed:
 //      s = "card_dealer_hole";
       s = "Dealer's hole card was " + card[intData].utf8();
-      dealerHand.cards.push_back(intData);
+      *(++(dealerHand.cards.begin())) = intData;
     break;
     case Info::DealerBlackjack:
 //      s = "dealer_blackjack";
@@ -135,8 +136,8 @@ void Tty::info(Info msg, int intData) {
   
   
   if (msg == Info::CardDealerHoleDealt) {
-    dealerHand.render();      
-    currentHand->render();      
+    render(&dealerHand);
+    render(&(*currentHand));
   }
   
   return;
@@ -231,4 +232,72 @@ int Tty::play() {
 #endif
   
   return 0;
+}
+
+
+
+void Tty::render(Hand *hand) {
+
+  for (auto it : hand->cards) {
+    std::cout << " _____   ";
+  }
+  std::cout << std::endl;
+  
+  unsigned int i = 0;
+  for (auto it : hand->cards) {
+    if (it > 0) {
+      std::cout << "|" << card[it].getNumberASCII() << ((card[it].number != 10)?" ":"") << "   |  ";
+    } else {
+      std::cout << "|#####|  ";
+    }
+    i++;
+  }
+  std::cout << std::endl;
+
+  i = 0;
+  for (auto it : hand->cards) {
+    if (it > 0) {
+      std::cout << "|     |  ";
+    } else {
+      std::cout << "|#####|  ";
+    }
+    i++;
+  }
+  std::cout << std::endl;
+  
+  i = 0;
+  for (auto it : hand->cards) {
+    if (it > 0) {
+      std::cout << "|  " << card[it].getSuitUTF8() << "  |  ";
+    } else {
+      std::cout << "|#####|  ";
+    }
+    i++;
+  }
+  std::cout << std::endl;
+  
+  i = 0;
+  for (auto it : hand->cards) {
+    if (it > 0) {
+      std::cout << "|     |  ";
+    } else {
+      std::cout << "|#####|  ";
+    }
+    i++;
+  }
+  std::cout << std::endl;
+
+  i = 0;
+  for (auto it : hand->cards) {
+    if (it > 0) {
+      std::cout << "|___" << ((card[it].number != 10)?"_":"") << card[it].getNumberASCII() << "|  ";
+    } else {
+      std::cout << "|#####|  ";
+    }
+    i++;
+  }
+  std::cout << std::endl;
+  
+  return;
+    
 }

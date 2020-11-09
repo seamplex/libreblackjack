@@ -32,6 +32,8 @@ class Tty : public Player {
     int play() override;
     void info(Info = Info::None, int = 0) override;
 
+    void render(Hand *);
+
     
   private:
     

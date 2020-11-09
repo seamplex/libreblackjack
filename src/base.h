@@ -137,7 +137,7 @@ extern Card card[52];
 
 class Hand {
   public:
-    std::list<unsigned int> cards;
+    std::list<int> cards;
 
     // inline on purpose
     int total() {
@@ -168,8 +168,6 @@ class Hand {
     bool busted() {
       return (abs(total()) > 21);
     }
-    
-    void render(bool = true);
 };    
     
 class PlayerHand : public Hand {
