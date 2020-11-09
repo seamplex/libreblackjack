@@ -163,30 +163,25 @@ void Blackjack::deal(Player *player) {
       player->total_money_waged += player->currentHand->bet;
 
       playerFirstCard = drawCard(&(*player->currentHand));
-      std::cout << "card_player_first " << card[playerFirstCard].utf8() << std::endl;
-      
+      player->info(Info::CardPlayerFirst, playerFirstCard);
+            
       // step 4. show dealer's upcard
       upCard = drawCard(&hand);
-      std::cout << "card_dealer_up " << card[upCard].utf8() << std::endl;
+      player->info(Info::CardDealerUp, upCard);
 
       // step 5. deal the second card to each player
       playerSecondCard = drawCard(&(*player->currentHand));
-      std::cout << "card_player_second " << card[playerSecondCard].utf8() << std::endl;
-      
+      player->info(Info::CardPlayerSecond, playerSecondCard);
       
       // step 6. deal the dealer's hole card 
       holeCard = drawCard(&hand);
-      std::cout << "card_dealer_hole" << std::endl;
-
-      hand.render(hand.holeCardShown);
-      player->currentHand->render();
+      player->info(Info::CardDealerHoleDealt);
 
       // step 7.a. if the upcard is an ace ask for insurance
       if (card[upCard].value == 11) {
         if (player->no_insurance == false && player->always_insure == false) {
           player->actionRequired = PlayerActionRequired::Insurance;
           nextAction = DealerAction::AskForInsurance;
-          std::cout << "next ask insurance" << std::endl;
           return;
         
         } else if (player->always_insure) {
@@ -213,42 +208,39 @@ void Blackjack::deal(Player *player) {
       // step 7.c. ask the player to play
       player->actionRequired = PlayerActionRequired::Play;
       nextAction = DealerAction::AskForPlay;
-      std::cout << "dealer upcard is " << card[upCard].utf8() << std::endl;
-      std::cout << "your total is " << playerTotal << std::endl;
-      std::cout << "play please" << std::endl;
       return;
     break;
-    
+ 
+    // TODO: ver esto
+/*    
     case DealerAction::AskForInsurance:
       std::cout << "next action do you want insurance?" << std::endl;  
       return;
     break;
-    
+*/    
     case DealerAction::CheckforBlackjacks:
       // step 8. check if there are any blackjack
       playerBlackack = player->currentHand->blackjack();
       if (hand.blackjack()) {
-        std::cout << "card_dealer_hole" << card[holeCard].utf8() << std::endl;
-        std::cout << "blackjack_dealer" << std::endl;
+        player->info(Info::CardDealerHoleRevealed, holeCard);
+        player->info(Info::DealerBlackjack);
         player->blackjacksDealer++;
-        // print_hand_art (blackjack.dealer_hand);
 
         if (player->currentHand->insured) {
-          std::cout << "player_wins_insurance " << player->currentHand->bet << std::endl;
+          player->info(Info::PlayerWinsInsurance, player->currentHand->bet);
           player->current_result += player->currentHand->bet;
           player->bankroll += player->currentHand->bet;
           player->winsInsured++;
         }
 
         if (playerBlackack) {
-          std::cout << "blackjack_player_also" << std::endl;
+          player->info(Info::PlayerBlackjackAlso);
+          player->info(Info::PlayerPushes);
           player->blackjacksPlayer++;
-          std::cout << "player_pushes " << player->currentHand->bet << std::endl;
           player->pushes++;
           
-          //  print_hand_art (player->current_hand);
         } else {
-          std::cout << "player_losses " << player->currentHand->bet << std::endl;
+          player->info(Info::PlayerLosses);
           player->current_result -= player->currentHand->bet;
           player->bankroll -= player->currentHand->bet;
           if (player->bankroll < player->worst_bankroll) {
@@ -259,33 +251,29 @@ void Blackjack::deal(Player *player) {
 
         nextAction = DealerAction::StartNewHand;
         player->actionRequired = PlayerActionRequired::None;
-        std::cout << "next start a new hand" << std::endl;
         return;
         
       } else if (playerBlackack) {
-        std::cout << "blackjack_player" << std::endl;
         player->current_result += blackjack_pays * player->currentHand->bet;
         player->bankroll += blackjack_pays * player->currentHand->bet;
         player->blackjacksPlayer++;
-          
-        std::cout << "player_wins " << blackjack_pays * player->currentHand->bet << std::endl;
+        
+        player->info(Info::PlayerWins, blackjack_pays * player->currentHand->bet);
         player->wins++;
         player->winsBlackjack++;
 
         nextAction = DealerAction::StartNewHand;
         player->actionRequired = PlayerActionRequired::None;
-        std::cout << "next start a new hand" << std::endl;
         return;
         
       } else {
         // only if the dealer had the chance to have a blackjack we say "no_blackjacks"
         if (card[upCard].value == 10 || card[upCard].value == 11) {
-          std::cout << "no_blackjacks" << std::endl;
+          player->info(Info::NoBlackjacks);
         }
         
         nextAction = DealerAction::AskForPlay;
         player->actionRequired = PlayerActionRequired::Play;
-//        std::cout << "prepare to play" << std::endl;
         return;
       }        
     break;

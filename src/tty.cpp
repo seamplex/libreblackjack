@@ -23,7 +23,8 @@ Tty::Tty(Configuration &conf) {
 }
 
 void Tty::info(Info msg, int intData) {
-  std::string s;  
+  std::string s;
+  
   switch (msg) {
     case Info::NewHand:
 //      s = "new_hand";  
@@ -33,6 +34,67 @@ void Tty::info(Info msg, int intData) {
 //      s = "shuffle";  
       s = "Deck needs to be shuffled.";
     break;
+    case Info::CardPlayerFirst:
+//      s = "card_player_first";
+      s = "Player's first card is " + card[intData].utf8();
+    break;
+    case Info::CardDealerUp:
+//      s = "card_dealer_up";
+      s = "Dealer's up card " + card[intData].utf8();
+    break;
+    case Info::CardPlayerSecond:
+//      s = "card_player_second";
+      s = "Player's second card is " + card[intData].utf8();
+    break;
+    case Info::CardDealerHoleDealt:
+//      s = "card_dealer_hole";
+      s = "Dealer's hole card is dealt";
+    break;
+    case Info::CardDealerHoleRevealed:
+//      s = "card_dealer_hole";
+      s = "Dealer's hole card was " + card[intData].utf8();
+    break;
+    case Info::DealerBlackjack:
+//      s = "dealer_blackjack";
+      s = "Dealer has Blackjack";
+      // TODO: draw dealer's hand
+    break;
+    case Info::PlayerWinsInsurance:
+//      s = "player_wins_insurance";
+      s = "Player wins insurance";
+    break;
+    case Info::PlayerBlackjackAlso:
+//      s = "player_blackjack_also";
+      s = "Player also has Blackjack";
+    break;
+    case Info::PlayerPushes:
+//      s = "player_pushes";
+      s = "Player pushes";
+      // TODO:
+      //  print_hand_art (player->current_hand);
+    break;
+    case Info::PlayerLosses:
+//      s = "player_losses";
+      s = "Player losses";
+      // TODO:
+      //  print_hand_art (player->current_hand);
+    break;
+    case Info::PlayerBlackjack:
+//      s = "blackjack_player";
+      s = "Player has Blackjack";
+      // TODO:
+      //  print_hand_art (player->current_hand);
+    break;
+    case Info::PlayerWins:
+//      s = "player_wins";
+      s = "Player wins " + std::to_string(intData);
+    break;
+    
+    case Info::NoBlackjacks:
+//      s = "no_blackjacks";
+      s = "No blackjacks";
+    break;
+    
     case Info::Bye:
 //      s = "bye";  
       s = "Bye bye! We'll play Blackjack again next time.";
@@ -43,6 +105,13 @@ void Tty::info(Info msg, int intData) {
     std::this_thread::sleep_for(std::chrono::milliseconds(delay));
   }  
   std::cout << green << s << reset << std::endl;
+  
+  
+  if (msg == Info::CardDealerHoleDealt) {
+  //  hand.render(hand.holeCardShown);
+    currentHand->render();      
+  }
+  
   return;
 }
 
