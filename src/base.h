@@ -178,12 +178,6 @@ class PlayerHand : public Hand {
     bool doubled = false;
 };
 
-class DealerHand : public Hand {
-  public:
-    bool holeCardShown = false;
-};
-
-
 class Player {
   public:
     Player() = default;
@@ -239,7 +233,7 @@ class Player {
     std::list<PlayerHand> hands;
     std::list<PlayerHand>::iterator currentHand;
 
-    DealerHand dealerHand;
+    Hand dealerHand;
     
 };
 
@@ -282,7 +276,7 @@ class Dealer {
     // TODO: most of the games will have a single element, but maybe
     // there are games where the dealer has more than one hand
 //    std::list <Hand> hands;
-    DealerHand hand;
+    Hand hand;
     
 };
 

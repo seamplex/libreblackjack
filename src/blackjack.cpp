@@ -107,7 +107,6 @@ void Blackjack::deal(Player *player) {
       n_hand++;
       
       // clear dealer's hand
-      hand.holeCardShown = false;
       hand.cards.clear();
 
       // erase all the player's hands, create one, add and make it the current one
@@ -321,7 +320,6 @@ void Blackjack::deal(Player *player) {
         if (player->bustedAllHands) {
           std::cout << "player_busted_all_hands" << std::endl;
           std::cout << "card_dealer_hole " << card[holeCard].utf8() << std::endl;
-          hand.holeCardShown = true;
           std::cout << "dealer_hand" << std::endl;
           // TODO: no tengo que sacarle todo el dinero?
           
@@ -339,7 +337,6 @@ void Blackjack::deal(Player *player) {
     case DealerAction::HitDealerHand:
         
       std::cout << "card_dealer_hole" << card[holeCard].utf8() << std::endl;
-      hand.holeCardShown = true;
 
       // TODO: print "soft"
       std::cout << "dealer_count " << hand.total() << std::endl;
