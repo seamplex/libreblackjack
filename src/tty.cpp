@@ -177,12 +177,6 @@ void Tty::info(Info msg, int intData) {
   }  
   std::cout << green << s << reset << std::endl;
   
-/*  
-  if (msg == Info::CardDealerHoleDealt) {
-    render(&dealerHand);
-    render(&(*currentHand));
-  }
-*/  
   return;
 }
 
