@@ -49,48 +49,82 @@ void Tty::info(Info msg, int intData) {
   // TODO: choose utf8 or other representation
   
   switch (msg) {
+      
+    case Info::InvalidBet:
+      if (intData < 0) {
+//      s = "bet_negative";  
+        s = "Your bet is negative (" + std::to_string(intData) + ")";
+      } else if (intData > 0) {
+//      s = "bet_maximum";  
+        s = "Your bet is larger than the maximum allowed (" + std::to_string(intData) + ")";
+      } else {
+//      s = "bet_zero";
+        s = "Your bet is zero";
+      }
+    break;
+
     case Info::NewHand:
 //      s = "new_hand";  
       s = "Starting new hand #" + std::to_string(intData);
       dealerHand.cards.clear();
-      
     break;
+    
     case Info::Shuffle:
 //      s = "shuffle";  
       s = "Deck needs to be shuffled.";
     break;
-    case Info::CardPlayerFirst:
-//      s = "card_player_first";
-      s = "Player's first card is " + card[intData].utf8();
+    case Info::CardPlayer:
+      switch (currentHand->cards.size()) {
+        case 1:
+//          s = "card_player_first";
+          s = "Player's first card is " + card[intData].utf8();
+        break;
+        case 2:
+//          s = "card_player_second";
+          s = "Player's second card is " + card[intData].utf8();
+        break;
+        default:
+//          s = "card_player";
+          s = "Player's card is " + card[intData].utf8();
+        break;
+      } 
     break;
-    case Info::CardDealerUp:
-//      s = "card_dealer_up";
-      s = "Dealer's up card " + card[intData].utf8();
+    
+    case Info::CardDealer:
+      if (intData != -1) {  
+        switch (dealerHand.cards.size()) {
+          case 0:
+//            s = "card_dealer_up";
+            s = "Dealer's up card is " + card[intData].utf8();
+          break;
+          default:
+//            s = "card_dealer";
+            s = "Dealer's card is " + card[intData].utf8();
+          break;
+        }
+      } else {
+        s = "Dealer's hole card is dealt";
+      }
       dealerHand.cards.push_back(intData);
     break;
-    case Info::CardPlayerSecond:
-//      s = "card_player_second";
-      s = "Player's second card is " + card[intData].utf8();
-    break;
-    case Info::CardDealerHoleDealt:
-//      s = "card_dealer_hole";
-      s = "Dealer's hole card is dealt";
-      dealerHand.cards.push_back(-1);
-    break;
+    
     case Info::CardDealerHoleRevealed:
 //      s = "card_dealer_hole";
       s = "Dealer's hole card was " + card[intData].utf8();
       *(++(dealerHand.cards.begin())) = intData;
     break;
+    
     case Info::DealerBlackjack:
 //      s = "dealer_blackjack";
       s = "Dealer has Blackjack";
       // TODO: draw dealer's hand
     break;
+    
     case Info::PlayerWinsInsurance:
 //      s = "player_wins_insurance";
       s = "Player wins insurance";
     break;
+    
     case Info::PlayerBlackjackAlso:
 //      s = "player_blackjack_also";
       s = "Player also has Blackjack";
@@ -123,6 +157,15 @@ void Tty::info(Info msg, int intData) {
       s = "No blackjacks";
     break;
     
+    case Info::PlayerBustedAllHands:
+//      s = "player_busted_all_hands";
+      if (hands.size() == 1) {
+        s = "Player busted";
+      } else {  
+        s = "Player busted all hands";
+      }
+    break;
+    
     case Info::Bye:
 //      s = "bye";  
       s = "Bye bye! We'll play Blackjack again next time.";
@@ -134,17 +177,48 @@ void Tty::info(Info msg, int intData) {
   }  
   std::cout << green << s << reset << std::endl;
   
-  
+/*  
   if (msg == Info::CardDealerHoleDealt) {
     render(&dealerHand);
     render(&(*currentHand));
   }
-  
+*/  
   return;
 }
 
 int Tty::play() {
+
+  std::string s;  
+  switch (actionRequired) {
+    case PlayerActionRequired::Bet:
+      s = "Bet?";  
+    break;
+
+    case PlayerActionRequired::Insurance:
+      s = "Insurance?";  
+    break;
+    
+    case PlayerActionRequired::Play:
+      std::cout << " -- Dealer's hand:  --------" << std::endl;
+      render(&dealerHand);
+      std::cout << "    Total: " << dealerHand.total() << std::endl;
+
+      std::cout << " -- Player's hand --------" << std::endl;
+      for (auto hand : hands) {
+        render(&hand);
+        std::cout << "    Total: " << hand.total() << std::endl;
+      }  
+      s = "Play?";
+    break;  
+  }
   
+  if (s != "") {
+    if (delay > 0) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+    }  
+    std::cout << yellow << " <-- " << s << reset << std::endl;
+  }
+    
 #ifdef HAVE_LIBREADLINE
     
   if ((input_buffer = readline(prompt.c_str())) == nullptr) {

@@ -26,6 +26,7 @@
 #include <string>
 #include <list>
 #include <random>
+#include <cmath>
 
 // TODO: namespace
 
@@ -71,12 +72,11 @@ enum class PlayerActionTaken {
 
 enum class Info {
   None,
+  InvalidBet,
   NewHand,
   Shuffle,
-  CardPlayerFirst,
-  CardDealerUp,
-  CardPlayerSecond,
-  CardDealerHoleDealt,
+  CardPlayer,
+  CardDealer,
   CardDealerHoleRevealed,
   DealerBlackjack,
   PlayerWinsInsurance,
@@ -86,6 +86,8 @@ enum class Info {
   PlayerBlackjack,
   PlayerWins,
   NoBlackjacks,
+  PlayerBustedAllHands,
+  DealerBusted,
   Bye,
 };
 
@@ -161,12 +163,12 @@ class Hand {
     
     // inline on purpose
     bool blackjack() {
-      return (abs(total()) == 21 && cards.size() == 2);
+      return (std::abs(total()) == 21 && cards.size() == 2);
     };
     
     // inline on purpose
     bool busted() {
-      return (abs(total()) > 21);
+      return (std::abs(total()) > 21);
     }
 };    
     
