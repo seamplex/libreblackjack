@@ -34,6 +34,60 @@
 #include "blackjack.h"
 #include "tty.h"
 
+
+
+
+
+// extern "C" {
+
+char *blackjack_commands[] = {
+    "help",
+    "hit",
+    "stand",
+    "yes",
+    "no",
+    NULL
+};
+
+
+char *blackjack_command_generator(const char *text, int state) {
+  static int list_index, len;
+  char *name;
+
+  if (!state) {
+    list_index = 0;
+    len = strlen(text);
+  }
+
+  while ((name = blackjack_commands[list_index++])) {
+    name = strdup(name);
+
+    if (strncmp(name, text, len) == 0) {
+      return name;
+    } else {
+      free(name);
+    }
+  }
+
+  return NULL;
+}
+
+char **blackjack_rl_completion(const char *text, int start, int end) {
+  char **matches = NULL;
+
+#ifdef HAVE_LIBREADLINE
+  matches = rl_completion_matches(text, blackjack_command_generator);
+#endif
+
+  return matches;
+}
+
+
+
+// }
+
+
+
 Tty::Tty(Configuration &conf) {
     
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
@@ -49,7 +103,7 @@ void Tty::info(Info msg, int intData) {
   // TODO: choose utf8 or other representation
   
   switch (msg) {
-      
+
     case Info::InvalidBet:
       if (intData < 0) {
 //      s = "bet_negative";  
@@ -65,6 +119,7 @@ void Tty::info(Info msg, int intData) {
 
     case Info::NewHand:
 //      s = "new_hand";  
+      std::cout << std::endl;
       s = "Starting new hand #" + std::to_string(intData);
       dealerHand.cards.clear();
     break;
@@ -108,7 +163,7 @@ void Tty::info(Info msg, int intData) {
       dealerHand.cards.push_back(intData);
     break;
     
-    case Info::CardDealerHoleRevealed:
+    case Info::CardDealerRevealsHole:
 //      s = "card_dealer_hole";
       s = "Dealer's hole card was " + card[intData].utf8();
       *(++(dealerHand.cards.begin())) = intData;
@@ -157,7 +212,7 @@ void Tty::info(Info msg, int intData) {
       s = "No blackjacks";
     break;
     
-    case Info::PlayerBustedAllHands:
+    case Info::PlayerBustsAllHands:
 //      s = "player_busted_all_hands";
       if (hands.size() == 1) {
         s = "Player busted";
@@ -165,6 +220,18 @@ void Tty::info(Info msg, int intData) {
         s = "Player busted all hands";
       }
     break;
+    
+    case Info::DealerBusts:
+//      s = "no_blackjacks";
+      s = "Dealer busts!";
+    break;  
+    
+    case Info::Help:
+      std::cout << "help yourself" << std::endl;        
+    break;
+    
+          
+
     
     case Info::Bye:
 //      s = "bye";  
@@ -189,19 +256,12 @@ int Tty::play() {
     break;
 
     case PlayerActionRequired::Insurance:
+      renderTable();  
       s = "Insurance?";  
     break;
     
     case PlayerActionRequired::Play:
-      std::cout << " -- Dealer's hand:  --------" << std::endl;
-      render(&dealerHand);
-      std::cout << "    Total: " << dealerHand.total() << std::endl;
-
-      std::cout << " -- Player's hand --------" << std::endl;
-      for (auto hand : hands) {
-        render(&hand);
-        std::cout << "    Total: " << hand.total() << std::endl;
-      }  
+      renderTable();  
       s = "Play?";
     break;  
   }
@@ -214,7 +274,7 @@ int Tty::play() {
   }
     
 #ifdef HAVE_LIBREADLINE
-    
+  rl_attempted_completion_function = blackjack_rl_completion;  
   if ((input_buffer = readline(prompt.c_str())) == nullptr) {
       
     // EOF means "quit"
@@ -302,9 +362,22 @@ int Tty::play() {
   return 0;
 }
 
+void Tty::renderTable(void) {
 
+  std::cout << " -- Dealer's hand:  --------" << std::endl;
+  renderHand(&dealerHand);
+  std::cout << "    Total: " << dealerHand.total() << std::endl;
 
-void Tty::render(Hand *hand) {
+  std::cout << " -- Player's hand --------" << std::endl;
+  for (auto hand : hands) {
+    renderHand(&hand);
+    std::cout << "    Total: " << hand.total() << std::endl;
+  }  
+
+  return;
+}
+
+void Tty::renderHand(Hand *hand) {
 
   for (auto it : hand->cards) {
     std::cout << " _____   ";

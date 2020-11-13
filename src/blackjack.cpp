@@ -222,7 +222,7 @@ void Blackjack::deal(Player *player) {
       // step 8. check if there are any blackjack
       playerBlackack = player->currentHand->blackjack();
       if (hand.blackjack()) {
-        player->info(Info::CardDealerHoleRevealed, holeCard);
+        player->info(Info::CardDealerRevealsHole, holeCard);
         player->info(Info::DealerBlackjack);
         player->blackjacksDealer++;
 
@@ -311,8 +311,8 @@ void Blackjack::deal(Player *player) {
 
         if (player->bustedAllHands) {
 
-          player->info(Info::PlayerBustedAllHands);
-          player->info(Info::CardDealerHoleRevealed, holeCard);
+          player->info(Info::PlayerBustsAllHands);
+          player->info(Info::CardDealerRevealsHole, holeCard);
           // TODO: no tengo que sacarle todo el dinero?
           
           player->actionRequired = PlayerActionRequired::None;
@@ -328,7 +328,7 @@ void Blackjack::deal(Player *player) {
     
     case DealerAction::HitDealerHand:
         
-      player->info(Info::CardDealerHoleRevealed, holeCard);
+      player->info(Info::CardDealerRevealsHole, holeCard);
 
       // hit if count is less than 17 (or equalt to soft 17 if hit_soft_17 is true)
       dealerTotal = hand.total();
@@ -339,7 +339,7 @@ void Blackjack::deal(Player *player) {
         dealerTotal = std::abs(hand.total());
 
         if (hand.busted()) {
-          player->info(Info::DealerBusted);
+          player->info(Info::DealerBusts);
           player->bustsDealer++;
           for (auto playerHand : player->hands) {
             if (playerHand.busted() == false) {
@@ -433,9 +433,8 @@ int Blackjack::process(Player *player) {
 ///ig+help+desc Ask for help
 ///ig+help+detail A succinct help message is written on the standard output.
 ///ig+help+detail This command makes sense only when issued by a human player.
-    // TODO
     case PlayerActionTaken::Help:
-      std::cout << "help yourself" << std::endl;
+      player->info(Info::Help);  
       return 0;
     break;  
       

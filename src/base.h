@@ -77,7 +77,7 @@ enum class Info {
   Shuffle,
   CardPlayer,
   CardDealer,
-  CardDealerHoleRevealed,
+  CardDealerRevealsHole,
   DealerBlackjack,
   PlayerWinsInsurance,
   PlayerBlackjackAlso,
@@ -86,8 +86,9 @@ enum class Info {
   PlayerBlackjack,
   PlayerWins,
   NoBlackjacks,
-  PlayerBustedAllHands,
-  DealerBusted,
+  PlayerBustsAllHands,
+  DealerBusts,
+  Help,
   Bye,
 };
 

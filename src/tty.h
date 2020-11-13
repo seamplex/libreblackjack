@@ -32,11 +32,11 @@ class Tty : public Player {
     int play() override;
     void info(Info = Info::None, int = 0) override;
 
-    void render(Hand *);
-
-    
   private:
-    
+
+    void renderHand(Hand *);
+    void renderTable(void);
+      
 #ifdef HAVE_LIBREADLINE
   char *input_buffer;
 #else
