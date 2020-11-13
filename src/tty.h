@@ -24,6 +24,8 @@
 #define TTY_H
 #include "blackjack.h"
 
+extern std::vector<std::string> commands;
+
 class Tty : public Player {
   public:  
     Tty(Configuration &);
@@ -32,6 +34,12 @@ class Tty : public Player {
     int play() override;
     void info(Info = Info::None, int = 0) override;
 
+    // for readline's autocompletion
+    static char *rl_command_generator(const char *, int);
+    static char **rl_completion(const char *, int, int);
+    static int list_index;
+    static int len;  
+    
   private:
 
     void renderHand(Hand *);
@@ -47,7 +55,7 @@ class Tty : public Player {
     std::string prompt;
     
     int delay = 200;
-
+    
     std::string black   = "\x1B[0m";
     std::string red     = "\x1B[31m";
     std::string green   = "\x1B[32m";

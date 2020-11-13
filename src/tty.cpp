@@ -25,6 +25,11 @@
 #include <thread>
 #include <chrono>
 
+#include <algorithm> 
+#include <functional> 
+#include <cctype>
+#include <locale>
+
 #ifdef HAVE_LIBREADLINE
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -34,58 +39,30 @@
 #include "blackjack.h"
 #include "tty.h"
 
+// TODO: make class static
+std::vector<std::string> commands;
 
 
 
-
-// extern "C" {
-
-char *blackjack_commands[] = {
-    "help",
-    "hit",
-    "stand",
-    "yes",
-    "no",
-    NULL
-};
-
-
-char *blackjack_command_generator(const char *text, int state) {
-  static int list_index, len;
-  char *name;
-
-  if (!state) {
-    list_index = 0;
-    len = strlen(text);
-  }
-
-  while ((name = blackjack_commands[list_index++])) {
-    name = strdup(name);
-
-    if (strncmp(name, text, len) == 0) {
-      return name;
-    } else {
-      free(name);
-    }
-  }
-
-  return NULL;
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
 }
 
-char **blackjack_rl_completion(const char *text, int start, int end) {
-  char **matches = NULL;
-
-#ifdef HAVE_LIBREADLINE
-  matches = rl_completion_matches(text, blackjack_command_generator);
-#endif
-
-  return matches;
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
 }
 
-
-
-// }
-
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
 
 
 Tty::Tty(Configuration &conf) {
@@ -93,6 +70,17 @@ Tty::Tty(Configuration &conf) {
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
   conf.set(&no_insurance, {"no_insurance", "dont_insure"});  
 
+  if (commands.size() == 0) {
+//    commands.push_back("help");
+    commands.push_back("hit");
+    commands.push_back("stand");
+    commands.push_back("double");
+    commands.push_back("split");
+    commands.push_back("yes");
+    commands.push_back("no");
+    commands.push_back("quit");
+  }
+  
   // TODO: check conf for colors
   prompt = cyan + " > " + reset;
 }
@@ -128,6 +116,7 @@ void Tty::info(Info msg, int intData) {
 //      s = "shuffle";  
       s = "Deck needs to be shuffled.";
     break;
+    
     case Info::CardPlayer:
       switch (currentHand->cards.size()) {
         case 1:
@@ -167,44 +156,48 @@ void Tty::info(Info msg, int intData) {
 //      s = "card_dealer_hole";
       s = "Dealer's hole card was " + card[intData].utf8();
       *(++(dealerHand.cards.begin())) = intData;
+      renderTable();  
     break;
     
     case Info::DealerBlackjack:
 //      s = "dealer_blackjack";
       s = "Dealer has Blackjack";
       // TODO: draw dealer's hand
+      renderTable();  
     break;
     
     case Info::PlayerWinsInsurance:
 //      s = "player_wins_insurance";
       s = "Player wins insurance";
+      renderTable();  
     break;
     
     case Info::PlayerBlackjackAlso:
 //      s = "player_blackjack_also";
       s = "Player also has Blackjack";
+      renderTable();  
     break;
+    
     case Info::PlayerPushes:
 //      s = "player_pushes";
       s = "Player pushes";
-      // TODO:
-      //  print_hand_art (player->current_hand);
+      renderTable();  
     break;
+    
     case Info::PlayerLosses:
 //      s = "player_losses";
       s = "Player losses";
-      // TODO:
-      //  print_hand_art (player->current_hand);
+      renderTable();  
     break;
     case Info::PlayerBlackjack:
 //      s = "blackjack_player";
       s = "Player has Blackjack";
-      // TODO:
-      //  print_hand_art (player->current_hand);
+      renderTable();  
     break;
     case Info::PlayerWins:
 //      s = "player_wins";
       s = "Player wins " + std::to_string(intData);
+      renderTable();  
     break;
     
     case Info::NoBlackjacks:
@@ -219,11 +212,13 @@ void Tty::info(Info msg, int intData) {
       } else {  
         s = "Player busted all hands";
       }
+      renderTable();  
     break;
     
     case Info::DealerBusts:
 //      s = "no_blackjacks";
       s = "Dealer busts!";
+      renderTable();  
     break;  
     
     case Info::Help:
@@ -274,7 +269,7 @@ int Tty::play() {
   }
     
 #ifdef HAVE_LIBREADLINE
-  rl_attempted_completion_function = blackjack_rl_completion;  
+  rl_attempted_completion_function = rl_completion;  
   if ((input_buffer = readline(prompt.c_str())) == nullptr) {
       
     // EOF means "quit"
@@ -286,22 +281,24 @@ int Tty::play() {
     add_history(input_buffer);
     actionTaken = PlayerActionTaken::None;
 
-  // TODO: convertir a string y usar algo comun para non-readline
+    // TODO: better solution
+    std::string command = input_buffer;
+    trim(command);
+    
+    
     // check common commands first
-    if (strcmp(input_buffer, "quit") == 0 || strcmp(input_buffer, "q")== 0) {
+           if (command == "quit" || command == "q") {
       actionTaken = PlayerActionTaken::Quit;
-    } else if (strcmp(input_buffer, "help") == 0) {
+    } else if (command == "help") {
       actionTaken = PlayerActionTaken::Help;
-    } else if (strcmp(input_buffer, "count") == 0 || strcmp(input_buffer, "c")== 0) {
+    } else if (command == "count" || command == "c") {
       actionTaken = PlayerActionTaken::Count;
-    } else if (strcmp(input_buffer, "upcard") == 0 || strcmp(input_buffer, "u")== 0) {
+    } else if (command == "upcard" || command == "u") {
       actionTaken = PlayerActionTaken::UpcardValue;
-    } else if (strcmp(input_buffer, "bankroll") == 0 || strcmp(input_buffer, "b")== 0) {
+    } else if (command == "bankroll" || command == "b") {
       actionTaken = PlayerActionTaken::Bankroll;
-    } else if (strcmp(input_buffer, "hands") == 0) {
+    } else if (command == "hands") {
       actionTaken = PlayerActionTaken::Hands;
-    } else if (strcmp(input_buffer, "table") == 0) {
-      actionTaken = PlayerActionTaken::Table;
     }
     
     if (actionTaken == PlayerActionTaken::None) {
@@ -313,9 +310,9 @@ int Tty::play() {
         break;
 
         case PlayerActionRequired::Insurance:
-          if (strcmp(input_buffer, "y") == 0 || strcmp(input_buffer, "yes") == 0) {
+          if (command == "y" || command == "yes") {
             actionTaken = PlayerActionTaken::Insure;
-          } else if (strcmp(input_buffer, "n") == 0 || strcmp(input_buffer, "no") == 0) {
+          } else if (command == "n" || command == "no") {
             actionTaken = PlayerActionTaken::DontInsure;
           } else {
             // TODO: chosse if we allow not(yes) == no
@@ -326,13 +323,13 @@ int Tty::play() {
         case PlayerActionRequired::Play:
 
           // TODO: sort by higher-expected response first
-          if (strcmp(input_buffer, "h") == 0 || strcmp(input_buffer, "hit") == 0) {
+                 if (command == "h" || command =="hit") {
             actionTaken = PlayerActionTaken::Hit;
-          } else if (strcmp(input_buffer, "s") == 0 || strcmp(input_buffer, "stand") == 0) {
+          } else if (command == "s" || command == "stand") {
             actionTaken = PlayerActionTaken::Stand;
-          } else if (strcmp(input_buffer, "d") == 0 || strcmp(input_buffer, "double") == 0) {
+          } else if (command == "d" || command == "double") {
             actionTaken = PlayerActionTaken::Stand;
-          } else if (strcmp(input_buffer, "p") == 0 || strcmp(input_buffer, "pair") == 0 || strcmp(input_buffer, "split") == 0) {
+          } else if (command == "p" || command == "split" || command == "pair") {
             actionTaken = PlayerActionTaken::Split;
           } else {
             actionTaken = PlayerActionTaken::None;
@@ -441,4 +438,35 @@ void Tty::renderHand(Hand *hand) {
   
   return;
     
+}
+
+
+int Tty::list_index = 0;
+int Tty::len = 0;
+
+char *Tty::rl_command_generator(const char *text, int state) {
+    
+  if (!state) {
+    list_index = 0;
+    len = strlen(text);
+  }
+
+  for (auto i = list_index; i < commands.size(); i++) {
+    if (commands[i].compare(0, len, text) == 0) {
+      list_index = i+1;
+      return strdup(commands[i].c_str());
+    }
+  }
+
+  return NULL;
+}
+
+char **Tty::rl_completion(const char *text, int start, int end) {
+  char **matches = NULL;
+
+#ifdef HAVE_LIBREADLINE
+  matches = rl_completion_matches(text, rl_command_generator);
+#endif
+
+  return matches;
 }
