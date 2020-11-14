@@ -25,11 +25,6 @@
 #include <thread>
 #include <chrono>
 
-#include <algorithm> 
-#include <functional> 
-#include <cctype>
-#include <locale>
-
 #ifdef HAVE_LIBREADLINE
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -43,27 +38,6 @@
 std::vector<std::string> commands;
 
 
-// trim from start (in place)
-static inline void ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }));
-}
-
-// trim from end (in place)
-static inline void rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }).base(), s.end());
-}
-
-// trim from both ends (in place)
-static inline void trim(std::string &s) {
-    ltrim(s);
-    rtrim(s);
-}
-
-
 Tty::Tty(Configuration &conf) {
     
   Libreblackjack::shortversion();
@@ -71,6 +45,7 @@ Tty::Tty(Configuration &conf) {
 
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
   conf.set(&no_insurance, {"no_insurance", "dont_insure"});  
+  conf.set(&delay, {"delay"});  
 
   if (commands.size() == 0) {
 //    commands.push_back("help");
@@ -105,7 +80,7 @@ Tty::Tty(Configuration &conf) {
   return;
 }
 
-void Tty::info(Info msg, int intData) {
+void Tty::info(Info msg, int p) {
   std::string s;
   
   // TODO: choose utf8 or other representation
@@ -113,12 +88,12 @@ void Tty::info(Info msg, int intData) {
   switch (msg) {
 
     case Info::InvalidBet:
-      if (intData < 0) {
+      if (p < 0) {
 //      s = "bet_negative";  
-        s = "Your bet is negative (" + std::to_string(intData) + ")";
-      } else if (intData > 0) {
+        s = "Your bet is negative (" + std::to_string(p) + ")";
+      } else if (p > 0) {
 //      s = "bet_maximum";  
-        s = "Your bet is larger than the maximum allowed (" + std::to_string(intData) + ")";
+        s = "Your bet is larger than the maximum allowed (" + std::to_string(p) + ")";
       } else {
 //      s = "bet_zero";
         s = "Your bet is zero";
@@ -128,7 +103,7 @@ void Tty::info(Info msg, int intData) {
     case Info::NewHand:
 //      s = "new_hand";  
       std::cout << std::endl;
-      s = "Starting new hand, bankroll " + std::to_string(intData);
+      s = "Starting new hand, bankroll " + std::to_string(p);
       dealerHand.cards.clear();
     break;
     
@@ -141,41 +116,41 @@ void Tty::info(Info msg, int intData) {
       switch (currentHand->cards.size()) {
         case 1:
 //          s = "card_player_first";
-          s = "Player's first card is " + card[intData].utf8();
+          s = "Player's first card is " + card[p].utf8();
         break;
         case 2:
 //          s = "card_player_second";
-          s = "Player's second card is " + card[intData].utf8();
+          s = "Player's second card is " + card[p].utf8();
         break;
         default:
 //          s = "card_player";
-          s = "Player's card is " + card[intData].utf8();
+          s = "Player's card is " + card[p].utf8();
         break;
       } 
     break;
     
     case Info::CardDealer:
-      if (intData != -1) {  
+      if (p != -1) {  
         switch (dealerHand.cards.size()) {
           case 0:
 //            s = "card_dealer_up";
-            s = "Dealer's up card is " + card[intData].utf8();
+            s = "Dealer's up card is " + card[p].utf8();
           break;
           default:
 //            s = "card_dealer";
-            s = "Dealer's card is " + card[intData].utf8();
+            s = "Dealer's card is " + card[p].utf8();
           break;
         }
       } else {
         s = "Dealer's hole card is dealt";
       }
-      dealerHand.cards.push_back(intData);
+      dealerHand.cards.push_back(p);
     break;
     
     case Info::CardDealerRevealsHole:
 //      s = "card_dealer_hole";
-      s = "Dealer's hole card was " + card[intData].utf8();
-      *(++(dealerHand.cards.begin())) = intData;
+      s = "Dealer's hole card was " + card[p].utf8();
+      *(++(dealerHand.cards.begin())) = p;
 //      renderTable();  
     break;
     
@@ -192,6 +167,12 @@ void Tty::info(Info msg, int intData) {
     case Info::PlayerBlackjackAlso:
 //      s = "player_blackjack_also";
       s = "Player also has Blackjack";
+      renderTable();  
+    break;
+
+    case Info::PlayerNextHand:
+//      s = "player_pushes";
+      s = "Playing next hand #" + std::to_string(p);
       renderTable();  
     break;
     
@@ -213,7 +194,7 @@ void Tty::info(Info msg, int intData) {
     break;
     case Info::PlayerWins:
 //      s = "player_wins";
-      s = "Player wins " + std::to_string(intData);
+      s = "Player wins " + std::to_string(p);
       renderTable();  
     break;
     
@@ -389,12 +370,12 @@ void Tty::renderTable(void) {
 
   std::cout << " -- Dealer's hand:  --------" << std::endl;
   renderHand(&dealerHand);
-  std::cout << "    Total: " << dealerHand.total() << std::endl;
+  std::cout << "    Total: " << ((dealerHand.total() < 0)?"soft ":"") << std::abs(dealerHand.total()) << std::endl;
 
   std::cout << " -- Player's hand --------" << std::endl;
   for (auto hand : hands) {
     renderHand(&hand);
-    std::cout << "    Total: " << hand.total() << std::endl;
+    std::cout << "    Total: " << ((hand.total() < 0)?"soft ":"") << std::abs(hand.total()) << std::endl;
   }  
 
   return;

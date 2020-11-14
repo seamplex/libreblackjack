@@ -36,7 +36,7 @@
 
 #include "blackjack.h"
 
-Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(0, 51) {
+Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 52) {
 
   conf.set(&n_hands, {"n_hands", "hands"});  
   conf.set(&n_decks, {"decks", "n_decks"});
@@ -120,7 +120,6 @@ void Blackjack::deal(Player *player) {
       // state that the player did not win anything nor splitted nor doubled down
       player->current_result = 0;
       player->currentSplits = 0;
-//      player->hasDoubled = 0;
       
       if (lastPass) {
         player->info(Info::Shuffle);
@@ -137,9 +136,12 @@ void Blackjack::deal(Player *player) {
       
       if (player->flat_bet) {
         player->currentHand->bet = player->flat_bet;
+        player->actionRequired = PlayerActionRequired::None;
         nextAction = DealerAction::DealPlayerFirstCard;
       } else {
+        player->actionRequired = PlayerActionRequired::Bet;
         nextAction = DealerAction::AskForBets;
+
       }
 
       player->info(Info::NewHand, player->bankroll);
@@ -582,14 +584,15 @@ int Blackjack::process(Player *player) {
 
         // deal a card to the first hand
         playerCard = drawCard(&(*player->currentHand));
-        std::cout << "card_player_second " << card[playerCard].utf8() << std::endl;
+        player->info(Info::CardPlayer, playerCard);
 
         // aces get dealt only one card
         // also, if the player gets 21 then we move on to the next hand
         if (card[*player->currentHand->cards.begin()].value == 11 || std::abs(player->currentHand->total()) == 21) {
           if (++player->currentHand != player->hands.end()) {
+            player->info(Info::PlayerNextHand, (*player->currentHand).id);
             playerCard = drawCard(&(*player->currentHand));
-            std::cout << "card_player_second " << card[playerCard].utf8() << std::endl;
+            player->info(Info::CardPlayer, playerCard);
 
             // if the player got an ace or 21 again, we are done
             if (card[*player->currentHand->cards.begin()].value == 11 || std::abs(player->currentHand->total()) == 21) {
@@ -684,7 +687,7 @@ unsigned int Blackjack::drawCard(Hand *hand) {
   if (n_decks == -1) {
     if (n_arranged_cards != 0 && i_arranged_cards < n_arranged_cards) {
       // negative (or invalid) values are placeholder for random cards  
-      if ((tag = arranged_cards[i_arranged_cards++]) < 0 || tag > 51) {
+      if ((tag = arranged_cards[i_arranged_cards++]) <= 0 || tag > 52) {
         tag = fiftyTwoCards(rng);
       }
     } else {

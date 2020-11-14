@@ -98,7 +98,7 @@ Configuration::Configuration(int argc, char **argv) {
         if (optarg != NULL) {
           data["flat_bet"] = optarg;
         } else {
-          data["flat_bet"] = "1";
+          data["flat_bet"] = "yes";
         }
       break;
       case '?':

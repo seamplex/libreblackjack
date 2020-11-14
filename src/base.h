@@ -86,6 +86,7 @@ enum class Info {
   DealerBlackjack,
   PlayerWinsInsurance,
   PlayerBlackjackAlso,
+  PlayerNextHand,
   PlayerPushes,
   PlayerLosses,
   PlayerBlackjack,
@@ -140,8 +141,8 @@ class Card {
     std::string singleUTF8;
 };
 
-// TODO: static inside a class
-extern Card card[52];
+// TODO: class static? which class?
+extern Card card[53];
 
 class Hand {
   public:
@@ -226,7 +227,7 @@ class Player {
     unsigned int losses = 0;
     // TODO: blackjack_pushes?
     
-    unsigned int flat_bet = 1;
+    unsigned int flat_bet = 0;
     bool no_insurance = false;
     bool always_insure = false;
   
@@ -260,16 +261,7 @@ class Dealer {
     virtual void deal(Player *) = 0;
     virtual unsigned int drawCard(Hand * = nullptr) = 0;
     virtual int process(Player *) = 0;
-    
-/*    
-    void setNextAction(DealerAction a) {
-      next_action = a;
-    }
 
-    void getNextAction(DealerAction a) {
-      next_action = a;
-    }
-*/    
     bool finished(void) {
       return done;
     }

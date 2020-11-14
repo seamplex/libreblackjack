@@ -31,7 +31,7 @@ void shortversion(void) {
 
   std::cout << "LibreBlackjack ";  
 #ifdef LIBREBLACKJACK_VCS_BRANCH
-  std::cout << LIBREBLACKJACK_VCS_VERSION << ((LIBREBLACKJACK_VCS_CLEAN == 0) ? "" : "+Δ") << ((strcmp(LIBREBLACKJACK_VCS_BRANCH, "master") == 0) ? LIBREBLACKJACK_VCS_BRANCH : "") << std::endl;
+  std::cout << LIBREBLACKJACK_VCS_VERSION << ((LIBREBLACKJACK_VCS_CLEAN == 0) ? "" : "+Δ") << ((strcmp(LIBREBLACKJACK_VCS_BRANCH, "master")) ? LIBREBLACKJACK_VCS_BRANCH : "") << std::endl;
 #else
   std::cout << PACKAGE_VERSION << std::endl;
 #endif
