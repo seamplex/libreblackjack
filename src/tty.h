@@ -37,7 +37,7 @@ class Tty : public Player {
     ~Tty() { };
     
     int play() override;
-    void info(Info = Info::None, int = 0) override;
+    void info(Info = Info::None, int = 0, int = 0) override;
 
     // for readline's autocompletion
     static char *rl_command_generator(const char *, int);

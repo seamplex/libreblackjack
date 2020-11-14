@@ -80,20 +80,21 @@ Tty::Tty(Configuration &conf) {
   return;
 }
 
-void Tty::info(Info msg, int p) {
+void Tty::info(Info msg, int p1, int p2) {
   std::string s;
+  bool render = false;
   
   // TODO: choose utf8 or other representation
   
   switch (msg) {
 
     case Info::InvalidBet:
-      if (p < 0) {
+      if (p1 < 0) {
 //      s = "bet_negative";  
-        s = "Your bet is negative (" + std::to_string(p) + ")";
-      } else if (p > 0) {
+        s = "Your bet is negative (" + std::to_string(p1) + ")";
+      } else if (p1 > 0) {
 //      s = "bet_maximum";  
-        s = "Your bet is larger than the maximum allowed (" + std::to_string(p) + ")";
+        s = "Your bet is larger than the maximum allowed (" + std::to_string(p1) + ")";
       } else {
 //      s = "bet_zero";
         s = "Your bet is zero";
@@ -103,11 +104,12 @@ void Tty::info(Info msg, int p) {
     case Info::NewHand:
 //      s = "new_hand";  
       std::cout << std::endl;
-      s = "Starting new hand, bankroll " + std::to_string(p);
+      s = "Starting new hand #" + std::to_string(p1) + " with bankroll " + std::to_string(1e-3*p2);
       dealerHand.cards.clear();
     break;
     
     case Info::Shuffle:
+      // TODO: ask the user to cut  
 //      s = "shuffle";  
       s = "Deck needs to be shuffled.";
     break;
@@ -116,42 +118,41 @@ void Tty::info(Info msg, int p) {
       switch (currentHand->cards.size()) {
         case 1:
 //          s = "card_player_first";
-          s = "Player's first card is " + card[p].utf8();
+          s = "Player's first card is " + card[p1].utf8();
         break;
         case 2:
 //          s = "card_player_second";
-          s = "Player's second card is " + card[p].utf8();
+          s = "Player's second card is " + card[p1].utf8();
         break;
         default:
 //          s = "card_player";
-          s = "Player's card is " + card[p].utf8();
+          s = "Player's card is " + card[p1].utf8();
         break;
       } 
     break;
     
     case Info::CardDealer:
-      if (p != -1) {  
+      if (p1 > 0) {  
         switch (dealerHand.cards.size()) {
           case 0:
 //            s = "card_dealer_up";
-            s = "Dealer's up card is " + card[p].utf8();
+            s = "Dealer's up card is " + card[p1].utf8();
           break;
           default:
 //            s = "card_dealer";
-            s = "Dealer's card is " + card[p].utf8();
+            s = "Dealer's card is " + card[p1].utf8();
           break;
         }
       } else {
         s = "Dealer's hole card is dealt";
       }
-      dealerHand.cards.push_back(p);
+      dealerHand.cards.push_back(p1);
     break;
     
     case Info::CardDealerRevealsHole:
 //      s = "card_dealer_hole";
-      s = "Dealer's hole card was " + card[p].utf8();
-      *(++(dealerHand.cards.begin())) = p;
-//      renderTable();  
+      s = "Dealer's hole card was " + card[p1].utf8();
+      *(++(dealerHand.cards.begin())) = p1;
     break;
     
     case Info::DealerBlackjack:
@@ -167,42 +168,43 @@ void Tty::info(Info msg, int p) {
     case Info::PlayerBlackjackAlso:
 //      s = "player_blackjack_also";
       s = "Player also has Blackjack";
-      renderTable();  
+      render = true;
     break;
 
     case Info::PlayerNextHand:
-//      s = "player_pushes";
-      s = "Playing next hand #" + std::to_string(p);
-      renderTable();  
+//      s = "player_next_hand";
+      s = "Playing next hand #" + std::to_string(p1);
+      render = true;
     break;
     
     case Info::PlayerPushes:
 //      s = "player_pushes";
-      s = "Player pushes";
-      renderTable();  
+      s = "Player pushes " + std::to_string(1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
+      render = true;
     break;
     
     case Info::PlayerLosses:
 //      s = "player_losses";
-      s = "Player losses";
-      renderTable();  
+      s = "Player losses " + std::to_string(1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
+      render = true;
     break;
     case Info::PlayerBlackjack:
 //      s = "blackjack_player";
       s = "Player has Blackjack";
-      renderTable();  
+      render = true;
     break;
     case Info::PlayerWins:
 //      s = "player_wins";
-      s = "Player wins " + std::to_string(p);
-      renderTable();  
+      s = "Player wins " + std::to_string(1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
+      render = true;
     break;
     
     case Info::NoBlackjacks:
 //      s = "no_blackjacks";
       s = "No blackjacks";
     break;
-    
+
+/*    
     case Info::PlayerBustsAllHands:
 //      s = "player_busted_all_hands";
       if (hands.size() == 1) {
@@ -212,11 +214,10 @@ void Tty::info(Info msg, int p) {
       }
       renderTable();  
     break;
-    
+*/  
     case Info::DealerBusts:
 //      s = "no_blackjacks";
-      s = "Dealer busts!";
-      renderTable();  
+      s = "Dealer busts with " + std::to_string(p1);
     break;  
     
     case Info::Help:
@@ -238,6 +239,10 @@ void Tty::info(Info msg, int p) {
     std::this_thread::sleep_for(std::chrono::milliseconds(delay));
   }  
   std::cout << green << s << reset << std::endl;
+
+  if (render) {
+    renderTable();
+  }
   
   return;
 }
@@ -287,6 +292,7 @@ int Tty::play() {
 
     // TODO: better solution
     std::string command = input_buffer;
+    free(input_buffer);
     trim(command);
     
     
@@ -309,7 +315,7 @@ int Tty::play() {
       switch (actionRequired) {
 
         case PlayerActionRequired::Bet:
-          currentBet = std::stoi(input_buffer);
+          currentBet = std::stoi(command);
           actionTaken = PlayerActionTaken::Bet;
         break;
 
@@ -344,8 +350,6 @@ int Tty::play() {
         
       }
     }
-      
-    free(input_buffer);
   }
   
 #else
@@ -383,63 +387,80 @@ void Tty::renderTable(void) {
 
 void Tty::renderHand(Hand *hand) {
 
+  std::string ansiColor;
+  std::string ansiReset;
+  
   for (unsigned int i = 0; i < hand->cards.size(); i++) {
     std::cout << " _____   ";
   }
   std::cout << std::endl;
   
-  unsigned int i = 0;
-  for (auto it : hand->cards) {
-    if (it >= 0) {
-      std::cout << "|" << card[it].getNumberASCII() << ((card[it].number != 10)?" ":"") << "   |  ";
+  for (auto c : hand->cards) {
+    if (color && (card[c].suit == Suit::Diamonds || card[c].suit == Suit::Hearts)) {
+      ansiColor = red;
+      ansiReset = reset;
+    } else {
+      ansiColor = "";
+      ansiReset = "";
+    }
+    
+    if (c > 0) {
+      std::cout << "|" << ansiColor << card[c].getNumberASCII() << ((card[c].number != 10)?" ":"") << ansiReset << "   |  ";
     } else {
       std::cout << "|#####|  ";
     }
-    i++;
   }
   std::cout << std::endl;
 
-  i = 0;
-  for (auto it : hand->cards) {
-    if (it >= 0) {
+  for (auto c : hand->cards) {
+    if (c > 0) {
       std::cout << "|     |  ";
     } else {
       std::cout << "|#####|  ";
     }
-    i++;
   }
   std::cout << std::endl;
   
-  i = 0;
-  for (auto it : hand->cards) {
-    if (it >= 0) {
-      std::cout << "|  " << card[it].getSuitUTF8() << "  |  ";
+  for (auto c : hand->cards) {
+    if (color && (card[c].suit == Suit::Diamonds || card[c].suit == Suit::Hearts)) {
+      ansiColor = red;
+      ansiReset = reset;
+    } else {
+      ansiColor = "";
+      ansiReset = "";
+    }
+    
+    if (c > 0) {
+      std::cout << "|  " << ansiColor << card[c].getSuitUTF8() << ansiReset << "  |  ";
     } else {
       std::cout << "|#####|  ";
     }
-    i++;
   }
   std::cout << std::endl;
   
-  i = 0;
-  for (auto it : hand->cards) {
-    if (it >= 0) {
+  for (auto c : hand->cards) {
+    if (c > 0) {
       std::cout << "|     |  ";
     } else {
       std::cout << "|#####|  ";
     }
-    i++;
   }
   std::cout << std::endl;
 
-  i = 0;
-  for (auto it : hand->cards) {
-    if (it >= 0) {
-      std::cout << "|___" << ((card[it].number != 10)?"_":"") << card[it].getNumberASCII() << "|  ";
+  for (auto c : hand->cards) {
+    if (color && (card[c].suit == Suit::Diamonds || card[c].suit == Suit::Hearts)) {
+      ansiColor = red;
+      ansiReset = reset;
+    } else {
+      ansiColor = "";
+      ansiReset = "";
+    }
+      
+    if (c > 0) {
+      std::cout << "|___" << ansiColor << ((card[c].number != 10)?"_":"") << card[c].getNumberASCII() << ansiReset<< "|  ";
     } else {
       std::cout << "|#####|  ";
     }
-    i++;
   }
   std::cout << std::endl;
   

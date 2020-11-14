@@ -1,9 +1,10 @@
- * version and copyright
- * messages implemented on the player's side
- * arranged shoes
+ * handle no readline
+ * to_string() para floats
+ * max_splits through conf (default 3)
+ * DAS
+ * shoes (and arranged shoes)
  * name of the game the dealer deals
  * name of the games the player can play
- * delays?
  * dealers
    * ENHC
    * blackjack switch
@@ -24,5 +25,3 @@
  
  * multithreading
  * use of const and restrict 
- 
- 

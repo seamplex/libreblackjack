@@ -73,6 +73,7 @@ int main(int argc, char **argv) {
   while (!dealer->finished()) {
     dealer->deal(player);
     if (player->actionRequired != PlayerActionRequired::None) {
+      unknownCommands = 0;
       do {
         if (unknownCommands++ > conf.max_incorrect_commands) {
           std::cerr << "Too many unknown commands." << std::endl;

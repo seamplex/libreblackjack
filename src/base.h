@@ -92,7 +92,7 @@ enum class Info {
   PlayerBlackjack,
   PlayerWins,
   NoBlackjacks,
-  PlayerBustsAllHands,
+//  PlayerBustsAllHands,
   DealerBusts,
   Help,
   Bye,
@@ -104,6 +104,11 @@ enum class Suit {
   Diamonds = 1,
   Hearts   = 2,
   Spades   = 3
+};
+
+enum class Color {
+  Black,
+  Red
 };
 
 
@@ -146,7 +151,7 @@ extern Card card[53];
 
 class Hand {
   public:
-    std::list<int> cards;
+    std::list<unsigned int> cards;
 
     // inline on purpose
     int total() {
@@ -198,7 +203,7 @@ class Player {
     Player(const Player &&) = delete;
 
     virtual int play() = 0;
-    virtual void info(Info = Info::None, int = 0) = 0;
+    virtual void info(Info = Info::None, int = 0, int = 0) = 0;
     
     PlayerActionRequired actionRequired = PlayerActionRequired::None;
     PlayerActionTaken    actionTaken    = PlayerActionTaken::None;
