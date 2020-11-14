@@ -122,7 +122,7 @@ void Blackjack::deal(Player *player) {
       player->currentSplits = 0;
       
       if (lastPass) {
-        player->info(Info::Shuffle);
+        info(player, Info::Shuffle);
           
         // shuffle the cards          
         shuffle();        
@@ -144,7 +144,7 @@ void Blackjack::deal(Player *player) {
 
       }
 
-      player->info(Info::NewHand, n_hand, 1e3*player->bankroll);
+      info(player, Info::NewHand, n_hand, 1e3*player->bankroll);
       return;
       
     break;
@@ -160,19 +160,19 @@ void Blackjack::deal(Player *player) {
       player->total_money_waged += player->currentHand->bet;
 
       playerFirstCard = drawCard(&(*player->currentHand));
-      player->info(Info::CardPlayer, playerFirstCard);
+      info(player, Info::CardPlayer, playerFirstCard);
             
       // step 4. show dealer's upcard
       upCard = drawCard(&hand);
-      player->info(Info::CardDealer, upCard);
+      info(player, Info::CardDealer, upCard);
 
       // step 5. deal the second card to each player
       playerSecondCard = drawCard(&(*player->currentHand));
-      player->info(Info::CardPlayer, playerSecondCard);
+      info(player, Info::CardPlayer, playerSecondCard);
       
       // step 6. deal the dealer's hole card 
       holeCard = drawCard(&hand);
-      player->info(Info::CardDealer);
+      info(player, Info::CardDealer);
 
       // step 7.a. if the upcard is an ace ask for insurance
       if (card[upCard].value == 11) {
@@ -216,25 +216,25 @@ void Blackjack::deal(Player *player) {
       // step 8. check if there are any blackjack
       playerBlackack = player->currentHand->blackjack();
       if (hand.blackjack()) {
-        player->info(Info::CardDealerRevealsHole, holeCard);
-        player->info(Info::DealerBlackjack);
+        info(player, Info::CardDealerRevealsHole, holeCard);
+        info(player, Info::DealerBlackjack);
         player->blackjacksDealer++;
 
         if (player->currentHand->insured) {
-          player->info(Info::PlayerWinsInsurance, 1e3*player->currentHand->bet);
+          info(player, Info::PlayerWinsInsurance, 1e3*player->currentHand->bet);
           player->current_result += player->currentHand->bet;
           player->bankroll += player->currentHand->bet;
           player->winsInsured++;
         }
 
         if (playerBlackack) {
-          player->info(Info::PlayerBlackjackAlso);
-          player->info(Info::PlayerPushes, 1e3*player->currentHand->bet);
+          info(player, Info::PlayerBlackjackAlso);
+          info(player, Info::PlayerPushes, 1e3*player->currentHand->bet);
           player->blackjacksPlayer++;
           player->pushes++;
           
         } else {
-          player->info(Info::PlayerLosses, 1e3*player->currentHand->bet);
+          info(player, Info::PlayerLosses, 1e3*player->currentHand->bet);
           player->current_result -= player->currentHand->bet;
           player->bankroll -= player->currentHand->bet;
           if (player->bankroll < player->worst_bankroll) {
@@ -252,7 +252,7 @@ void Blackjack::deal(Player *player) {
         player->bankroll += blackjack_pays * player->currentHand->bet;
         player->blackjacksPlayer++;
         
-        player->info(Info::PlayerWins, 1e3 * blackjack_pays*player->currentHand->bet);
+        info(player, Info::PlayerWins, 1e3 * blackjack_pays*player->currentHand->bet);
         player->wins++;
         player->winsBlackjack++;
 
@@ -263,7 +263,7 @@ void Blackjack::deal(Player *player) {
       } else {
         // only if the dealer had the chance to have a blackjack we say "no_blackjacks"
         if (card[upCard].value == 10 || card[upCard].value == 11) {
-          player->info(Info::NoBlackjacks);
+          info(player, Info::NoBlackjacks);
         }
         
         nextAction = DealerAction::AskForPlay;
@@ -282,7 +282,7 @@ void Blackjack::deal(Player *player) {
       // see if we finished all the player's hands
       if (++player->currentHand != player->hands.end()) {
         unsigned int playerCard = drawCard(&(*player->currentHand));
-        player->info(Info::CardPlayer, playerCard);
+        info(player, Info::CardPlayer, playerCard);
 
         if (std::abs(player->currentHand->total()) == 21) {
           player->actionRequired = PlayerActionRequired::None;
@@ -295,16 +295,16 @@ void Blackjack::deal(Player *player) {
         }
       } else {
         // assume the player busted in all the hands
-        player->bustedAllHands = true;
+        bool bustedAllHands = true;
         for (auto playerHand : player->hands) {
           // if she did not bust, set false
           if (playerHand.busted() == false) {
-            player->bustedAllHands = false;
+            bustedAllHands = false;
           }
         }
 
-        if (player->bustedAllHands) {
-          player->info(Info::CardDealerRevealsHole, holeCard);
+        if (bustedAllHands) {
+          info(player, Info::CardDealerRevealsHole, holeCard);
           
           player->actionRequired = PlayerActionRequired::None;
           nextAction = DealerAction::StartNewHand;
@@ -319,23 +319,23 @@ void Blackjack::deal(Player *player) {
     
     case DealerAction::HitDealerHand:
         
-      player->info(Info::CardDealerRevealsHole, holeCard);
+      info(player, Info::CardDealerRevealsHole, holeCard);
 
       // hit while count is less than 17 (or equal to soft 17 if hit_soft_17 is true)
       dealerTotal = hand.total();
       while ((std::abs(dealerTotal) < 17 || (hit_soft_17 && dealerTotal == -17)) && hand.busted() == 0) {
         unsigned int dealerCard = drawCard(&hand);
-        player->info(Info::CardDealer, dealerCard);
+        info(player, Info::CardDealer, dealerCard);
         dealerTotal = hand.total();
       }
         
 
       if (hand.busted()) {
-        player->info(Info::DealerBusts, dealerTotal);
+        info(player, Info::DealerBusts, dealerTotal);
         player->bustsDealer++;
         for (auto playerHand : player->hands) {
           if (playerHand.busted() == false) {
-            player->info(Info::PlayerWins, 1e3*playerHand.bet);
+            info(player, Info::PlayerWins, 1e3*playerHand.bet);
             player->current_result += playerHand.bet;
             player->bankroll += playerHand.bet;
             player->wins++;
@@ -349,7 +349,7 @@ void Blackjack::deal(Player *player) {
            
             if (dealerTotal > playerTotal) {
                 
-              player->info(Info::PlayerLosses, 1e3*playerHand.bet, playerTotal);
+              info(player, Info::PlayerLosses, 1e3*playerHand.bet, playerTotal);
               player->bankroll -= playerHand.bet;
               if (player->bankroll < player->worst_bankroll) {
                 player->worst_bankroll = player->bankroll;
@@ -358,12 +358,12 @@ void Blackjack::deal(Player *player) {
                 
             } else if (dealerTotal == playerTotal) {
                   
-              player->info(Info::PlayerPushes, 1e3*playerHand.bet);
+              info(player, Info::PlayerPushes, 1e3*playerHand.bet);
               player->pushes++;
                 
             } else {
                 
-              player->info(Info::PlayerWins, 1e3*playerHand.bet, playerTotal);
+              info(player, Info::PlayerWins, 1e3*playerHand.bet, playerTotal);
               player->current_result += playerHand.bet;
               player->bankroll += playerHand.bet;
               player->wins++;
@@ -419,7 +419,7 @@ int Blackjack::process(Player *player) {
 ///ig+help+detail A succinct help message is written on the standard output.
 ///ig+help+detail This command makes sense only when issued by a human player.
     case PlayerActionTaken::Help:
-      player->info(Info::Help);  
+      info(player, Info::Help);  
       return 0;
     break;  
     
@@ -432,13 +432,13 @@ int Blackjack::process(Player *player) {
     case PlayerActionTaken::Bet:
       // TODO: bet = 0 -> wonging
       if (player->currentBet == 0) {
-        player->info(Info::InvalidBet, player->currentBet);
+        info(player, Info::InvalidBet, player->currentBet);
         return 0;
       } else if (player->currentBet < 0) {
-        player->info(Info::InvalidBet, player->currentBet);
+        info(player, Info::InvalidBet, player->currentBet);
         return 0;
       } else if (max_bet != 0  && player->currentBet > max_bet) {
-        player->info(Info::InvalidBet, player->currentBet);
+        info(player, Info::InvalidBet, player->currentBet);
         return 0;
       } else {
         // ok, valid bet
@@ -499,10 +499,10 @@ int Blackjack::process(Player *player) {
 
         playerCard = drawCard(&(*player->currentHand));
         unsigned int playerTotal = player->currentHand->total();
-        player->info(Info::CardPlayer, playerCard);
+        info(player, Info::CardPlayer, playerCard);
 
         if (player->currentHand->busted()) {
-          player->info(Info::PlayerLosses, 1e3*player->currentHand->bet, playerTotal);
+          info(player, Info::PlayerLosses, 1e3*player->currentHand->bet, playerTotal);
           player->current_result -= player->currentHand->bet;
           player->bankroll -= player->currentHand->bet;
           player->bustsPlayer++;
@@ -559,15 +559,15 @@ int Blackjack::process(Player *player) {
 
         // deal a card to the first hand
         playerCard = drawCard(&(*player->currentHand));
-        player->info(Info::CardPlayer, playerCard);
+        info(player, Info::CardPlayer, playerCard);
 
         // aces get dealt only one card
         // also, if the player gets 21 then we move on to the next hand
         if (card[*player->currentHand->cards.begin()].value == 11 || std::abs(player->currentHand->total()) == 21) {
           if (++player->currentHand != player->hands.end()) {
-            player->info(Info::PlayerNextHand, (*player->currentHand).id);
+            info(player, Info::PlayerNextHand, (*player->currentHand).id);
             playerCard = drawCard(&(*player->currentHand));
-            player->info(Info::CardPlayer, playerCard);
+            info(player, Info::CardPlayer, playerCard);
 
             // if the player got an ace or 21 again, we are done
             if (card[*player->currentHand->cards.begin()].value == 11 || std::abs(player->currentHand->total()) == 21) {
@@ -604,10 +604,10 @@ int Blackjack::process(Player *player) {
 ///ip+hit+detail 
 ///ip+hit+detail This command can be abbreviated as `h`.
       playerCard = drawCard(&(*player->currentHand));        
-      player->info(Info::CardPlayer, playerCard);
+      info(player, Info::CardPlayer, playerCard);
 
       if (player->currentHand->busted()) {
-        player->info(Info::PlayerLosses, 1e3*player->currentHand->bet);
+        info(player, Info::PlayerLosses, 1e3*player->currentHand->bet);
         player->current_result -= player->currentHand->bet;
         player->bankroll -= player->currentHand->bet;
         player->bustsPlayer++;

@@ -59,6 +59,11 @@ Tty::Tty(Configuration &conf) {
     commands.push_back("quit");
   }
   
+  verbose = true;
+  if (conf.exists("verbose")) {
+    conf.set(&verbose, {"verbose"});
+  }
+
   if (conf.exists("color")) {
     conf.set(&color, {"color"});
   }

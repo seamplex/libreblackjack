@@ -207,8 +207,6 @@ class Player {
     
     PlayerActionRequired actionRequired = PlayerActionRequired::None;
     PlayerActionTaken    actionTaken    = PlayerActionTaken::None;
-    
-    bool bustedAllHands = false;
 
     unsigned int currentSplits = 0;
     
@@ -232,7 +230,8 @@ class Player {
     unsigned int losses = 0;
     // TODO: blackjack_pushes?
     
-    unsigned int flat_bet = 0;
+    bool verbose = false;
+    bool flat_bet = false;
     bool no_insurance = false;
     bool always_insure = false;
   
@@ -266,6 +265,13 @@ class Dealer {
     virtual void deal(Player *) = 0;
     virtual unsigned int drawCard(Hand * = nullptr) = 0;
     virtual int process(Player *) = 0;
+    
+    void info(Player *player, Info msg, int p1 = 0, int p2 = 0) {
+      if (player->verbose) {
+        player->info(msg, p1, p2);
+      }
+      return;
+    }
 
     bool finished(void) {
       return done;
@@ -275,14 +281,16 @@ class Dealer {
       return (done = d);
     }
     
-    bool done = false;
     DealerAction nextAction = DealerAction::None;
     
     // TODO: most of the games will have a single element, but maybe
     // there are games where the dealer has more than one hand
 //    std::list <Hand> hands;
     Hand hand;
-    
+
+  private:
+    bool done = false;
+
 };
 
 #endif
