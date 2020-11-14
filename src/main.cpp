@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 
   
   // let the action begin!
-  int unknownCommands = 0;
+  unsigned int unknownCommands = 0;
   dealer->nextAction = DealerAction::StartNewHand;
   while (!dealer->finished()) {
     dealer->deal(player);

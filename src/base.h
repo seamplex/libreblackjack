@@ -46,7 +46,6 @@ enum class DealerAction {
   AskForPlay,
   MoveOnToNextHand,
   HitDealerHand,
-  Payout
 };
 
 enum class PlayerActionRequired {

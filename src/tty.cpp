@@ -43,7 +43,6 @@
 std::vector<std::string> commands;
 
 
-
 // trim from start (in place)
 static inline void ltrim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
@@ -67,6 +66,9 @@ static inline void trim(std::string &s) {
 
 Tty::Tty(Configuration &conf) {
     
+  Libreblackjack::shortversion();
+//   Libreblackjack::copyright();
+
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
   conf.set(&no_insurance, {"no_insurance", "dont_insure"});  
 
@@ -76,13 +78,31 @@ Tty::Tty(Configuration &conf) {
     commands.push_back("stand");
     commands.push_back("double");
     commands.push_back("split");
+    commands.push_back("pair");
     commands.push_back("yes");
     commands.push_back("no");
     commands.push_back("quit");
   }
   
-  // TODO: check conf for colors
+  if (conf.exists("color")) {
+    conf.set(&color, {"color"});
+  }
+  
+  if (color) {
+    black   = "\x1B[0m";
+    red     = "\x1B[31m";
+    green   = "\x1B[32m";
+    yellow  = "\x1B[33m";
+    blue    = "\x1B[34m";
+    magenta = "\x1B[35m";
+    cyan    = "\x1B[36m";
+    white   = "\x1B[37m";
+    reset   = "\033[0m";
+  }
+  
   prompt = cyan + " > " + reset;
+  
+  return;
 }
 
 void Tty::info(Info msg, int intData) {
@@ -222,13 +242,15 @@ void Tty::info(Info msg, int intData) {
       std::cout << "help yourself" << std::endl;        
     break;
     
-          
-
     
     case Info::Bye:
 //      s = "bye";  
       s = "Bye bye! We'll play Blackjack again next time.";
     break;
+    
+    case Info::None:
+    break;
+    
   }
   
   if (delay > 0) {
@@ -256,6 +278,10 @@ int Tty::play() {
       renderTable();  
       s = "Play?";
     break;  
+    
+    case PlayerActionRequired::None:
+    break;
+    
   }
   
   if (s != "") {
@@ -318,7 +344,6 @@ int Tty::play() {
         break;
 
         case PlayerActionRequired::Play:
-
           // TODO: sort by higher-expected response first
                  if (command == "h" || command =="hit") {
             actionTaken = PlayerActionTaken::Hit;
@@ -332,6 +357,10 @@ int Tty::play() {
             actionTaken = PlayerActionTaken::None;
           }
         break;
+        
+        case PlayerActionRequired::None:
+        break;
+        
       }
     }
       
@@ -373,7 +402,7 @@ void Tty::renderTable(void) {
 
 void Tty::renderHand(Hand *hand) {
 
-  for (auto it : hand->cards) {
+  for (unsigned int i = 0; i < hand->cards.size(); i++) {
     std::cout << " _____   ";
   }
   std::cout << std::endl;
@@ -448,7 +477,7 @@ char *Tty::rl_command_generator(const char *text, int state) {
     len = strlen(text);
   }
 
-  for (auto i = list_index; i < commands.size(); i++) {
+  for (unsigned int i = list_index; i < commands.size(); i++) {
     if (commands[i].compare(0, len, text) == 0) {
       list_index = i+1;
       return strdup(commands[i].c_str());

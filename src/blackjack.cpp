@@ -129,7 +129,7 @@ void Blackjack::deal(Player *player) {
         shuffle();        
           
         // burn as many cards as asked
-        for (int i = 0; i < number_of_burnt_cards; i++) {
+        for (unsigned int i = 0; i < number_of_burnt_cards; i++) {
           drawCard();
         }
         lastPass = false;
@@ -147,14 +147,10 @@ void Blackjack::deal(Player *player) {
       
     break;
     
+    case DealerAction::AskForBets:
+    break;
     
     // -------------------------------------------------------------------------  
-    case DealerAction::AskForBets:
-      // step 1. ask for bets
-      player->actionRequired = PlayerActionRequired::Bet;
-      return;
-    break;
-
     case DealerAction::DealPlayerFirstCard:
       // where's step 2? <- probably that's the player's bet
       // step 3. deal the first card to each player
@@ -210,13 +206,10 @@ void Blackjack::deal(Player *player) {
       return;
     break;
  
-    // TODO: ver esto
-/*    
     case DealerAction::AskForInsurance:
-      std::cout << "next action do you want insurance?" << std::endl;  
       return;
     break;
-*/    
+
     case DealerAction::CheckforBlackjacks:
       // step 8. check if there are any blackjack
       playerBlackack = player->currentHand->blackjack();
@@ -331,9 +324,9 @@ void Blackjack::deal(Player *player) {
 
       // hit if count is less than 17 (or equalt to soft 17 if hit_soft_17 is true)
       dealerTotal = hand.total();
-      while (((abs(dealerTotal) < 17 || (hit_soft_17 && dealerTotal == -17))) && hand.busted() == 0) {
+      while ((std::abs(dealerTotal) < 17 || (hit_soft_17 && dealerTotal == -17)) && hand.busted() == 0) {
         unsigned int dealerCard = drawCard(&hand);
-        player->info(Info::CardDealer, dealerTotal);
+        player->info(Info::CardDealer, dealerCard);
 
         dealerTotal = std::abs(hand.total());
 
@@ -356,7 +349,7 @@ void Blackjack::deal(Player *player) {
         } else {
           for (auto playerHand : player->hands) {
             if (playerHand.busted() == false) {  // busted hands have already been solved
-              unsigned int playerTotal = std::abs(playerHand.total());
+              playerTotal = std::abs(playerHand.total());
             
               if (dealerTotal > playerTotal) {
                   

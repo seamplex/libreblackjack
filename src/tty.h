@@ -56,15 +56,16 @@ class Tty : public Player {
     
     int delay = 200;
     
-    std::string black   = "\x1B[0m";
-    std::string red     = "\x1B[31m";
-    std::string green   = "\x1B[32m";
-    std::string yellow  = "\x1B[33m";
-    std::string blue    = "\x1B[34m";
-    std::string magenta = "\x1B[35m";
-    std::string cyan    = "\x1B[36m";
-    std::string white   = "\x1B[37m";
-    std::string reset   = "\033[0m";
+    bool color = true;
+    std::string black;
+    std::string red;
+    std::string green;
+    std::string yellow;
+    std::string blue;
+    std::string magenta;
+    std::string cyan;
+    std::string white;
+    std::string reset;
       
 };
 #endif

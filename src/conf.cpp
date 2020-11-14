@@ -69,9 +69,9 @@ Configuration::Configuration(int argc, char **argv) {
     {NULL, 0, NULL, 0}
   };
 
-  int i, optc;
+  int optc = 0;
   int option_index = 0;
-  int opterr = 0;
+//  int opterr = 0;
   while ((optc = getopt_long_only(argc, argv, "c:hvd:n:if:", longopts, &option_index)) != -1) {
     switch (optc) {
       case 'h':
@@ -106,7 +106,13 @@ Configuration::Configuration(int argc, char **argv) {
           std::string line(argv[optind - 1]);
           std::size_t delimiterPos = line.find("=");
           if (delimiterPos != std::string::npos) {
-            auto name = line.substr(0, delimiterPos);
+            std::size_t offset = 0;  
+            if (line.substr(0, 2) == "--") {
+              offset = 2;
+            } else if (line.substr(0, 1) == "-") {
+              offset = 1;
+            }
+            auto name = line.substr(offset, delimiterPos-offset);
             auto value = line.substr(delimiterPos + 1);
             data[name] = value;
           } else {
@@ -191,12 +197,13 @@ int Configuration::readConfigFile(std::string filePath, bool mandatory) {
 bool Configuration::set(bool *value, std::list<std::string> key) {
   for (auto it : key) {
     if (exists(*(&it))) {
-      if (data[*(&it)] == "true") {
+      auto s = data[*(&it)];
+      if (s == "true" || s == "yes" || s == "y") {
         *value = true;  
-      } else if (data[*(&it)] == "false") {
+      } else if (s == "false" || s == "no" || s == "n") {
         *value = false; 
       } else {
-        *value = std::stoi(data[*(&it)]);
+        *value = std::stoi(s);
       }
       return true;
     }
