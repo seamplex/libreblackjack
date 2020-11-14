@@ -108,7 +108,7 @@ void Tty::info(Info msg, int intData) {
     case Info::NewHand:
 //      s = "new_hand";  
       std::cout << std::endl;
-      s = "Starting new hand #" + std::to_string(intData);
+      s = "Starting new hand, bankroll " + std::to_string(intData);
       dealerHand.cards.clear();
     break;
     
@@ -156,20 +156,17 @@ void Tty::info(Info msg, int intData) {
 //      s = "card_dealer_hole";
       s = "Dealer's hole card was " + card[intData].utf8();
       *(++(dealerHand.cards.begin())) = intData;
-      renderTable();  
+//      renderTable();  
     break;
     
     case Info::DealerBlackjack:
 //      s = "dealer_blackjack";
       s = "Dealer has Blackjack";
-      // TODO: draw dealer's hand
-      renderTable();  
     break;
     
     case Info::PlayerWinsInsurance:
 //      s = "player_wins_insurance";
       s = "Player wins insurance";
-      renderTable();  
     break;
     
     case Info::PlayerBlackjackAlso:
@@ -383,7 +380,7 @@ void Tty::renderHand(Hand *hand) {
   
   unsigned int i = 0;
   for (auto it : hand->cards) {
-    if (it > 0) {
+    if (it >= 0) {
       std::cout << "|" << card[it].getNumberASCII() << ((card[it].number != 10)?" ":"") << "   |  ";
     } else {
       std::cout << "|#####|  ";
@@ -394,7 +391,7 @@ void Tty::renderHand(Hand *hand) {
 
   i = 0;
   for (auto it : hand->cards) {
-    if (it > 0) {
+    if (it >= 0) {
       std::cout << "|     |  ";
     } else {
       std::cout << "|#####|  ";
@@ -405,7 +402,7 @@ void Tty::renderHand(Hand *hand) {
   
   i = 0;
   for (auto it : hand->cards) {
-    if (it > 0) {
+    if (it >= 0) {
       std::cout << "|  " << card[it].getSuitUTF8() << "  |  ";
     } else {
       std::cout << "|#####|  ";
@@ -416,7 +413,7 @@ void Tty::renderHand(Hand *hand) {
   
   i = 0;
   for (auto it : hand->cards) {
-    if (it > 0) {
+    if (it >= 0) {
       std::cout << "|     |  ";
     } else {
       std::cout << "|#####|  ";
@@ -427,7 +424,7 @@ void Tty::renderHand(Hand *hand) {
 
   i = 0;
   for (auto it : hand->cards) {
-    if (it > 0) {
+    if (it >= 0) {
       std::cout << "|___" << ((card[it].number != 10)?"_":"") << card[it].getNumberASCII() << "|  ";
     } else {
       std::cout << "|#####|  ";

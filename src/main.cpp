@@ -35,6 +35,19 @@ int main(int argc, char **argv) {
   
   Configuration conf(argc, argv);
 
+
+  if (conf.show_version) {
+    Libreblackjack::shortversion();
+    Libreblackjack::copyright();
+  }
+  if (conf.show_help) {
+    Libreblackjack::help(argv[0]);
+  }
+
+  if (conf.show_version || conf.show_help) {
+    return 0;
+  }  
+  
   if (conf.getDealerName() == "blackjack") {
     dealer = new Blackjack(conf);
   } else {

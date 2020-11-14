@@ -58,6 +58,8 @@ class Configuration {
     unsigned int hands_per_char = false;
     
     double error_standard_deviations;
+    bool show_help = false;
+    bool show_version = false;
     
   private:
     std::map<std::string, std::string> data;
@@ -67,8 +69,6 @@ class Configuration {
     std::string dealer;
     std::string player;
     
-    bool show_help = false;
-    bool show_version = false;
 //    bool show_bar = false;
 //    bool bar_already_alloced = false;
     

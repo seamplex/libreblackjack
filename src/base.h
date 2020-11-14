@@ -28,6 +28,12 @@
 #include <random>
 #include <cmath>
 
+namespace Libreblackjack {
+  void shortversion(void);
+  void help(const char *);
+  void copyright(void);
+}
+
 // TODO: namespace
 
 enum class DealerAction {

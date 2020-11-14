@@ -53,17 +53,15 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(0, 
   conf.set(&shuffle_every_hand, {"shuffle_every_hand"});
   
   if (conf.exists("arranged_cards")) {
-    std::istringstream x(conf.getString("arranged_cads"));
-    std::list<std::string> chunks;
-    std::copy(std::istream_iterator<std::string>(x), std::istream_iterator<std::string>(), std::back_inserter(chunks));
-    for (auto it : chunks)  {
-      arranged_cards.push_back(std::stoi(it));
+    std::istringstream stream(conf.getString("arranged_cards"));
+    std::string token;
+    while(std::getline(stream, token, ',')) {
+      arranged_cards.push_back(std::stoi(token));
     }
   }
   
-  // TODO: what's this?
-  conf.set(&infinite_decks_card_number_for_arranged_ones, {"infinite_decks_card_number_for_arranged_ones"});
-
+  n_arranged_cards = arranged_cards.size();
+  
   bool explicit_seed = conf.set(&rng_seed, {"rng_seed", "seed"});
   
   if (explicit_seed) {
@@ -104,7 +102,8 @@ void Blackjack::deal(Player *player) {
         player->variance = player->M2 / (double)(n_hand);
       }
 
-      infinite_decks_card_number_for_arranged_ones = 0;
+      // reset this index
+      i_arranged_cards = 0;
       n_hand++;
       
       // clear dealer's hand
@@ -143,7 +142,7 @@ void Blackjack::deal(Player *player) {
         nextAction = DealerAction::AskForBets;
       }
 
-      player->info(Info::NewHand, n_hand);
+      player->info(Info::NewHand, player->bankroll);
       return;
       
     break;
@@ -690,9 +689,14 @@ unsigned int Blackjack::drawCard(Hand *hand) {
   unsigned int tag = 0; 
 
   if (n_decks == -1) {
-      
-    // TODO: arranged cards
-    tag = fiftyTwoCards(rng);
+    if (n_arranged_cards != 0 && i_arranged_cards < n_arranged_cards) {
+      // negative (or invalid) values are placeholder for random cards  
+      if ((tag = arranged_cards[i_arranged_cards++]) < 0 || tag > 51) {
+        tag = fiftyTwoCards(rng);
+      }
+    } else {
+      tag = fiftyTwoCards(rng);
+    }  
     
   } else {
     // TODO: shoes

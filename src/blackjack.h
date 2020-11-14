@@ -60,10 +60,11 @@ class Blackjack : public Dealer {
     bool shuffle_every_hand = false;
     
     std::vector<unsigned int> arranged_cards;
+    unsigned int n_arranged_cards = 0; // just to prevent calling size() each time we draw a card
+    unsigned int i_arranged_cards = 0;
 
     unsigned int max_bet = 0;
     unsigned int number_of_burnt_cards = 0;
-    unsigned int infinite_decks_card_number_for_arranged_ones = 0;
     
     
     
