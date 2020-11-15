@@ -47,7 +47,7 @@ class Tty : public Player {
     
   private:
 
-    void renderHand(Hand *);
+    void renderHand(Hand *, bool = false);
     void renderTable(void);
       
 #ifdef HAVE_LIBREADLINE

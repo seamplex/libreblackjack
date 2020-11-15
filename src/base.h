@@ -208,6 +208,7 @@ class Player {
     PlayerActionRequired actionRequired = PlayerActionRequired::None;
     PlayerActionTaken    actionTaken    = PlayerActionTaken::None;
 
+    // TODO: one for the dealer and one for the player
     unsigned int currentSplits = 0;
     
     unsigned int currentBet = 0;
@@ -245,6 +246,7 @@ class Player {
     
     std::list<PlayerHand> hands;
     std::list<PlayerHand>::iterator currentHand;
+    std::size_t currentHandId = 0;
 
     Hand dealerHand;
     

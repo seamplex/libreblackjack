@@ -282,7 +282,7 @@ void Blackjack::deal(Player *player) {
       // see if we finished all the player's hands
       if (++player->currentHand != player->hands.end()) {
         unsigned int playerCard = drawCard(&(*player->currentHand));
-        info(player, Info::CardPlayer, playerCard);
+        info(player, Info::CardPlayer, playerCard, player->currentHand->id);
 
         if (std::abs(player->currentHand->total()) == 21) {
           player->actionRequired = PlayerActionRequired::None;
@@ -499,7 +499,7 @@ int Blackjack::process(Player *player) {
 
         playerCard = drawCard(&(*player->currentHand));
         unsigned int playerTotal = player->currentHand->total();
-        info(player, Info::CardPlayer, playerCard);
+        info(player, Info::CardPlayer, playerCard, player->currentHand->id);
 
         if (player->currentHand->busted()) {
           info(player, Info::PlayerLosses, 1e3*player->currentHand->bet, playerTotal);
@@ -559,7 +559,7 @@ int Blackjack::process(Player *player) {
 
         // deal a card to the first hand
         playerCard = drawCard(&(*player->currentHand));
-        info(player, Info::CardPlayer, playerCard);
+        info(player, Info::CardPlayer, playerCard, player->currentHand->id);
 
         // aces get dealt only one card
         // also, if the player gets 21 then we move on to the next hand
@@ -567,7 +567,7 @@ int Blackjack::process(Player *player) {
           if (++player->currentHand != player->hands.end()) {
             info(player, Info::PlayerNextHand, (*player->currentHand).id);
             playerCard = drawCard(&(*player->currentHand));
-            info(player, Info::CardPlayer, playerCard);
+            info(player, Info::CardPlayer, playerCard, player->currentHand->id);
 
             // if the player got an ace or 21 again, we are done
             if (card[*player->currentHand->cards.begin()].value == 11 || std::abs(player->currentHand->total()) == 21) {
@@ -604,7 +604,7 @@ int Blackjack::process(Player *player) {
 ///ip+hit+detail 
 ///ip+hit+detail This command can be abbreviated as `h`.
       playerCard = drawCard(&(*player->currentHand));        
-      info(player, Info::CardPlayer, playerCard);
+      info(player, Info::CardPlayer, playerCard, player->currentHand->id);
 
       if (player->currentHand->busted()) {
         info(player, Info::PlayerLosses, 1e3*player->currentHand->bet);

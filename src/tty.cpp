@@ -120,20 +120,10 @@ void Tty::info(Info msg, int p1, int p2) {
     break;
     
     case Info::CardPlayer:
-      switch (currentHand->cards.size()) {
-        case 1:
-//          s = "card_player_first";
-          s = "Player's first card is " + card[p1].utf8();
-        break;
-        case 2:
-//          s = "card_player_second";
-          s = "Player's second card is " + card[p1].utf8();
-        break;
-        default:
-//          s = "card_player";
-          s = "Player's card is " + card[p1].utf8();
-        break;
-      } 
+//      s = "card_player";
+      currentHandId = p2;
+      s = "Player's card" + ((p2 != 0)?(" in hand #"+std::to_string(p2)):"") + " is " + card[p1].utf8();
+      break;
     break;
     
     case Info::CardDealer:
@@ -209,17 +199,6 @@ void Tty::info(Info msg, int p1, int p2) {
       s = "No blackjacks";
     break;
 
-/*    
-    case Info::PlayerBustsAllHands:
-//      s = "player_busted_all_hands";
-      if (hands.size() == 1) {
-        s = "Player busted";
-      } else {  
-        s = "Player busted all hands";
-      }
-      renderTable();  
-    break;
-*/  
     case Info::DealerBusts:
 //      s = "no_blackjacks";
       s = "Dealer busts with " + std::to_string(p1);
@@ -342,7 +321,7 @@ int Tty::play() {
           } else if (command == "s" || command == "stand") {
             actionTaken = PlayerActionTaken::Stand;
           } else if (command == "d" || command == "double") {
-            actionTaken = PlayerActionTaken::Stand;
+            actionTaken = PlayerActionTaken::Double;
           } else if (command == "p" || command == "split" || command == "pair") {
             actionTaken = PlayerActionTaken::Split;
           } else {
@@ -383,14 +362,14 @@ void Tty::renderTable(void) {
 
   std::cout << " -- Player's hand --------" << std::endl;
   for (auto hand : hands) {
-    renderHand(&hand);
+    renderHand(&hand, (hand.id != 0) && (hand.id == currentHandId));
     std::cout << "    Total: " << ((hand.total() < 0)?"soft ":"") << std::abs(hand.total()) << std::endl;
   }  
 
   return;
 }
 
-void Tty::renderHand(Hand *hand) {
+void Tty::renderHand(Hand *hand, bool current) {
 
   std::string ansiColor;
   std::string ansiReset;
@@ -399,6 +378,8 @@ void Tty::renderHand(Hand *hand) {
     std::cout << " _____   ";
   }
   std::cout << std::endl;
+  
+  std::cout << "hand id = " << hand->id << std::endl;
   
   for (auto c : hand->cards) {
     if (color && (card[c].suit == Suit::Diamonds || card[c].suit == Suit::Hearts)) {
@@ -440,6 +421,9 @@ void Tty::renderHand(Hand *hand) {
     } else {
       std::cout << "|#####|  ";
     }
+  }
+  if (current) {
+    std::cout << cyan << "<-- current hand" << reset;
   }
   std::cout << std::endl;
   
