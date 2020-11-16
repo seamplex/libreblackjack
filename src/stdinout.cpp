@@ -34,7 +34,7 @@
 StdInOut::StdInOut(void) {
 }
 
-void StdInOut::info(Info msg, int p1, int p2) {
+void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
   return;
 }
 

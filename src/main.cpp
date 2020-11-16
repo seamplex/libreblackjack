@@ -65,14 +65,17 @@ int main(int argc, char **argv) {
     std::cerr << "Unknown player '" << conf.getPlayerName() <<".'" << std::endl;
     return -1;
   }
+  
+  // assign player to dealer
+  dealer->setPlayer(player);
 
   
   // let the action begin!
   unsigned int unknownCommands = 0;
-  dealer->nextAction = DealerAction::StartNewHand;
+  dealer->nextAction = Libreblackjack::DealerAction::StartNewHand;
   while (!dealer->finished()) {
-    dealer->deal(player);
-    if (player->actionRequired != PlayerActionRequired::None) {
+    dealer->deal();
+    if (player->actionRequired != Libreblackjack::PlayerActionRequired::None) {
       unknownCommands = 0;
       do {
         if (unknownCommands++ > conf.max_incorrect_commands) {
@@ -80,7 +83,7 @@ int main(int argc, char **argv) {
           return -2;
         }
         player->play();
-      } while (dealer->process(player) <= 0);
+      } while (dealer->process() <= 0);
     }
   }
   

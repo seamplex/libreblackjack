@@ -73,17 +73,17 @@ Blackjack::~Blackjack() {
   return;    
 }
 
-void Blackjack::deal(Player *player) {
+void Blackjack::deal(void) {
   
   int playerTotal = 0;
   int dealerTotal = 0;
   bool playerBlackack = false;
   // let's start by assuming the player does not need to do anything
-  player->actionRequired = PlayerActionRequired::None;
+  player->actionRequired = Libreblackjack::PlayerActionRequired::None;
     
   switch(nextAction) {
     // -------------------------------------------------------------------------  
-    case DealerAction::StartNewHand:
+    case Libreblackjack::DealerAction::StartNewHand:
         
       // check if we are done
       if (n_hands > 0 && n_hand >= n_hands) {
@@ -96,13 +96,12 @@ void Blackjack::deal(Player *player) {
       // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
 
       if (n_hand != 0) {
-        double delta = player->current_result - player->mean;
-        player->mean += delta / (double)(n_hand);
-        player->M2 += delta * (player->current_result - player->mean);
-        player->variance = player->M2 / (double)(n_hand);
+        double delta = playerInfo.currentResult - playerInfo.mean;
+        playerInfo.mean += delta / (double)(n_hand);
+        playerInfo.M2 += delta * (playerInfo.currentResult - playerInfo.mean);
+        playerInfo.variance = playerInfo.M2 / (double)(n_hand);
       }
 
-      // reset this index
       i_arranged_cards = 0;
       n_hand++;
       
@@ -110,19 +109,19 @@ void Blackjack::deal(Player *player) {
       hand.cards.clear();
 
       // erase all the player's hands, create one, add and make it the current one
-      for (auto playerHand : player->hands) {
+      for (auto playerHand : playerInfo.hands) {
         playerHand.cards.clear();
       }
-      player->hands.clear();
-      player->hands.push_back(std::move(PlayerHand()));
-      player->currentHand = player->hands.begin();
+      playerInfo.hands.clear();
+      playerInfo.hands.push_back(std::move(PlayerHand()));
+      playerInfo.currentHand = playerInfo.hands.begin();
       
       // state that the player did not win anything nor splitted nor doubled down
-      player->current_result = 0;
-      player->currentSplits = 0;
+      playerInfo.currentResult = 0;
+      playerInfo.currentSplits = 0;
       
       if (lastPass) {
-        info(player, Info::Shuffle);
+        info(Libreblackjack::Info::Shuffle);
           
         // shuffle the cards          
         shuffle();        
@@ -135,162 +134,161 @@ void Blackjack::deal(Player *player) {
       }
       
       if (player->flat_bet) {
-        player->currentHand->bet = player->flat_bet;
-        player->actionRequired = PlayerActionRequired::None;
-        nextAction = DealerAction::DealPlayerFirstCard;
+        playerInfo.currentHand->bet = player->flat_bet;
+        player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+        nextAction = Libreblackjack::DealerAction::DealPlayerFirstCard;
       } else {
-        player->actionRequired = PlayerActionRequired::Bet;
-        nextAction = DealerAction::AskForBets;
-
+        player->actionRequired = Libreblackjack::PlayerActionRequired::Bet;
+        nextAction = Libreblackjack::DealerAction::AskForBets;
       }
 
-      info(player, Info::NewHand, n_hand, 1e3*player->bankroll);
+      info(Libreblackjack::Info::NewHand, n_hand, 1e3*playerInfo.bankroll);
       return;
       
     break;
     
-    case DealerAction::AskForBets:
+    case Libreblackjack::DealerAction::AskForBets:
     break;
     
     // -------------------------------------------------------------------------  
-    case DealerAction::DealPlayerFirstCard:
+    case Libreblackjack::DealerAction::DealPlayerFirstCard:
       // where's step 2? <- probably that's the player's bet
       // step 3. deal the first card to each player
-      player->n_hands++;        // splits are counted as a single hand
-      player->total_money_waged += player->currentHand->bet;
+      playerInfo.n_hands++;        // splits are counted as a single hand
+      playerInfo.totalMoneyWaged += playerInfo.currentHand->bet;
 
-      playerFirstCard = drawCard(&(*player->currentHand));
-      info(player, Info::CardPlayer, playerFirstCard);
+      playerFirstCard = drawCard(&(*playerInfo.currentHand));
+      info(Libreblackjack::Info::CardPlayer, playerFirstCard);
             
       // step 4. show dealer's upcard
       upCard = drawCard(&hand);
-      info(player, Info::CardDealer, upCard);
+      info(Libreblackjack::Info::CardDealer, upCard);
 
       // step 5. deal the second card to each player
-      playerSecondCard = drawCard(&(*player->currentHand));
-      info(player, Info::CardPlayer, playerSecondCard);
+      playerSecondCard = drawCard(&(*playerInfo.currentHand));
+      info(Libreblackjack::Info::CardPlayer, playerSecondCard);
       
       // step 6. deal the dealer's hole card 
       holeCard = drawCard(&hand);
-      info(player, Info::CardDealer);
+      info(Libreblackjack::Info::CardDealer);
 
       // step 7.a. if the upcard is an ace ask for insurance
       if (card[upCard].value == 11) {
         if (player->no_insurance == false && player->always_insure == false) {
-          player->actionRequired = PlayerActionRequired::Insurance;
-          nextAction = DealerAction::AskForInsurance;
+          player->actionRequired = Libreblackjack::PlayerActionRequired::Insurance;
+          nextAction = Libreblackjack::DealerAction::AskForInsurance;
           return;
         
         } else if (player->always_insure) {
-          player->currentHand->insured = true;
+          playerInfo.currentHand->insured = true;
           // TODO: allow insurance for less than one half of the original bet
-          player->current_result -= 0.5 * player->currentHand->bet;
-          player->bankroll -= 0.5 * player->currentHand->bet;
-          player->handsInsured++;
+          playerInfo.currentResult -= 0.5 * playerInfo.currentHand->bet;
+          playerInfo.bankroll -= 0.5 * playerInfo.currentHand->bet;
+          playerInfo.handsInsured++;
           
-          player->actionRequired = PlayerActionRequired::None;
-          nextAction = DealerAction::CheckforBlackjacks;
+          player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+          nextAction = Libreblackjack::DealerAction::CheckforBlackjacks;
           return;
         }
       }
       
       // step 7.b. if either the dealer or the player has a chance to have a blackjack, check
-      playerTotal = player->currentHand->total();
+      playerTotal = playerInfo.currentHand->value();
       if ((card[upCard].value == 10 || card[upCard].value == 11) || std::abs(playerTotal) == 21) {
-        player->actionRequired = PlayerActionRequired::None;
-        nextAction = DealerAction::CheckforBlackjacks;
+        player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+        nextAction = Libreblackjack::DealerAction::CheckforBlackjacks;
         return;
       }
 
       // step 7.c. ask the player to play
-      player->actionRequired = PlayerActionRequired::Play;
-      nextAction = DealerAction::AskForPlay;
+      player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
+      nextAction = Libreblackjack::DealerAction::AskForPlay;
       return;
     break;
  
-    case DealerAction::AskForInsurance:
+    case Libreblackjack::DealerAction::AskForInsurance:
       return;
     break;
 
-    case DealerAction::CheckforBlackjacks:
+    case Libreblackjack::DealerAction::CheckforBlackjacks:
       // step 8. check if there are any blackjack
       playerBlackack = player->currentHand->blackjack();
       if (hand.blackjack()) {
-        info(player, Info::CardDealerRevealsHole, holeCard);
-        info(player, Info::DealerBlackjack);
-        player->blackjacksDealer++;
+        info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
+        info(Libreblackjack::Info::DealerBlackjack);
+        playerInfo.blackjacksDealer++;
 
         if (player->currentHand->insured) {
-          info(player, Info::PlayerWinsInsurance, 1e3*player->currentHand->bet);
-          player->current_result += player->currentHand->bet;
-          player->bankroll += player->currentHand->bet;
-          player->winsInsured++;
+          info(Libreblackjack::Info::PlayerWinsInsurance, 1e3*player->currentHand->bet);
+          playerInfo.currentResult += player->currentHand->bet;
+          playerInfo.bankroll += player->currentHand->bet;
+          playerInfo.winsInsured++;
         }
 
         if (playerBlackack) {
-          info(player, Info::PlayerBlackjackAlso);
-          info(player, Info::PlayerPushes, 1e3*player->currentHand->bet);
-          player->blackjacksPlayer++;
-          player->pushes++;
+          info(Libreblackjack::Info::PlayerBlackjackAlso);
+          info(Libreblackjack::Info::PlayerPushes, 1e3*player->currentHand->bet);
+          playerInfo.blackjacksPlayer++;
+          playerInfo.pushes++;
           
         } else {
-          info(player, Info::PlayerLosses, 1e3*player->currentHand->bet);
-          player->current_result -= player->currentHand->bet;
-          player->bankroll -= player->currentHand->bet;
-          if (player->bankroll < player->worst_bankroll) {
-            player->worst_bankroll = player->bankroll;
+          info(Libreblackjack::Info::PlayerLosses, 1e3*player->currentHand->bet);
+          playerInfo.currentResult -= player->currentHand->bet;
+          playerInfo.bankroll -= player->currentHand->bet;
+          if (playerInfo.bankroll < playerInfo.worstBankroll) {
+            playerInfo.worstBankroll = playerInfo.bankroll;
           }
-          player->losses++;
+          playerInfo.losses++;
         }
 
-        nextAction = DealerAction::StartNewHand;
-        player->actionRequired = PlayerActionRequired::None;
+        nextAction = Libreblackjack::DealerAction::StartNewHand;
+        player->actionRequired = Libreblackjack::PlayerActionRequired::None;
         return;
         
       } else if (playerBlackack) {
-        player->current_result += blackjack_pays * player->currentHand->bet;
-        player->bankroll += blackjack_pays * player->currentHand->bet;
-        player->blackjacksPlayer++;
+        playerInfo.currentResult += blackjack_pays * player->currentHand->bet;
+        playerInfo.bankroll += blackjack_pays * player->currentHand->bet;
+        playerInfo.blackjacksPlayer++;
         
-        info(player, Info::PlayerWins, 1e3 * blackjack_pays*player->currentHand->bet);
-        player->wins++;
-        player->winsBlackjack++;
+        info(Libreblackjack::Info::PlayerWins, 1e3 * blackjack_pays*player->currentHand->bet);
+        playerInfo.wins++;
+        playerInfo.winsBlackjack++;
 
-        nextAction = DealerAction::StartNewHand;
-        player->actionRequired = PlayerActionRequired::None;
+        nextAction = Libreblackjack::DealerAction::StartNewHand;
+        player->actionRequired = Libreblackjack::PlayerActionRequired::None;
         return;
         
       } else {
         // only if the dealer had the chance to have a blackjack we say "no_blackjacks"
         if (card[upCard].value == 10 || card[upCard].value == 11) {
-          info(player, Info::NoBlackjacks);
+          info(Libreblackjack::Info::NoBlackjacks);
         }
         
-        nextAction = DealerAction::AskForPlay;
-        player->actionRequired = PlayerActionRequired::Play;
+        nextAction = Libreblackjack::DealerAction::AskForPlay;
+        player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
         return;
       }        
     break;
     
-    case DealerAction::AskForPlay:
-      player->actionRequired = PlayerActionRequired::Play;
-      nextAction = DealerAction::AskForPlay;
+    case Libreblackjack::DealerAction::AskForPlay:
+      player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
+      nextAction = Libreblackjack::DealerAction::AskForPlay;
       return;
     break;
     
-    case DealerAction::MoveOnToNextHand:
+    case Libreblackjack::DealerAction::MoveOnToNextHand:
       // see if we finished all the player's hands
       if (++player->currentHand != player->hands.end()) {
         unsigned int playerCard = drawCard(&(*player->currentHand));
-        info(player, Info::CardPlayer, playerCard, player->currentHand->id);
+        info(Libreblackjack::Info::CardPlayer, playerCard, player->currentHand->id);
 
-        if (std::abs(player->currentHand->total()) == 21) {
-          player->actionRequired = PlayerActionRequired::None;
-          nextAction = DealerAction::MoveOnToNextHand;
+        if (std::abs(player->currentHand->value()) == 21) {
+          player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+          nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
           return;
         }  else  {
-          player->actionRequired = PlayerActionRequired::Play;
-          nextAction = DealerAction::AskForPlay;
+          player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
+          nextAction = Libreblackjack::DealerAction::AskForPlay;
           return;
         }
       } else {
@@ -304,74 +302,74 @@ void Blackjack::deal(Player *player) {
         }
 
         if (bustedAllHands) {
-          info(player, Info::CardDealerRevealsHole, holeCard);
+          info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
           
-          player->actionRequired = PlayerActionRequired::None;
-          nextAction = DealerAction::StartNewHand;
+          player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+          nextAction = Libreblackjack::DealerAction::StartNewHand;
           return;
         }  else {
-          player->actionRequired = PlayerActionRequired::None;
-          nextAction = DealerAction::HitDealerHand;
+          player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+          nextAction = Libreblackjack::DealerAction::HitDealerHand;
           return;
         }
       }        
     break;
     
-    case DealerAction::HitDealerHand:
+    case Libreblackjack::DealerAction::HitDealerHand:
         
-      info(player, Info::CardDealerRevealsHole, holeCard);
+      info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
 
       // hit while count is less than 17 (or equal to soft 17 if hit_soft_17 is true)
-      dealerTotal = hand.total();
+      dealerTotal = hand.value();
       while ((std::abs(dealerTotal) < 17 || (hit_soft_17 && dealerTotal == -17)) && hand.busted() == 0) {
         unsigned int dealerCard = drawCard(&hand);
-        info(player, Info::CardDealer, dealerCard);
-        dealerTotal = hand.total();
+        info(Libreblackjack::Info::CardDealer, dealerCard);
+        dealerTotal = hand.value();
       }
         
 
       if (hand.busted()) {
-        info(player, Info::DealerBusts, dealerTotal);
-        player->bustsDealer++;
+        info(Libreblackjack::Info::DealerBusts, dealerTotal);
+        playerInfo.bustsDealer++;
         for (auto playerHand : player->hands) {
           if (playerHand.busted() == false) {
-            info(player, Info::PlayerWins, 1e3*playerHand.bet);
-            player->current_result += playerHand.bet;
-            player->bankroll += playerHand.bet;
-            player->wins++;
-            player->winsDoubled += playerHand.doubled;
+            info(Libreblackjack::Info::PlayerWins, 1e3*playerHand.bet);
+            playerInfo.currentResult += playerHand.bet;
+            playerInfo.bankroll += playerHand.bet;
+            playerInfo.wins++;
+            playerInfo.winsDoubled += playerHand.doubled;
           }
         }
       } else {
         for (auto playerHand : player->hands) {
           if (playerHand.busted() == false) {  // busted hands have already been solved
-            playerTotal = std::abs(playerHand.total());
+            playerTotal = std::abs(playerHand.value());
            
             if (dealerTotal > playerTotal) {
                 
-              info(player, Info::PlayerLosses, 1e3*playerHand.bet, playerTotal);
-              player->bankroll -= playerHand.bet;
-              if (player->bankroll < player->worst_bankroll) {
-                player->worst_bankroll = player->bankroll;
+              info(Libreblackjack::Info::PlayerLosses, 1e3*playerHand.bet, playerTotal);
+              playerInfo.bankroll -= playerHand.bet;
+              if (playerInfo.bankroll < playerInfo.worstBankroll) {
+                playerInfo.worstBankroll = playerInfo.bankroll;
               }
-              player->losses++;
+              playerInfo.losses++;
                 
             } else if (dealerTotal == playerTotal) {
                   
-              info(player, Info::PlayerPushes, 1e3*playerHand.bet);
-              player->pushes++;
+              info(Libreblackjack::Info::PlayerPushes, 1e3*playerHand.bet);
+              playerInfo.pushes++;
                 
             } else {
                 
-              info(player, Info::PlayerWins, 1e3*playerHand.bet, playerTotal);
-              player->current_result += playerHand.bet;
-              player->bankroll += playerHand.bet;
-              player->wins++;
+              info(Libreblackjack::Info::PlayerWins, 1e3*playerHand.bet, playerTotal);
+              playerInfo.currentResult += playerHand.bet;
+              playerInfo.bankroll += playerHand.bet;
+              playerInfo.wins++;
 
               if (playerHand.doubled) {
-                player->winsDoubled++;
+                playerInfo.winsDoubled++;
               } else {
-                player->wins++;
+                playerInfo.wins++;
               }
             }
           }
@@ -379,12 +377,12 @@ void Blackjack::deal(Player *player) {
       }
                
 
-      player->actionRequired = PlayerActionRequired::None;
-      nextAction = DealerAction::StartNewHand;
+      player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+      nextAction = Libreblackjack::DealerAction::StartNewHand;
       return;
     break;
 
-    case DealerAction::None:
+    case Libreblackjack::DealerAction::None:
     break;
 
   }
@@ -394,7 +392,7 @@ void Blackjack::deal(Player *player) {
 // returns zero if it is a common command and we need to ask again
 // returns positive if what was asked was answered
 // returns negative if what was aked was not asnwered or the command does not apply
-int Blackjack::process(Player *player) {
+int Blackjack::process(void) {
   
   unsigned int playerCard;
   unsigned int firstCard;
@@ -409,7 +407,7 @@ int Blackjack::process(Player *player) {
 ///ig+quit+detail immediately without even finishing the hand.
 ///ig+quit+detail All IPC resources are unlocked, removed and/or destroyed.
 ///ig+quit+detail The YAML report is written before exiting.
-    case PlayerActionTaken::Quit:
+    case Libreblackjack::PlayerActionTaken::Quit:
       finished(true);
       return 1;
     break;    
@@ -418,52 +416,53 @@ int Blackjack::process(Player *player) {
 ///ig+help+desc Ask for help
 ///ig+help+detail A succinct help message is written on the standard output.
 ///ig+help+detail This command makes sense only when issued by a human player.
-    case PlayerActionTaken::Help:
-      info(player, Info::Help);  
+    case Libreblackjack::PlayerActionTaken::Help:
+      info(Libreblackjack::Info::Help);  
       return 0;
     break;  
     
-    case PlayerActionTaken::None:
+    case Libreblackjack::PlayerActionTaken::None:
       return 0;
     break;
       
       
     // if we made it this far, the command is particular
-    case PlayerActionTaken::Bet:
+    case Libreblackjack::PlayerActionTaken::Bet:
       // TODO: bet = 0 -> wonging
       if (player->currentBet == 0) {
-        info(player, Info::InvalidBet, player->currentBet);
+        info(Libreblackjack::Info::InvalidBet, player->currentBet);
         return 0;
       } else if (player->currentBet < 0) {
-        info(player, Info::InvalidBet, player->currentBet);
+        info(Libreblackjack::Info::InvalidBet, player->currentBet);
         return 0;
       } else if (max_bet != 0  && player->currentBet > max_bet) {
-        info(player, Info::InvalidBet, player->currentBet);
+        info(Libreblackjack::Info::InvalidBet, player->currentBet);
         return 0;
       } else {
-        // ok, valid bet
-        player->currentHand->bet = player->currentBet;
-        nextAction = DealerAction::DealPlayerFirstCard;
+        // ok, valid bet, copy the player's bet and use the local copy
+        // (to prevent cheating players from changing the bet after dealing)
+        playerInfo.currentHand->bet = player->currentBet;
+        nextAction = Libreblackjack::DealerAction::DealPlayerFirstCard;
         return 1;
       }
     break;
 
-    case PlayerActionTaken::Insure:
+    case Libreblackjack::PlayerActionTaken::Insure:
       // TODO: allow insurance for less than one half of the original bet
-      player->currentHand->insured = true;
-      player->current_result -= 0.5 * player->currentHand->bet;
-      player->bankroll -= 0.5 * player->currentHand->bet;
-      player->handsInsured++;
+      playerInfo.currentHand->insured = true;
+      playerInfo.currentResult -= 0.5 * playerInfo.currentHand->bet;
+      playerInfo.bankroll -= 0.5 * playerInfo.currentHand->bet;
+      playerInfo.handsInsured++;
          
-      player->actionRequired = PlayerActionRequired::None;
-      nextAction = DealerAction::CheckforBlackjacks;
+      player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+      nextAction = Libreblackjack::DealerAction::CheckforBlackjacks;
       return 1;
     break;
 
-    case PlayerActionTaken::DontInsure:
+    case Libreblackjack::PlayerActionTaken::DontInsure:
       player->currentHand->insured = false;
-      player->actionRequired = PlayerActionRequired::None;
-      nextAction = DealerAction::CheckforBlackjacks;
+      player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+      nextAction = Libreblackjack::DealerAction::CheckforBlackjacks;
       return 1;
     break;
 
@@ -475,9 +474,9 @@ int Blackjack::process(Player *player) {
 ///ip+stand+detail Otherwise the dealer reveals his hole card and deals
 ///ip+stand+detail himself more cards if needed.
 ///ip+stand+detail This command can be abbreviated as `s`.
-    case PlayerActionTaken::Stand:
-      player->actionRequired = PlayerActionRequired::None;
-      nextAction = DealerAction::MoveOnToNextHand;
+    case Libreblackjack::PlayerActionTaken::Stand:
+      player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+      nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
       return 1;
     break;  
     
@@ -488,29 +487,29 @@ int Blackjack::process(Player *player) {
 ///ip+double+detail Doubling down is allowed only after receiving the first
 ///ip+double+detail two cards.
 ///ip+double+detail This command can be abbreviated as `d`.
-    case PlayerActionTaken::Double:
-      if (player->currentHand->cards.size() == 2) {
+    case Libreblackjack::PlayerActionTaken::Double:
+      if (playerInfo.currentHand->cards.size() == 2) {
 
         // TODO: check bankroll
-        player->total_money_waged += player->currentHand->bet;
-        player->currentHand->bet *= 2;
-        player->currentHand->doubled = true;
-        player->handsDoubled++;
+        playerInfo.totalMoneyWaged += playerInfo.currentHand->bet;
+        playerInfo.currentHand->bet *= 2;
+        playerInfo.currentHand->doubled = true;
+        playerInfo.handsDoubled++;
 
-        playerCard = drawCard(&(*player->currentHand));
-        unsigned int playerTotal = player->currentHand->total();
-        info(player, Info::CardPlayer, playerCard, player->currentHand->id);
+        playerCard = drawCard(&(*playerInfo.currentHand));
+        unsigned int playerTotal = playerInfo.currentHand->value();
+        info(Libreblackjack::Info::CardPlayer, playerCard, playerInfo.currentHand->id);
 
-        if (player->currentHand->busted()) {
-          info(player, Info::PlayerLosses, 1e3*player->currentHand->bet, playerTotal);
-          player->current_result -= player->currentHand->bet;
-          player->bankroll -= player->currentHand->bet;
-          player->bustsPlayer++;
-          player->losses++;
+        if (playerInfo.currentHand->busted()) {
+          info(Libreblackjack::Info::PlayerLosses, 1e3*playerInfo.currentHand->bet, playerTotal);
+          playerInfo.currentResult -= playerInfo.currentHand->bet;
+          playerInfo.bankroll -= playerInfo.currentHand->bet;
+          playerInfo.bustsPlayer++;
+          playerInfo.losses++;
   }
 
-        player->actionRequired = PlayerActionRequired::None;
-        nextAction = DealerAction::MoveOnToNextHand;
+        player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+        nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
         return 1;
         
       } else {
@@ -525,68 +524,68 @@ int Blackjack::process(Player *player) {
 ///ip+split+desc Split the current hand
 ///ip+split+detail 
 ///ip+split+detail This command can be abbreviated as `p` (for pair).
-    case PlayerActionTaken::Split:
+    case Libreblackjack::PlayerActionTaken::Split:
 
-      firstCard  = *(player->currentHand->cards.begin());
-      secondCard = *(++player->currentHand->cards.begin());
+      firstCard  = *(playerInfo.currentHand->cards.begin());
+      secondCard = *(++playerInfo.currentHand->cards.begin());
       
       // up to three splits (i.e. four hands)
       // TODO: choose through conf
       // TODO: check bankroll to see if player can split
-      if (player->currentSplits < 3 && player->currentHand->cards.size() == 2 && card[firstCard].value == card[secondCard].value) {
+      if (playerInfo.currentSplits < 3 && playerInfo.currentHand->cards.size() == 2 && card[firstCard].value == card[secondCard].value) {
         // mark that we split to put ids in the hands and to limi the number of spltis
-        player->currentSplits++;
+        playerInfo.currentSplits++;
 
         // the first hand is id=1, then we add one
-        if (player->currentHand == player->hands.begin()) {
-          player->currentHand->id = 1;
+        if (playerInfo.currentHand == playerInfo.hands.begin()) {
+          playerInfo.currentHand->id = 1;
         }
         
         // create a new hand
         PlayerHand newHand;
-        newHand.id = player->hands.size() + 1;
-        newHand.bet = player->currentHand->bet;
-        player->total_money_waged += player->currentHand->bet;
+        newHand.id = playerInfo.hands.size() + 1;
+        newHand.bet = playerInfo.currentHand->bet;
+        playerInfo.totalMoneyWaged += playerInfo.currentHand->bet;
         
         // remove second the card from the first hand
-        player->currentHand->cards.pop_back();
+        playerInfo.currentHand->cards.pop_back();
         
         // and put it into the second hand
         newHand.cards.push_back(secondCard);
 
         // add the new hand to the list of hands        
-        player->hands.push_back(std::move(newHand));
+        playerInfo.hands.push_back(std::move(newHand));
 
         // deal a card to the first hand
-        playerCard = drawCard(&(*player->currentHand));
-        info(player, Info::CardPlayer, playerCard, player->currentHand->id);
+        playerCard = drawCard(&(*playerInfo.currentHand));
+        info(Libreblackjack::Info::CardPlayer, playerCard, playerInfo.currentHand->id);
 
         // aces get dealt only one card
         // also, if the player gets 21 then we move on to the next hand
-        if (card[*player->currentHand->cards.begin()].value == 11 || std::abs(player->currentHand->total()) == 21) {
-          if (++player->currentHand != player->hands.end()) {
-            info(player, Info::PlayerNextHand, (*player->currentHand).id);
-            playerCard = drawCard(&(*player->currentHand));
-            info(player, Info::CardPlayer, playerCard, player->currentHand->id);
+        if (card[*playerInfo.currentHand->cards.begin()].value == 11 || std::abs(playerInfo.currentHand->value()) == 21) {
+          if (++playerInfo.currentHand != playerInfo.hands.end()) {
+            info(Libreblackjack::Info::PlayerNextHand, (*playerInfo.currentHand).id);
+            playerCard = drawCard(&(*playerInfo.currentHand));
+            info(Libreblackjack::Info::CardPlayer, playerCard, playerInfo.currentHand->id);
 
             // if the player got an ace or 21 again, we are done
-            if (card[*player->currentHand->cards.begin()].value == 11 || std::abs(player->currentHand->total()) == 21) {
-              player->actionRequired = PlayerActionRequired::None;
-              nextAction = DealerAction::MoveOnToNextHand;
+            if (card[*playerInfo.currentHand->cards.begin()].value == 11 || std::abs(playerInfo.currentHand->value()) == 21) {
+              player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+              nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
               return 1;
             } else {
-              player->actionRequired = PlayerActionRequired::Play;
-              nextAction = DealerAction::AskForPlay;
+              player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
+              nextAction = Libreblackjack::DealerAction::AskForPlay;
               return 1;
             }
           } else {
-            player->actionRequired = PlayerActionRequired::None;
-            nextAction = DealerAction::MoveOnToNextHand;
+            player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+            nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
             return 1;
           }  
         } else {
-          player->actionRequired = PlayerActionRequired::Play;
-          nextAction = DealerAction::AskForPlay;
+          player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
+          nextAction = Libreblackjack::DealerAction::AskForPlay;
           return 1;
         }
       } else {
@@ -597,32 +596,32 @@ int Blackjack::process(Player *player) {
       }
     break;
       
-    case PlayerActionTaken::Hit:
+    case Libreblackjack::PlayerActionTaken::Hit:
         
 ///ip+hit+name hit
 ///ip+hit+desc Hit on the current hand
 ///ip+hit+detail 
 ///ip+hit+detail This command can be abbreviated as `h`.
-      playerCard = drawCard(&(*player->currentHand));        
-      info(player, Info::CardPlayer, playerCard, player->currentHand->id);
+      playerCard = drawCard(&(*playerInfo.currentHand));        
+      info(Libreblackjack::Info::CardPlayer, playerCard, playerInfo.currentHand->id);
 
-      if (player->currentHand->busted()) {
-        info(player, Info::PlayerLosses, 1e3*player->currentHand->bet);
-        player->current_result -= player->currentHand->bet;
-        player->bankroll -= player->currentHand->bet;
-        player->bustsPlayer++;
-        player->losses++;
+      if (playerInfo.currentHand->busted()) {
+        info(Libreblackjack::Info::PlayerLosses, 1e3*playerInfo.currentHand->bet);
+        playerInfo.currentResult -= playerInfo.currentHand->bet;
+        playerInfo.bankroll -= playerInfo.currentHand->bet;
+        playerInfo.bustsPlayer++;
+        playerInfo.losses++;
 
-        player->actionRequired = PlayerActionRequired::None;
-        nextAction = DealerAction::MoveOnToNextHand;
+        player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+        nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
         return 1;
-      } else if (std::abs(player->currentHand->total()) == 21) {
-        player->actionRequired = PlayerActionRequired::None;
-        nextAction = DealerAction::MoveOnToNextHand;
+      } else if (std::abs(playerInfo.currentHand->value()) == 21) {
+        player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+        nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
         return 1;
       } else {
-        player->actionRequired = PlayerActionRequired::Play;
-        nextAction = DealerAction::AskForPlay;
+        player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
+        nextAction = Libreblackjack::DealerAction::AskForPlay;
         return 1;
       }
     break;

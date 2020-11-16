@@ -32,27 +32,27 @@ Card::Card(unsigned int tag) {
   }  
     
   number = 1 + ((tag-1) % 13);
-  suit = static_cast<Suit>((tag-1)/13);
+  suit = static_cast<Libreblackjack::Suit>((tag-1)/13);
   value = (number == 1) ? 11 : ((number > 10) ? 10 : number);
   numberASCII = (number == 1) ? "A" : ((number < 11) ? std::to_string(number) : TJQK[number-10]);
       
   switch (suit){
-    case Suit::Clubs:
+    case Libreblackjack::Suit::Clubs:
       suitName = "clubs";
       suitASCII = "C";
       suitUTF8 = "♣";
     break;
-    case Suit::Diamonds:
+    case Libreblackjack::Suit::Diamonds:
       suitName = "diamonds";
       suitASCII = "D";
       suitUTF8 = "♦";
     break;
-    case Suit::Hearts:
+    case Libreblackjack::Suit::Hearts:
       suitName = "hearts";
       suitASCII = "H";
       suitUTF8 = "♥";
     break;
-    case Suit::Spades:
+    case Libreblackjack::Suit::Spades:
       suitName = "spades";
       suitASCII = "S";
       suitUTF8 = "♠";
