@@ -74,7 +74,7 @@ namespace Libreblackjack {
   
   enum class Info {
     None,
-    InvalidBet,
+    BetInvalid,
     NewHand,
     Shuffle,
     CardPlayer,
@@ -83,6 +83,9 @@ namespace Libreblackjack {
     DealerBlackjack,
     PlayerWinsInsurance,
     PlayerBlackjackAlso,
+    PlayerSplitInvalid,
+    PlayerSplitOk,
+    PlayerSplitIds,
     PlayerNextHand,
     PlayerPushes,
     PlayerLosses,
@@ -183,6 +186,7 @@ class Hand {
     
 class PlayerHand : public Hand {
   public:
+    PlayerHand(std::size_t i = 0) : id(i) { };
     std::size_t id;
     unsigned int bet = 0;
     bool insured = false;

@@ -93,7 +93,7 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
   
   switch (msg) {
 
-    case Libreblackjack::Info::InvalidBet:
+    case Libreblackjack::Info::BetInvalid:
       if (p1 < 0) {
 //      s = "bet_negative";  
         s = "Your bet is negative (" + std::to_string(p1) + ")";
@@ -185,6 +185,40 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
       render = true;
     break;
 
+    case Libreblackjack::Info::PlayerSplitInvalid:
+//      s = "player_split_invalid";
+      s = "Cannot split";
+      render = true;
+    break;
+
+    case Libreblackjack::Info::PlayerSplitOk:
+//      s = "player_split_ok";
+      s = "Splitting hand" + ((p1 != 0)?(" #" + std::to_string(p1)):"");
+      handToSplit = p1;
+      render = true;
+    break;
+
+    case Libreblackjack::Info::PlayerSplitIds:
+
+      // TODO: check if the hand is found  
+      for (auto hand = hands.begin(); hand != hands.end(); ++currentHand) {
+        if (hand->id == handToSplit) {
+          hand->id = p1;
+          cardToSplit = hand.back();
+          hand.pop_back();
+          break;
+        }
+      }
+      
+      // create a new hand
+      PlayerHand newHand;
+      newHand.id = playerInfo.hands.size() + 1;
+      newHand.bet = playerInfo.currentHand->bet;
+      
+        
+      render = true;
+    break;
+    
     case Libreblackjack::Info::PlayerNextHand:
 //      s = "player_next_hand";
       s = "Playing next hand #" + std::to_string(p1);

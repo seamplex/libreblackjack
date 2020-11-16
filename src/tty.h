@@ -56,6 +56,9 @@ class Tty : public Player {
   std::string input_buffer;
 #endif
 
+    std::size_t handToSplit;
+    unsigned int cardToSplit;
+  
     std::string arrow;
     std::string prompt;
     

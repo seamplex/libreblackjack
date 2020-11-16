@@ -430,13 +430,13 @@ int Blackjack::process(void) {
     case Libreblackjack::PlayerActionTaken::Bet:
       // TODO: bet = 0 -> wonging
       if (player->currentBet == 0) {
-        info(Libreblackjack::Info::InvalidBet, player->currentBet);
+        info(Libreblackjack::Info::BetInvalid, player->currentBet);
         return 0;
       } else if (player->currentBet < 0) {
-        info(Libreblackjack::Info::InvalidBet, player->currentBet);
+        info(Libreblackjack::Info::BetInvalid, player->currentBet);
         return 0;
       } else if (max_bet != 0  && player->currentBet > max_bet) {
-        info(Libreblackjack::Info::InvalidBet, player->currentBet);
+        info(Libreblackjack::Info::BetInvalid, player->currentBet);
         return 0;
       } else {
         // ok, valid bet, copy the player's bet and use the local copy
@@ -526,6 +526,7 @@ int Blackjack::process(void) {
 ///ip+split+detail This command can be abbreviated as `p` (for pair).
     case Libreblackjack::PlayerActionTaken::Split:
 
+      // TODO: front() and front()+1  
       firstCard  = *(playerInfo.currentHand->cards.begin());
       secondCard = *(++playerInfo.currentHand->cards.begin());
       
