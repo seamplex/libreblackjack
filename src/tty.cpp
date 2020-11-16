@@ -379,7 +379,7 @@ void Tty::renderHand(Hand *hand, bool current) {
   }
   std::cout << std::endl;
   
-  std::cout << "hand id = " << hand->id << std::endl;
+//   std::cout << "hand id = " << hand->id << std::endl;
   
   for (auto c : hand->cards) {
     if (color && (card[c].suit == Suit::Diamonds || card[c].suit == Suit::Hearts)) {

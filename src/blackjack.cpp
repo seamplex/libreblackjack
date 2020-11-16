@@ -544,7 +544,7 @@ int Blackjack::process(Player *player) {
         
         // create a new hand
         PlayerHand newHand;
-        newHand.id = player->currentHand->id + 1;
+        newHand.id = player->hands.size() + 1;
         newHand.bet = player->currentHand->bet;
         player->total_money_waged += player->currentHand->bet;
         
