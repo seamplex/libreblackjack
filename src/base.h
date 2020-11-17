@@ -36,9 +36,7 @@ namespace Libreblackjack {
   enum class DealerAction {
     None,
     StartNewHand,
-    AskForBets,
     DealPlayerFirstCard,
-    AskForInsurance,
     CheckforBlackjacks,
     AskForPlay,
     MoveOnToNextHand,
@@ -57,7 +55,6 @@ namespace Libreblackjack {
   // common  
     Quit,
     Help,
-    Count,
     UpcardValue,
     Bankroll,
     Hands,
@@ -86,15 +83,17 @@ namespace Libreblackjack {
     PlayerSplitInvalid,
     PlayerSplitOk,
     PlayerSplitIds,
+    PlayerDoubleInvalid,
     PlayerNextHand,
     PlayerPushes,
     PlayerLosses,
     PlayerBlackjack,
     PlayerWins,
     NoBlackjacks,
-  //  PlayerBustsAllHands,
     DealerBusts,
+    Bankroll,
     Help,
+    CommandInvalid,
     Bye,
   };
   
@@ -216,6 +215,7 @@ class Player {
     
     unsigned int currentBet;
     
+  protected:
     std::list<PlayerHand> hands;
     std::list<PlayerHand>::iterator currentHand;
     std::size_t currentHandId = 0;

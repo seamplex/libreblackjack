@@ -44,7 +44,8 @@ Tty::Tty(Configuration &conf) {
 //   Libreblackjack::copyright();
 
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
-  conf.set(&no_insurance, {"no_insurance", "dont_insure"});  
+  conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});  
+  conf.set(&always_insure, {"always_insure"});  
   conf.set(&delay, {"delay"});  
 
   if (commands.size() == 0) {
@@ -56,6 +57,7 @@ Tty::Tty(Configuration &conf) {
     commands.push_back("pair");
     commands.push_back("yes");
     commands.push_back("no");
+    commands.push_back("bankroll");
     commands.push_back("quit");
   }
   
@@ -149,7 +151,7 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
     
     case Libreblackjack::Info::CardDealer:
-      if (p1 > 0) {  
+      if (p1 > 0) {
         switch (dealerHand.cards.size()) {
           case 0:
 //            s = "card_dealer_up";
@@ -164,12 +166,14 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
         s = "Dealer's hole card is dealt";
       }
       dealerHand.cards.push_back(p1);
+      currentHandId = 0;
     break;
     
     case Libreblackjack::Info::CardDealerRevealsHole:
 //      s = "card_dealer_hole";
       s = "Dealer's hole card was " + card[p1].utf8();
       *(++(dealerHand.cards.begin())) = p1;
+      currentHandId = 0;
     break;
     
     case Libreblackjack::Info::DealerBlackjack:
@@ -226,6 +230,11 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
       s = "Creating new hand #" + std::to_string(p2) + " with card " + card[cardToSplit].utf8();
       currentHandId = p1;  
     break;
+
+    case Libreblackjack::Info::PlayerDoubleInvalid:
+//      s = "player_double_invalid";
+      s = "Cannot double down";
+    break;
     
     case Libreblackjack::Info::PlayerNextHand:
 //      s = "player_next_hand";
@@ -268,11 +277,20 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
     case Libreblackjack::Info::Help:
       std::cout << "help yourself" << std::endl;        
     break;
+
+    case Libreblackjack::Info::Bankroll:
+      std::cout << "Your bankroll is " << std::to_string(1e-3*p1) << std::endl;        
+    break;
     
+    
+    case Libreblackjack::Info::CommandInvalid:
+//      s = "command_invalid";
+      s = "Invalid command";
+    break;
     
     case Libreblackjack::Info::Bye:
 //      s = "bye";  
-      s = "Bye bye! We'll play Blackjack again next time.";
+      s = "Bye bye! We'll play Blackjack again next time";
     break;
     
     case Libreblackjack::Info::None:
@@ -346,8 +364,8 @@ int Tty::play() {
       actionTaken = Libreblackjack::PlayerActionTaken::Quit;
     } else if (command == "help") {
       actionTaken = Libreblackjack::PlayerActionTaken::Help;
-    } else if (command == "count" || command == "c") {
-      actionTaken = Libreblackjack::PlayerActionTaken::Count;
+//    } else if (command == "count" || command == "c") {
+//      actionTaken = Libreblackjack::PlayerActionTaken::Count;
     } else if (command == "upcard" || command == "u") {
       actionTaken = Libreblackjack::PlayerActionTaken::UpcardValue;
     } else if (command == "bankroll" || command == "b") {
