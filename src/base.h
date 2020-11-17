@@ -223,44 +223,6 @@ class Player {
     Hand dealerHand;
 };
 
-struct PlayerInfo {
-
-  std::list<PlayerHand> hands;
-  std::list<PlayerHand>::iterator currentHand;
-
-  unsigned int currentSplits = 0;
-    
-//  unsigned int currentBet = 0;
-  unsigned int n_hands = 0;  // this is different from the dealer's due to splitting
-
-  unsigned int handsInsured = 0;
-  unsigned int handsDoubled = 0;
-  unsigned int blackjacksPlayer = 0;
-  unsigned int blackjacksDealer = 0;
-
-  unsigned int bustsPlayer = 0;
-  unsigned int bustsDealer = 0;
-    
-  unsigned int wins = 0;
-  unsigned int winsInsured = 0;
-  unsigned int winsDoubled = 0;
-  unsigned int winsBlackjack = 0;
-    
-  unsigned int pushes = 0;
-  unsigned int losses = 0;
-    // TODO: blackjack_pushes?
-    
-  
-  double bankroll = 0;
-  double worstBankroll = 0;
-  double totalMoneyWaged = 0;
-  double currentResult = 0;
-  double mean = 0;
-  double M2 = 0;
-  double variance = 0;
- 
-};
-
 class Dealer {
   public:
     Dealer() = default;
@@ -298,18 +260,55 @@ class Dealer {
     
     Libreblackjack::DealerAction nextAction = Libreblackjack::DealerAction::None;
     
+    
+  protected:
+    // TODO: multiple players
+    Player *player;
+
     // TODO: most of the games will have a single element, but maybe
     // there are games where the dealer has more than one hand
 //    std::list <Hand> hands;
     Hand hand;
-
-    // TODO: multiple players
-    Player *player;
-    PlayerInfo playerInfo;
     
+    struct {
+      std::list<PlayerHand> hands;
+      std::list<PlayerHand>::iterator currentHand;
+    
+      unsigned int currentSplits = 0;
+        
+    //  unsigned int currentBet = 0;
+      unsigned int n_hands = 0;  // this is different from the dealer's due to splitting
+    
+      unsigned int handsInsured = 0;
+      unsigned int handsDoubled = 0;
+      unsigned int blackjacksPlayer = 0;
+      unsigned int blackjacksDealer = 0;
+    
+      unsigned int bustsPlayer = 0;
+      unsigned int bustsDealer = 0;
+        
+      unsigned int wins = 0;
+      unsigned int winsInsured = 0;
+      unsigned int winsDoubled = 0;
+      unsigned int winsBlackjack = 0;
+        
+      unsigned int pushes = 0;
+      unsigned int losses = 0;
+        // TODO: blackjack_pushes?
+        
+      
+      double bankroll = 0;
+      double worstBankroll = 0;
+      double totalMoneyWaged = 0;
+      double currentResult = 0;
+      double mean = 0;
+      double M2 = 0;
+      double variance = 0;
+    } playerStats;
+
   private:
     bool done = false;
-
+    
 };
 
 #endif
