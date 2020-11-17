@@ -81,7 +81,7 @@ void Blackjack::deal(void) {
   // let's start by assuming the player does not need to do anything
   player->actionRequired = Libreblackjack::PlayerActionRequired::None;
 
-  std::list<PlayerHand>::iterator playerHand;
+//  std::list<PlayerHand>::iterator playerHand;
   
   switch(nextAction) {
     // -------------------------------------------------------------------------  
@@ -111,7 +111,7 @@ void Blackjack::deal(void) {
       hand.cards.clear();
 
       // erase all the player's hands, create one, add and make it the current one
-      for (playerHand = playerInfo.hands.begin(); playerHand != playerInfo.hands.end(); ++playerHand) {
+      for (auto playerHand = playerInfo.hands.begin(); playerHand != playerInfo.hands.end(); ++playerHand) {
         playerHand->cards.clear();
       }
       playerInfo.hands.clear();
@@ -281,7 +281,7 @@ void Blackjack::deal(void) {
     case Libreblackjack::DealerAction::MoveOnToNextHand:
       // see if we finished all the player's hands
       if (++player->currentHand != player->hands.end()) {
-        unsigned int playerCard = drawCard(&(*player->currentHand));
+        unsigned int playerCard = drawCard(&(*playerInfo.currentHand));
         info(Libreblackjack::Info::CardPlayer, playerCard, player->currentHand->id);
 
         if (std::abs(player->currentHand->value()) == 21) {

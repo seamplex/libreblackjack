@@ -114,10 +114,13 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
       // clear dealer's hand
       dealerHand.cards.clear();
 
-      // erase all of our hands, create one, add and make it the current one
-      for (auto hand : hands) {
-        hand.cards.clear();
+      // erase all of our hands
+      {
+        for (auto hand = hands.begin(); hand != hands.end(); ++hand) {
+          hand->cards.clear();
+        }
       }
+      // create one, add and make it the current one
       hands.clear();
       hands.push_back(std::move(PlayerHand()));
       currentHand = hands.begin();
@@ -200,8 +203,7 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
 
       {
         bool found = false;
-        std::list<PlayerHand>::iterator hand;
-        for (hand = hands.begin(); hand != hands.end(); ++hand) {
+        for (auto hand = hands.begin(); hand != hands.end(); ++hand) {
           if (hand->id == handToSplit) {
             found = true;
             hand->id = p1;
@@ -214,18 +216,15 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
           exit(0); 
         }
       
-        for (auto hand : hands) {  
-          std::cout << hand.id << " " << hand.cards.size() << std::endl;  
-        }    
         // create a new hand
         PlayerHand newHand;
         newHand.id = p2;
         newHand.cards.push_back(cardToSplit);
         hands.push_back(std::move(newHand));
       }  
-      
+    
+      s = "Creating new hand #" + std::to_string(p2) + " with card " + card[cardToSplit].utf8();
       currentHandId = p1;  
-      render = true;
     break;
     
     case Libreblackjack::Info::PlayerNextHand:
