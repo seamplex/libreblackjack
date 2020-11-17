@@ -188,34 +188,43 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
     case Libreblackjack::Info::PlayerSplitInvalid:
 //      s = "player_split_invalid";
       s = "Cannot split";
-      render = true;
     break;
 
     case Libreblackjack::Info::PlayerSplitOk:
 //      s = "player_split_ok";
       s = "Splitting hand" + ((p1 != 0)?(" #" + std::to_string(p1)):"");
       handToSplit = p1;
-      render = true;
     break;
 
     case Libreblackjack::Info::PlayerSplitIds:
 
-      // TODO: check if the hand is found  
-      for (auto hand = hands.begin(); hand != hands.end(); ++currentHand) {
-        if (hand->id == handToSplit) {
-          hand->id = p1;
-          cardToSplit = hand.back();
-          hand.pop_back();
-          break;
+      {
+        bool found = false;
+        std::list<PlayerHand>::iterator hand;
+        for (hand = hands.begin(); hand != hands.end(); ++hand) {
+          if (hand->id == handToSplit) {
+            found = true;
+            hand->id = p1;
+            cardToSplit = *(++(hand->cards.begin()));
+            hand->cards.pop_back();
+            break;
+          }
         }
-      }
+        if (found == false) {
+          exit(0); 
+        }
       
-      // create a new hand
-      PlayerHand newHand;
-      newHand.id = playerInfo.hands.size() + 1;
-      newHand.bet = playerInfo.currentHand->bet;
+        for (auto hand : hands) {  
+          std::cout << hand.id << " " << hand.cards.size() << std::endl;  
+        }    
+        // create a new hand
+        PlayerHand newHand;
+        newHand.id = p2;
+        newHand.cards.push_back(cardToSplit);
+        hands.push_back(std::move(newHand));
+      }  
       
-        
+      currentHandId = p1;  
       render = true;
     break;
     
@@ -431,9 +440,7 @@ void Tty::renderHand(Hand *hand, bool current) {
     std::cout << " _____   ";
   }
   std::cout << std::endl;
-  
-//   std::cout << "hand id = " << hand->id << std::endl;
-  
+    
   for (auto c : hand->cards) {
     if (color && (card[c].suit == Libreblackjack::Suit::Diamonds || card[c].suit == Libreblackjack::Suit::Hearts)) {
       ansiColor = red;

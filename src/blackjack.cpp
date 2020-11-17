@@ -80,7 +80,9 @@ void Blackjack::deal(void) {
   bool playerBlackack = false;
   // let's start by assuming the player does not need to do anything
   player->actionRequired = Libreblackjack::PlayerActionRequired::None;
-    
+
+  std::list<PlayerHand>::iterator playerHand;
+  
   switch(nextAction) {
     // -------------------------------------------------------------------------  
     case Libreblackjack::DealerAction::StartNewHand:
@@ -109,8 +111,8 @@ void Blackjack::deal(void) {
       hand.cards.clear();
 
       // erase all the player's hands, create one, add and make it the current one
-      for (auto playerHand : playerInfo.hands) {
-        playerHand.cards.clear();
+      for (playerHand = playerInfo.hands.begin(); playerHand != playerInfo.hands.end(); ++playerHand) {
+        playerHand->cards.clear();
       }
       playerInfo.hands.clear();
       playerInfo.hands.push_back(std::move(PlayerHand()));
@@ -534,6 +536,10 @@ int Blackjack::process(void) {
       // TODO: choose through conf
       // TODO: check bankroll to see if player can split
       if (playerInfo.currentSplits < 3 && playerInfo.currentHand->cards.size() == 2 && card[firstCard].value == card[secondCard].value) {
+        
+        // tell the player the split is valid
+        info(Libreblackjack::Info::PlayerSplitOk, playerInfo.currentHand->id);
+        
         // mark that we split to put ids in the hands and to limi the number of spltis
         playerInfo.currentSplits++;
 
@@ -557,6 +563,9 @@ int Blackjack::process(void) {
         // add the new hand to the list of hands        
         playerInfo.hands.push_back(std::move(newHand));
 
+        // tell the player what the ids are
+        info(Libreblackjack::Info::PlayerSplitIds, playerInfo.currentHand->id, newHand.id);
+        
         // deal a card to the first hand
         playerCard = drawCard(&(*playerInfo.currentHand));
         info(Libreblackjack::Info::CardPlayer, playerCard, playerInfo.currentHand->id);
@@ -591,7 +600,7 @@ int Blackjack::process(void) {
         }
       } else {
 
-        std::cout << "cannot_split" << std::endl;
+        info(Libreblackjack::Info::PlayerSplitInvalid);
         return -1;
           
       }
