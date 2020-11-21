@@ -50,11 +50,7 @@ class Blackjack : public Dealer {
     unsigned int holeCard;
     unsigned int playerFirstCard;
     unsigned int playerSecondCard;
-    
-    int n_decks = -1;
-    unsigned long int n_hands = 0;
-    unsigned long int n_hand = 0;
-    
+        
     bool hit_soft_17 = true;
     bool double_after_split = true;
     bool shuffle_every_hand = false;

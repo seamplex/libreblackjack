@@ -1,5 +1,6 @@
  * handle no readline
- * to_string() para floats
+ * flag to see if a conf string was used or not
+ * to_string() for floats
  * max_splits through conf (default 3)
  * DAS
  * shoes (and arranged shoes)

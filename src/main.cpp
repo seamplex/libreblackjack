@@ -87,7 +87,8 @@ int main(int argc, char **argv) {
     }
   }
   
-  // TODO: write report
+  dealer->reportPrepare();
+  dealer->writeReportYAML();
   
   delete player;
   delete dealer;

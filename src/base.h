@@ -25,6 +25,7 @@
 
 #include <string>
 #include <list>
+#include <unordered_map>
 #include <random>
 #include <cmath>
 
@@ -260,6 +261,9 @@ class Dealer {
     
     Libreblackjack::DealerAction nextAction = Libreblackjack::DealerAction::None;
     
+    void reportPrepare(void);
+    int writeReportYAML(void);
+    
     
   protected:
     // TODO: multiple players
@@ -269,6 +273,11 @@ class Dealer {
     // there are games where the dealer has more than one hand
 //    std::list <Hand> hands;
     Hand hand;
+
+    double error_standard_deviations = 1.0;
+    int n_decks = -1;
+    unsigned long int n_hands = 0;
+    unsigned long int n_hand = 0;
     
     struct {
       std::list<PlayerHand> hands;
@@ -308,6 +317,12 @@ class Dealer {
 
   private:
     bool done = false;
+    std::unordered_map<std::string, std::string> results;
+
+    void insert(std::string key, std::string value) {
+      results.insert(std::pair<std::string, std::string>(key, value));
+    }
+    
     
 };
 
