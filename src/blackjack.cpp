@@ -99,9 +99,9 @@ void Blackjack::deal(void) {
       // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
 
       if (n_hand != 0) {
-        double delta = playerStats.currentResult - playerStats.mean;
+        double delta = playerStats.result - playerStats.mean;
         playerStats.mean += delta / (double)(n_hand);
-        playerStats.M2 += delta * (playerStats.currentResult - playerStats.mean);
+        playerStats.M2 += delta * (playerStats.result - playerStats.mean);
         playerStats.variance = playerStats.M2 / (double)(n_hand);
       }
 
@@ -120,8 +120,7 @@ void Blackjack::deal(void) {
       playerStats.currentHand = playerStats.hands.begin();
       
       // state that the player did not win anything nor split nor doubled down
-      playerStats.currentResult = 0;
-      playerStats.currentSplits = 0;
+      playerStats.splits = 0;
       
       if (lastPass) {
         info(Libreblackjack::Info::Shuffle);
@@ -231,7 +230,7 @@ void Blackjack::deal(void) {
           
           // pay him (her)
           playerStats.bankroll += (1.0 + 0.5) * playerStats.currentHand->bet;
-          playerStats.currentResult += playerStats.currentHand->bet;
+          playerStats.result += playerStats.currentHand->bet;
           info(Libreblackjack::Info::PlayerWinsInsurance, 1e3*playerStats.currentHand->bet);
 
           playerStats.winsInsured++;
@@ -249,7 +248,7 @@ void Blackjack::deal(void) {
           
         } else {
           
-          playerStats.currentResult -= playerStats.currentHand->bet;
+          playerStats.result -= playerStats.currentHand->bet;
           info(Libreblackjack::Info::PlayerLosses, 1e3*playerStats.currentHand->bet);
           
           playerStats.losses++;
@@ -263,7 +262,7 @@ void Blackjack::deal(void) {
 
         // pay him (her)
         playerStats.bankroll += (1.0 + blackjack_pays) * playerStats.currentHand->bet;
-        playerStats.currentResult += blackjack_pays * playerStats.currentHand->bet;
+        playerStats.result += blackjack_pays * playerStats.currentHand->bet;
         info(Libreblackjack::Info::PlayerWins, 1e3 * blackjack_pays*playerStats.currentHand->bet);
         
         playerStats.blackjacksPlayer++;
@@ -351,7 +350,7 @@ void Blackjack::deal(void) {
           if (playerHand.busted() == false) {
             // pay him (her)
             playerStats.bankroll += 2 * playerHand.bet;
-            playerStats.currentResult += playerHand.bet;
+            playerStats.result += playerHand.bet;
             info(Libreblackjack::Info::PlayerWins, 1e3*playerHand.bet);
             
             playerStats.wins++;
@@ -365,7 +364,7 @@ void Blackjack::deal(void) {
            
             if (dealerTotal > playerTotal) {
                 
-              playerStats.currentResult -= playerHand.bet;
+              playerStats.result -= playerHand.bet;
               info(Libreblackjack::Info::PlayerLosses, 1e3*playerHand.bet, playerTotal);
               playerStats.losses++;
                 
@@ -380,7 +379,7 @@ void Blackjack::deal(void) {
                 
               // pay him (her)  
               playerStats.bankroll += 2 * playerHand.bet;
-              playerStats.currentResult += playerHand.bet;
+              playerStats.result += playerHand.bet;
               info(Libreblackjack::Info::PlayerWins, 1e3*playerHand.bet, playerTotal);
               playerStats.wins++;
               playerStats.winsDoubled += playerHand.doubled;
@@ -542,7 +541,7 @@ int Blackjack::process(void) {
 
         if (playerStats.currentHand->busted()) {
           info(Libreblackjack::Info::PlayerLosses, 1e3*playerStats.currentHand->bet, playerTotal);
-          playerStats.currentResult -= playerStats.currentHand->bet;
+          playerStats.result -= playerStats.currentHand->bet;
           playerStats.bustsPlayer++;
           playerStats.losses++;
         }
@@ -572,7 +571,7 @@ int Blackjack::process(void) {
       // up to three splits (i.e. four hands)
       // TODO: choose through conf
       // TODO: check bankroll to see if player can split
-      if (playerStats.currentSplits < 3 && playerStats.currentHand->cards.size() == 2 && card[firstCard].value == card[secondCard].value) {
+      if (playerStats.splits < 3 && playerStats.currentHand->cards.size() == 2 && card[firstCard].value == card[secondCard].value) {
         
         // take player's money
         playerStats.bankroll -= playerStats.currentHand->bet;
@@ -585,7 +584,7 @@ int Blackjack::process(void) {
         info(Libreblackjack::Info::PlayerSplitOk, playerStats.currentHand->id);
         
         // mark that we split to put ids in the hands and to limi the number of spltis
-        playerStats.currentSplits++;
+        playerStats.splits++;
 
         // the first hand is id=1, the rest have the id of the size of the list
         if (playerStats.currentHand == playerStats.hands.begin()) {
@@ -659,7 +658,7 @@ int Blackjack::process(void) {
 
       if (playerStats.currentHand->busted()) {
           
-        playerStats.currentResult -= playerStats.currentHand->bet;
+        playerStats.result -= playerStats.currentHand->bet;
         info(Libreblackjack::Info::PlayerLosses, 1e3*playerStats.currentHand->bet);
         playerStats.bustsPlayer++;
         playerStats.losses++;

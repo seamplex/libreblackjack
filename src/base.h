@@ -283,7 +283,7 @@ class Dealer {
       std::list<PlayerHand> hands;
       std::list<PlayerHand>::iterator currentHand;
     
-      unsigned int currentSplits = 0;
+      unsigned int splits = 0;
         
     //  unsigned int currentBet = 0;
       unsigned int n_hands = 0;  // this is different from the dealer's due to splitting
@@ -309,7 +309,7 @@ class Dealer {
       double bankroll = 0;
       double worstBankroll = 0;
       double totalMoneyWaged = 0;
-      double currentResult = 0;
+      double result = 0;
       double mean = 0;
       double M2 = 0;
       double variance = 0;

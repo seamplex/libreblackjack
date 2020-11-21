@@ -7,7 +7,7 @@
 
 void Dealer::reportPrepare(void) {
 
-  double ev = (double) playerStats.currentResult / (double) n_hand;
+  double ev = (double) playerStats.result / (double) n_hand;
   double error = error_standard_deviations * sqrt (playerStats.variance / (double) n_hand);
     
   insert("result", std::to_string(ev));
