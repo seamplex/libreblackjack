@@ -48,16 +48,16 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
 
     case Libreblackjack::Info::BetInvalid:
       if (p1 < 0) {
-        s = "bet_negative";  
+        s = "bet_negative" + std::to_string(p1);  
       } else if (p1 > 0) {
-        s = "bet_maximum";  
+        s = "bet_maximum" + std::to_string(p1);  
       } else {
         s = "bet_zero";
       }
     break;
 
     case Libreblackjack::Info::NewHand:
-      s = "new_hand";  
+      s = "new_hand " + std::to_string(p1) + " " + std::to_string(1e-3*p2);  
       
       // clear dealer's hand
       dealerHand.cards.clear();
@@ -81,7 +81,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
     
     case Libreblackjack::Info::CardPlayer:
-      s = "card_player";
+      s = "card_player " + ((p2 != 0)?(std::to_string(p2)+ " "):"") + card[p1].ascii();
       if (p2 != static_cast<int>(currentHandId)) {
         for (currentHand = hands.begin(); currentHand != hands.end(); ++currentHand) {
           if (static_cast<int>(currentHand->id) == p2) {
@@ -98,21 +98,21 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
       if (p1 > 0) {
         switch (dealerHand.cards.size()) {
           case 0:
-            s = "card_dealer_up";
+            s = "card_dealer_up " + card[p1].ascii();
           break;
           default:
-            s = "card_dealer";
+            s = "card_dealer " + card[p1].ascii();;
           break;
         }
       } else {
-        s = "card_dealer";
+        s = "card_dealer " + card[p1].ascii();;
       }
       dealerHand.cards.push_back(p1);
       currentHandId = 0;
     break;
     
     case Libreblackjack::Info::CardDealerRevealsHole:
-      s = "card_dealer_hole";
+      s = "card_dealer_hole " + card[p1].utf8();;
       *(++(dealerHand.cards.begin())) = p1;
       currentHandId = 0;
     break;
@@ -134,7 +134,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
 
     case Libreblackjack::Info::PlayerSplitOk:
-      s = "player_split_ok";
+      s = "player_split_ok" + ((p1 != 0)?(" #" + std::to_string(p1)):"");
       handToSplit = p1;
     break;
 
@@ -163,6 +163,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
       }  
     
       currentHandId = p1;  
+      s = "new_hand " + std::to_string(p2) + " " + card[cardToSplit].utf8();
     break;
 
     case Libreblackjack::Info::PlayerDoubleInvalid:
@@ -236,7 +237,7 @@ int StdInOut::play(void) {
     break;
     
     case Libreblackjack::PlayerActionRequired::Play:
-      s = "play?";
+      s = "play?" + std::to_string(dealerValue) + " " + std::to_string(playerValue);
     break;  
     
     case Libreblackjack::PlayerActionRequired::None:

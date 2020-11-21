@@ -20,6 +20,13 @@ void Dealer::reportPrepare(void) {
     
   report.push_back(reportItem("played_hands", "%g", n_hands));
   report.push_back(reportItem("total_money_waged", "%g", playerStats.totalMoneyWaged));
+
+  report.push_back(reportItem("bustsPlayer", "%g", playerStats.bustsPlayer));
+  report.push_back(reportItem("bustsDealer", "%g", playerStats.bustsDealer));
+
+  report.push_back(reportItem("wins", "%g", playerStats.wins));
+  report.push_back(reportItem("pushes", "%g", playerStats.pushes));
+  report.push_back(reportItem("losses", "%g", playerStats.losses));
   
   return;
 }
