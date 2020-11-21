@@ -36,7 +36,7 @@ class Tty : public Player {
     Tty(Configuration &);
     ~Tty() { };
     
-    int play() override;
+    int play(void) override;
     void info(Libreblackjack::Info = Libreblackjack::Info::None, int = 0, int = 0) override;
 
     // for readline's autocompletion

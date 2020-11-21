@@ -213,6 +213,8 @@ void Blackjack::deal(void) {
       }
 
       // step 7.c. ask the player to play
+      player->playerValue = playerTotal;
+      player->dealerValue = dealerTotal;
       player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
       nextAction = Libreblackjack::DealerAction::AskForPlay;
       return;
@@ -280,12 +282,16 @@ void Blackjack::deal(void) {
         }
         
         nextAction = Libreblackjack::DealerAction::AskForPlay;
+        player->playerValue = playerTotal;
+        player->dealerValue = dealerTotal;
         player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
         return;
       }        
     break;
     
     case Libreblackjack::DealerAction::AskForPlay:
+      player->playerValue = playerTotal;
+      player->dealerValue = dealerTotal;
       player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
       nextAction = Libreblackjack::DealerAction::AskForPlay;
       return;
@@ -302,6 +308,8 @@ void Blackjack::deal(void) {
           nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
           return;
         } else {
+          player->playerValue = playerTotal;
+          player->dealerValue = dealerTotal;
           player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
           nextAction = Libreblackjack::DealerAction::AskForPlay;
           return;
@@ -626,6 +634,8 @@ int Blackjack::process(void) {
               nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
               return 1;
             } else {
+//              player->playerValue = playerTotal;
+//              player->dealerValue = dealerTotal;
               player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
               nextAction = Libreblackjack::DealerAction::AskForPlay;
               return 1;
@@ -636,6 +646,9 @@ int Blackjack::process(void) {
             return 1;
           }  
         } else {
+//          player->playerValue = playerTotal;
+//          player->dealerValue = dealerTotal;
+            
           player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
           nextAction = Libreblackjack::DealerAction::AskForPlay;
           return 1;
@@ -675,6 +688,8 @@ int Blackjack::process(void) {
         
       } else {
           
+//        player->playerValue = playerTotal;
+//        player->dealerValue = dealerTotal;
         player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
         nextAction = Libreblackjack::DealerAction::AskForPlay;
         return 1;

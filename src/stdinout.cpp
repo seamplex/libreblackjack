@@ -217,10 +217,12 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
     
   }
   
+  std::cout << s << std::endl;
+  
   return;
 }
 
-int StdInOut::play() {
+int StdInOut::play(void) {
   
   std::string s;
   
@@ -246,6 +248,12 @@ int StdInOut::play() {
   
   std::string command;
   std::cin >> command;
+
+  if (std::cin.eof()) {
+    actionTaken = Libreblackjack::PlayerActionTaken::Quit;
+    return 0;
+  }
+
   trim(command);
   actionTaken = Libreblackjack::PlayerActionTaken::None;
     

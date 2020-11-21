@@ -325,7 +325,7 @@ int Tty::play() {
     
     case Libreblackjack::PlayerActionRequired::Play:
       renderTable();  
-      s = "Play?";
+      s = "Play? " + std::to_string(dealerValue) + " " + std::to_string(playerValue);
     break;  
     
     case Libreblackjack::PlayerActionRequired::None:

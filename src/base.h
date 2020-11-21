@@ -203,12 +203,15 @@ class Player {
     Player(Player &&) = delete;
     Player(const Player &&) = delete;
 
-    virtual int play() = 0;
+    virtual int play(void) = 0;
     virtual void info(Libreblackjack::Info = Libreblackjack::Info::None, int = 0, int = 0) = 0;
     
     Libreblackjack::PlayerActionRequired actionRequired = Libreblackjack::PlayerActionRequired::None;
     Libreblackjack::PlayerActionTaken    actionTaken    = Libreblackjack::PlayerActionTaken::None;
 
+    int dealerValue = 0;
+    int playerValue = 0;
+    
     bool verbose = false;
     bool flat_bet = false;
     bool no_insurance = false;

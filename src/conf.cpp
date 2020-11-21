@@ -139,10 +139,10 @@ Configuration::Configuration(int argc, char **argv) {
   
   if (set(player, {"player"}) == false) {
     // if we are on an interactive terminal we play through tty otherwise stdinout
-    if (isatty(1)) {
+    if (isatty(0)) {
       player = "tty";
     } else {
-      player = "stdinout";
+      player = "stdio";
     }
   }
   
