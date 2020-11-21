@@ -227,6 +227,13 @@ class Player {
     Hand dealerHand;
 };
 
+struct reportItem {
+  reportItem(std::string k, std::string f, double v) : key(k), format(f), value(v) {};
+  std::string key;
+  std::string format;
+  double value;
+};
+
 class Dealer {
   public:
     Dealer() = default;
@@ -320,12 +327,7 @@ class Dealer {
 
   private:
     bool done = false;
-    std::unordered_map<std::string, std::string> results;
-
-    void insert(std::string key, std::string value) {
-      results.insert(std::pair<std::string, std::string>(key, value));
-    }
-    
+    std::list<reportItem> report;
     
 };
 

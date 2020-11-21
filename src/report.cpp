@@ -10,11 +10,17 @@ void Dealer::reportPrepare(void) {
   double ev = (double) playerStats.result / (double) n_hand;
   double error = error_standard_deviations * sqrt (playerStats.variance / (double) n_hand);
     
-  insert("result", std::to_string(ev));
-  insert("variance", std::to_string(playerStats.variance));
-  insert("deviation", std::to_string(sqrt(playerStats.variance)));
-  insert("error", std::to_string(error));  
+  report.push_back(reportItem("bankroll", "%g", playerStats.bankroll));
+  report.push_back(reportItem("result", "%g", playerStats.result));
+  report.push_back(reportItem("ev", "%g", ev));
+  report.push_back(reportItem("hands", "%g", n_hand));
+  report.push_back(reportItem("variance", "%g", playerStats.variance));
+  report.push_back(reportItem("deviation", "%g", sqrt(playerStats.variance)));
+  report.push_back(reportItem("error", "%g", error));
     
+  report.push_back(reportItem("played_hands", "%g", n_hands));
+  report.push_back(reportItem("total_money_waged", "%g", playerStats.totalMoneyWaged));
+  
   return;
 }
 
@@ -32,8 +38,10 @@ int Dealer::writeReportYAML(void) {
 
   // TODO: choose if comments with explanations are to be added
   std::cerr <<  "---" << std::endl;
-  for (auto it = results.begin(); it != results.end(); ++it) {
-    std::cerr << it->first << ": " << it->second << std::endl;
+  for (auto item : report) {
+    std::cerr << item.key << ": ";
+    fprintf(stderr, item.format.c_str(), item.value);
+    std::cerr << std::endl;
   }
   
 //   std::cerr <<  "rules:" << std::endl;
