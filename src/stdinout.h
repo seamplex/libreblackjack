@@ -24,9 +24,15 @@
 #define STDINOUT_H
 #include "blackjack.h"
 
+#include <algorithm> 
+#include <functional> 
+#include <cctype>
+#include <locale>
+
+
 class StdInOut : public Player {
   public:  
-    StdInOut();
+    StdInOut(Configuration &);
     ~StdInOut() { };
     
     int play(void) override;
@@ -34,17 +40,19 @@ class StdInOut : public Player {
     
   private:
     std::string input_buffer;
-
-    std::string black   = "\x1B[0m";
-    std::string red     = "\x1B[31m";
-    std::string green   = "\x1B[32m";
-    std::string yellow  = "\x1B[33m";
-    std::string blue    = "\x1B[34m";
-    std::string magenta = "\x1B[35m";
-    std::string cyan    = "\x1B[36m";
-    std::string white   = "\x1B[37m";
-    std::string reset   = "\033[0m";
     
+    std::size_t handToSplit;
+    unsigned int cardToSplit;
+    
+    inline void ltrim(std::string &s) {
+      s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+    };
+
+    inline void rtrim(std::string &s) {
+      s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
+    };
+
+    inline void trim(std::string &s) { ltrim(s); rtrim(s); };    
       
 };
 #endif

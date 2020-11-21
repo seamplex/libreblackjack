@@ -57,8 +57,8 @@ int main(int argc, char **argv) {
 
   if (conf.getPlayerName() == "tty") {
     player = new Tty(conf);
-  } else if (conf.getPlayerName() == "stdinout") {
-    player = new StdInOut();
+  } else if (conf.getPlayerName() == "stdinout" || conf.getPlayerName() == "stdio") {
+    player = new StdInOut(conf);
     
   // TODO: player strategy from file
   } else {
