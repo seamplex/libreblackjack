@@ -76,9 +76,7 @@ Blackjack::~Blackjack() {
 
 void Blackjack::deal(void) {
   
-  int playerTotal = 0;
-  int dealerTotal = 0;
-  bool playerBlackack = false;
+  bool playerBlackjack = false;
   // let's start by assuming the player does not need to do anything
   player->actionRequired = Libreblackjack::PlayerActionRequired::None;
 
@@ -172,6 +170,7 @@ void Blackjack::deal(void) {
       // step 4. show dealer's upcard
       upCard = drawCard(&hand);
       info(Libreblackjack::Info::CardDealer, upCard);
+      player->dealerValue = hand.value();
 
       // step 5. deal the second card to each player
       playerSecondCard = drawCard(&(*playerStats.currentHand));
@@ -205,16 +204,14 @@ void Blackjack::deal(void) {
       }
       
       // step 7.b. if either the dealer or the player has a chance to have a blackjack, check
-      playerTotal = playerStats.currentHand->value();
-      if ((card[upCard].value == 10 || card[upCard].value == 11) || std::abs(playerTotal) == 21) {
+      player->playerValue = playerStats.currentHand->value();
+      if ((card[upCard].value == 10 || card[upCard].value == 11) || std::abs(player->playerValue) == 21) {
         player->actionRequired = Libreblackjack::PlayerActionRequired::None;
         nextAction = Libreblackjack::DealerAction::CheckforBlackjacks;
         return;
       }
 
       // step 7.c. ask the player to play
-      player->playerValue = playerTotal;
-      player->dealerValue = dealerTotal;
       player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
       nextAction = Libreblackjack::DealerAction::AskForPlay;
       return;
@@ -222,7 +219,7 @@ void Blackjack::deal(void) {
  
     case Libreblackjack::DealerAction::CheckforBlackjacks:
       // step 8. check if there are any blackjack
-      playerBlackack = playerStats.currentHand->blackjack();
+      playerBlackjack = playerStats.currentHand->blackjack();
       if (hand.blackjack()) {
         info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
         info(Libreblackjack::Info::DealerBlackjack);
@@ -238,7 +235,7 @@ void Blackjack::deal(void) {
           playerStats.winsInsured++;
         }
 
-        if (playerBlackack) {
+        if (playerBlackjack) {
           info(Libreblackjack::Info::PlayerBlackjackAlso);
 
           // give him his (her her) money back
@@ -260,7 +257,7 @@ void Blackjack::deal(void) {
         player->actionRequired = Libreblackjack::PlayerActionRequired::None;
         return;
         
-      } else if (playerBlackack) {
+      } else if (playerBlackjack) {
 
         // pay him (her)
         playerStats.bankroll += (1.0 + blackjack_pays) * playerStats.currentHand->bet;
@@ -282,16 +279,12 @@ void Blackjack::deal(void) {
         }
         
         nextAction = Libreblackjack::DealerAction::AskForPlay;
-        player->playerValue = playerTotal;
-        player->dealerValue = dealerTotal;
         player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
         return;
       }        
     break;
     
     case Libreblackjack::DealerAction::AskForPlay:
-      player->playerValue = playerTotal;
-      player->dealerValue = dealerTotal;
       player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
       nextAction = Libreblackjack::DealerAction::AskForPlay;
       return;
@@ -308,8 +301,6 @@ void Blackjack::deal(void) {
           nextAction = Libreblackjack::DealerAction::MoveOnToNextHand;
           return;
         } else {
-          player->playerValue = playerTotal;
-          player->dealerValue = dealerTotal;
           player->actionRequired = Libreblackjack::PlayerActionRequired::Play;
           nextAction = Libreblackjack::DealerAction::AskForPlay;
           return;
@@ -344,15 +335,15 @@ void Blackjack::deal(void) {
       info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
 
       // hit while count is less than 17 (or equal to soft 17 if hit_soft_17 is true)
-      dealerTotal = hand.value();
-      while ((std::abs(dealerTotal) < 17 || (hit_soft_17 && dealerTotal == -17)) && hand.busted() == 0) {
+      player->dealerValue = hand.value();
+      while ((std::abs(player->dealerValue) < 17 || (hit_soft_17 && player->dealerValue == -17)) && hand.busted() == 0) {
         unsigned int dealerCard = drawCard(&hand);
         info(Libreblackjack::Info::CardDealer, dealerCard);
-        dealerTotal = hand.value();
+        player->dealerValue = hand.value();
       }
         
       if (hand.busted()) {
-        info(Libreblackjack::Info::DealerBusts, dealerTotal);
+        info(Libreblackjack::Info::DealerBusts, player->dealerValue);
         playerStats.bustsDealer++;
         for (auto playerHand : playerStats.hands) {
           if (playerHand.busted() == false) {
@@ -368,15 +359,15 @@ void Blackjack::deal(void) {
       } else {
         for (auto playerHand : playerStats.hands) {
           if (playerHand.busted() == false) {  // busted hands have already been solved
-            playerTotal = std::abs(playerHand.value());
+            player->playerValue = std::abs(playerHand.value());
            
-            if (dealerTotal > playerTotal) {
+            if (std::abs(player->dealerValue) > std::abs(player->playerValue)) {
                 
               playerStats.result -= playerHand.bet;
-              info(Libreblackjack::Info::PlayerLosses, 1e3*playerHand.bet, playerTotal);
+              info(Libreblackjack::Info::PlayerLosses, 1e3*playerHand.bet, player->playerValue);
               playerStats.losses++;
                 
-            } else if (dealerTotal == playerTotal) {
+            } else if (std::abs(player->dealerValue) == std::abs(player->playerValue)) {
                   
               // give him his (her her) money back
               playerStats.bankroll += playerHand.bet;
@@ -388,7 +379,7 @@ void Blackjack::deal(void) {
               // pay him (her)  
               playerStats.bankroll += 2 * playerHand.bet;
               playerStats.result += playerHand.bet;
-              info(Libreblackjack::Info::PlayerWins, 1e3*playerHand.bet, playerTotal);
+              info(Libreblackjack::Info::PlayerWins, 1e3*playerHand.bet, player->playerValue);
               playerStats.wins++;
               playerStats.winsDoubled += playerHand.doubled;
               

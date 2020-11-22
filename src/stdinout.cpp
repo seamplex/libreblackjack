@@ -112,7 +112,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
     
     case Libreblackjack::Info::CardDealerRevealsHole:
-      s = "card_dealer_hole " + card[p1].utf8();;
+      s = "card_dealer_hole " + card[p1].ascii();;
       *(++(dealerHand.cards.begin())) = p1;
       currentHandId = 0;
     break;
@@ -163,7 +163,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
       }  
     
       currentHandId = p1;  
-      s = "new_hand " + std::to_string(p2) + " " + card[cardToSplit].utf8();
+      s = "new_hand " + std::to_string(p2) + " " + card[cardToSplit].ascii();
     break;
 
     case Libreblackjack::Info::PlayerDoubleInvalid:
@@ -175,17 +175,17 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
     
     case Libreblackjack::Info::PlayerPushes:
-      s = "player_pushes";
+      s = "player_pushes " + std::to_string(playerValue) + " " + std::to_string(dealerValue);;
     break;
     
     case Libreblackjack::Info::PlayerLosses:
-      s = "player_losses";
+      s = "player_losses " + std::to_string(playerValue) + " " + std::to_string(dealerValue);
     break;
     case Libreblackjack::Info::PlayerBlackjack:
       s = "blackjack_player";
     break;
     case Libreblackjack::Info::PlayerWins:
-      s = "player_wins";
+      s = "player_wins " + std::to_string(playerValue) + " " + std::to_string(dealerValue);;
     break;
     
     case Libreblackjack::Info::NoBlackjacks:
@@ -193,7 +193,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
 
     case Libreblackjack::Info::DealerBusts:
-      s = "dealer_busts";
+      s = "dealer_busts " + std::to_string(playerValue) + " " + std::to_string(dealerValue);;
     break;  
     
     case Libreblackjack::Info::Help:
@@ -237,7 +237,7 @@ int StdInOut::play(void) {
     break;
     
     case Libreblackjack::PlayerActionRequired::Play:
-      s = "play?" + std::to_string(dealerValue) + " " + std::to_string(playerValue);
+      s = "play? " + std::to_string(playerValue) + " " + std::to_string(dealerValue);
     break;  
     
     case Libreblackjack::PlayerActionRequired::None:

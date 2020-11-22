@@ -71,7 +71,7 @@ Configuration::Configuration(int argc, char **argv) {
 
   int optc = 0;
   int option_index = 0;
-//  int opterr = 0;
+  opterr = 0;
   while ((optc = getopt_long_only(argc, argv, "c:hvd:n:if:", longopts, &option_index)) != -1) {
     switch (optc) {
       case 'h':
@@ -139,7 +139,7 @@ Configuration::Configuration(int argc, char **argv) {
   
   if (set(player, {"player"}) == false) {
     // if we are on an interactive terminal we play through tty otherwise stdinout
-    if (isatty(0)) {
+    if (isatty(0) && isatty(1))  {
       player = "tty";
     } else {
       player = "stdio";
@@ -198,7 +198,7 @@ bool Configuration::set(bool *value, std::list<std::string> key) {
   for (auto it : key) {
     if (exists(*(&it))) {
       auto s = data[*(&it)];
-      if (s == "true" || s == "yes" || s == "y") {
+      if (s == "true" || s == "yes" || s == "y" || s == "") {
         *value = true;  
       } else if (s == "false" || s == "no" || s == "n") {
         *value = false; 
