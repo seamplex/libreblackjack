@@ -1,6 +1,15 @@
  * handle no readline
+ * named pipes (a.k.a FIFOs)
+ * eV = expected value = return
+ * check that the card distribution is uniform
+ * initial bankroll
+ * report
+   * as a file
+   * format (yaml, json, markdown table)
+   * size (extra small, small, medium, large, extra large)
+ * flat_bet implies =1
  * parse 1e5 in hands
- * trap ctrl+c and write report anyway
+ * trap ctrl+c and write report anyway (not sure how to pass arguments to signal handler)
  * flag to see if a conf string was used or not
  * to_string() for floats
  * max_splits through conf (default 3)

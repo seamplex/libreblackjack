@@ -69,11 +69,6 @@ int main(int argc, char **argv) {
   // assign player to dealer
   dealer->setPlayer(player);
 
-  // TODO: check and/or choose in the conf
-//  std::setlinebuf(stdout);
-//  std::setvbuf(stdout, NULL, _IOLBF, 0);
-//  std::setvbuf(stdin,  NULL, _IOLBF, 0);
-
   // let the action begin!
   unsigned int unknownCommands = 0;
   dealer->nextAction = Libreblackjack::DealerAction::StartNewHand;
