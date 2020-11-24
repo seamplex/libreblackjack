@@ -21,6 +21,9 @@ AC_PROG_CXX
 AC_CHECK_HEADER([readline/readline.h])
 AC_CHECK_LIB([readline], [readline])
 
+# default is optimized without debugging symbols
+AS_IF([test "$CXXFLAGS" = "-g -O2"], [CXXFLAGS="-O3"])
+
 AC_MSG_NOTICE([creating version-conf.h])
 cat << EOF > src/version-conf.h
 #define COMPILATION_ARCH     "${host_os} ${host_cpu}"
