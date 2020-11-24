@@ -44,7 +44,7 @@ fi
 echo "define(libreblackjackversion, [${version}])dnl" > version.m4
 
 
-if [ ! -z "`which pandoc`" ]; then
+if [ ! -z "$(which pandoc)" ]; then
   pandoc README.md -t plain -o README
 #   cd doc
 #   ./md2texi.sh
