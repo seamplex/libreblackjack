@@ -21,7 +21,6 @@
  */
 
 #include <iostream>
-#include <cstring>
 #include <thread>
 #include <chrono>
 
@@ -106,9 +105,8 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
 
     case Libreblackjack::Info::NewHand:
-//      s = "new_hand";  
       std::cout << std::endl;
-      s = "Starting new hand #" + std::to_string(p1) + " with bankroll " + std::to_string(1e-3*p2);
+      s = "Starting new hand #" + std::to_string(p1) + " with bankroll " + string_format("%g", 1e-3*p2, 0.0);
       
       // clear dealer's hand
       dealerHand.cards.clear();
@@ -152,7 +150,6 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
             s = "Dealer's up card is " + card[p1].utf8();
           break;
           default:
-//            s = "card_dealer";
             s = "Dealer's card is " + card[p1].utf8();
           break;
         }
@@ -220,45 +217,37 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
 
     case Libreblackjack::Info::PlayerDoubleInvalid:
-//      s = "player_double_invalid";
       s = "Cannot double down";
     break;
     
     case Libreblackjack::Info::PlayerNextHand:
-//      s = "player_next_hand";
       s = "Playing next hand #" + std::to_string(p1);
       render = true;
     break;
     
     case Libreblackjack::Info::PlayerPushes:
-//      s = "player_pushes";
-      s = "Player pushes " + std::to_string(1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
+      s = "Player pushes " + string_format("%g", 1e-3*p1, 0.0) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
       render = true;
     break;
     
     case Libreblackjack::Info::PlayerLosses:
-//      s = "player_losses";
-      s = "Player losses " + std::to_string(1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
+      s = "Player losses " + string_format("%g", 1e-3*p1, 0.0) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
       render = true;
     break;
     case Libreblackjack::Info::PlayerBlackjack:
-//      s = "blackjack_player";
       s = "Player has Blackjack";
       render = true;
     break;
     case Libreblackjack::Info::PlayerWins:
-//      s = "player_wins";
-      s = "Player wins " + std::to_string(1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
+      s = "Player wins " + string_format("%g", 1e-3*p1, 0.0) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
       render = true;
     break;
     
     case Libreblackjack::Info::NoBlackjacks:
-//      s = "no_blackjacks";
       s = "No blackjacks";
     break;
 
     case Libreblackjack::Info::DealerBusts:
-//      s = "no_blackjacks";
       s = "Dealer busts with " + std::to_string(p1);
     break;  
     
@@ -267,17 +256,15 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
 
     case Libreblackjack::Info::Bankroll:
-      std::cout << "Your bankroll is " << std::to_string(1e-3*p1) << std::endl;        
+      std::cout << "Your bankroll is " << string_format("%g", 1e-3*p1, 0.0) << std::endl;        
     break;
     
     
     case Libreblackjack::Info::CommandInvalid:
-//      s = "command_invalid";
       s = "Invalid command";
     break;
     
     case Libreblackjack::Info::Bye:
-//      s = "bye";  
       s = "Bye bye! We'll play Blackjack again next time";
     break;
     

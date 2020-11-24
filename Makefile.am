@@ -23,4 +23,5 @@ blackjack_SOURCES = \
  src/blackjack.cpp \
  src/cards.cpp \
  src/stdinout.cpp \
- src/tty.cpp
+ src/tty.cpp \
+ src/internal.cpp

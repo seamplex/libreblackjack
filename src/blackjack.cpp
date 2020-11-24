@@ -92,18 +92,12 @@ void Blackjack::deal(void) {
         return;
       }
       
-      // update the uncertainty (knuth citing welford)
-      // The Art of Computer Programming, volume 2: Seminumerical Algorithms, 3rd edn., p. 232
-      // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
-
       if (n_hand != 0) {
-        double delta = playerStats.result - playerStats.mean;
-        playerStats.mean += delta / (double)(n_hand);
-        playerStats.M2 += delta * (playerStats.result - playerStats.mean);
-        playerStats.variance = playerStats.M2 / (double)(n_hand);
+        updateMeanAndVariance();
       }
 
       i_arranged_cards = 0;
+      playerStats.currentOutcome = 0;
       n_hand++;
       
       // clear dealer's hand
@@ -229,7 +223,7 @@ void Blackjack::deal(void) {
           
           // pay him (her)
           playerStats.bankroll += (1.0 + 0.5) * playerStats.currentHand->bet;
-          playerStats.result += playerStats.currentHand->bet;
+          playerStats.currentOutcome += playerStats.currentHand->bet;
           info(Libreblackjack::Info::PlayerWinsInsurance, 1e3*playerStats.currentHand->bet);
 
           playerStats.winsInsured++;
@@ -247,7 +241,7 @@ void Blackjack::deal(void) {
           
         } else {
           
-          playerStats.result -= playerStats.currentHand->bet;
+          playerStats.currentOutcome -= playerStats.currentHand->bet;
           info(Libreblackjack::Info::PlayerLosses, 1e3*playerStats.currentHand->bet);
           
           playerStats.losses++;
@@ -261,7 +255,7 @@ void Blackjack::deal(void) {
 
         // pay him (her)
         playerStats.bankroll += (1.0 + blackjack_pays) * playerStats.currentHand->bet;
-        playerStats.result += blackjack_pays * playerStats.currentHand->bet;
+        playerStats.currentOutcome += blackjack_pays * playerStats.currentHand->bet;
         info(Libreblackjack::Info::PlayerWins, 1e3 * blackjack_pays*playerStats.currentHand->bet);
         
         playerStats.blackjacksPlayer++;
@@ -350,7 +344,7 @@ void Blackjack::deal(void) {
           if (playerHand.busted() == false) {
             // pay him (her)
             playerStats.bankroll += 2 * playerHand.bet;
-            playerStats.result += playerHand.bet;
+            playerStats.currentOutcome += playerHand.bet;
             info(Libreblackjack::Info::PlayerWins, 1e3*playerHand.bet);
             
             playerStats.wins++;
@@ -364,7 +358,7 @@ void Blackjack::deal(void) {
            
             if (std::abs(player->dealerValue) > std::abs(player->playerValue)) {
                 
-              playerStats.result -= playerHand.bet;
+              playerStats.currentOutcome -= playerHand.bet;
               info(Libreblackjack::Info::PlayerLosses, 1e3*playerHand.bet, player->playerValue);
               playerStats.losses++;
                 
@@ -379,7 +373,7 @@ void Blackjack::deal(void) {
                 
               // pay him (her)  
               playerStats.bankroll += 2 * playerHand.bet;
-              playerStats.result += playerHand.bet;
+              playerStats.currentOutcome += playerHand.bet;
               info(Libreblackjack::Info::PlayerWins, 1e3*playerHand.bet, player->playerValue);
               playerStats.wins++;
               playerStats.winsDoubled += playerHand.doubled;
@@ -469,6 +463,7 @@ int Blackjack::process(void) {
         if (playerStats.bankroll < playerStats.worstBankroll) {
           playerStats.worstBankroll = playerStats.bankroll;
         }
+        playerStats.totalMoneyWaged += playerStats.currentHand->bet;
         
         nextAction = Libreblackjack::DealerAction::DealPlayerFirstCard;
         return 1;
@@ -541,7 +536,7 @@ int Blackjack::process(void) {
         
         if (playerStats.currentHand->busted()) {
           info(Libreblackjack::Info::PlayerLosses, 1e3*playerStats.currentHand->bet, player->playerValue);
-          playerStats.result -= playerStats.currentHand->bet;
+          playerStats.currentOutcome -= playerStats.currentHand->bet;
           playerStats.bustsPlayer++;
           playerStats.losses++;
         }
@@ -661,7 +656,7 @@ int Blackjack::process(void) {
 
       if (playerStats.currentHand->busted()) {
           
-        playerStats.result -= playerStats.currentHand->bet;
+        playerStats.currentOutcome -= playerStats.currentHand->bet;
         info(Libreblackjack::Info::PlayerLosses, 1e3*playerStats.currentHand->bet);
         playerStats.bustsPlayer++;
         playerStats.losses++;

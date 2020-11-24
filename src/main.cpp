@@ -27,6 +27,7 @@
 #include "blackjack.h"
 #include "tty.h"
 #include "stdinout.h"
+#include "internal.h"
 
 int main(int argc, char **argv) {
   
@@ -59,8 +60,8 @@ int main(int argc, char **argv) {
     player = new Tty(conf);
   } else if (conf.getPlayerName() == "stdinout" || conf.getPlayerName() == "stdio") {
     player = new StdInOut(conf);
-    
-  // TODO: player strategy from file
+  } else if (conf.getPlayerName() == "internal") {
+    player = new Internal(conf);
   } else {
     std::cerr << "Unknown player '" << conf.getPlayerName() <<".'" << std::endl;
     return -1;

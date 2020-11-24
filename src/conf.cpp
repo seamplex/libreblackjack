@@ -96,7 +96,7 @@ Configuration::Configuration(int argc, char **argv) {
       break;
       case 'f':
         if (optarg != NULL) {
-          data["flat_bet"] = optarg;
+          data["flat_bet"] = optarg;    
         } else {
           data["flat_bet"] = "yes";
         }
@@ -151,8 +151,7 @@ Configuration::Configuration(int argc, char **argv) {
   set(&error_standard_deviations, {"error_standard_deviations"});
   set(yaml_report_path, {"yaml_report", "yaml_report_path"});
   
-  
-
+  return;
     
 }
 
@@ -234,7 +233,7 @@ bool Configuration::set(unsigned int *value, std::list<std::string> key) {
 bool Configuration::set(unsigned long int *value, std::list<std::string> key) {
   for (auto it : key) {
     if (exists(*(&it))) {
-      *value = std::stoi(data[*(&it)]);
+      *value = (unsigned long int)std::stod(data[*(&it)]);
       return true;
     }
   }

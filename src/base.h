@@ -228,10 +228,11 @@ class Player {
 };
 
 struct reportItem {
-  reportItem(std::string k, std::string f, double v) : key(k), format(f), value(v) {};
+  reportItem(int l, std::string k, std::string f, double v) : key(k), format(f), value(v), level(l) {};
   std::string key;
   std::string format;
   double value;
+  int level;
 };
 
 class Dealer {
@@ -274,7 +275,6 @@ class Dealer {
     void reportPrepare(void);
     int writeReportYAML(void);
     
-    
   protected:
     // TODO: multiple players
     Player *player;
@@ -284,9 +284,13 @@ class Dealer {
 //    std::list <Hand> hands;
     Hand hand;
 
-    double error_standard_deviations = 1.0;
-    int n_decks = -1;
-    unsigned long int n_hands = 0;
+    // how many standard deviations does the reported error mean?
+    double error_standard_deviations = 3.0;
+    // default infinite number of decks (it's faster)
+    int n_decks = -1;   
+    // default one million hands
+    unsigned long int n_hands = 1000000;
+    
     unsigned long int n_hand = 0;
     
     struct {
@@ -294,8 +298,8 @@ class Dealer {
       std::list<PlayerHand>::iterator currentHand;
     
       unsigned int splits = 0;
-        
-    //  unsigned int currentBet = 0;
+
+      // TODO: separate handsDealt from handsPlayed
       unsigned int n_hands = 0;  // this is different from the dealer's due to splitting
     
       unsigned int handsInsured = 0;
@@ -313,22 +317,28 @@ class Dealer {
         
       unsigned int pushes = 0;
       unsigned int losses = 0;
-        // TODO: blackjack_pushes?
-        
+      // TODO: blackjack_pushes?
       
       double bankroll = 0;
       double worstBankroll = 0;
       double totalMoneyWaged = 0;
-      double result = 0;
+      
+      // these variables are used to compute the running mean and variance 
+      double currentOutcome = 0;
       double mean = 0;
       double M2 = 0;
       double variance = 0;
     } playerStats;
 
+    void updateMeanAndVariance(void);
+    
   private:
     bool done = false;
     std::list<reportItem> report;
+    int reportVerbosity = 3;
     
 };
+
+template <typename ... Args> std::string string_format( const std::string& format, Args ... args);
 
 #endif
