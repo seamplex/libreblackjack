@@ -127,7 +127,7 @@ int Internal::play() {
     
     case Libreblackjack::PlayerActionRequired::Play:
 
-//       std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
+//      std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
         
       // TODO: split
         
@@ -139,11 +139,18 @@ int Internal::play() {
         
         // TODO: double  
         if (actionTaken == Libreblackjack::PlayerActionTaken::Double) {
-          actionTaken = Libreblackjack::PlayerActionTaken::Hit;    
+          actionTaken = Libreblackjack::PlayerActionTaken::Hit;
         }
       }  
-//       std::cout << (int)(actionTaken) << std::endl;
-      
+/*      
+      if (actionTaken == Libreblackjack::PlayerActionTaken::Hit) {
+        std::cout << "hit" << std::endl;
+      } else if (actionTaken == Libreblackjack::PlayerActionTaken::Stand) {
+        std::cout << "stand" << std::endl;
+      } else {
+        std::cout << "none" << std::endl;
+      }
+*/    
     break;  
     
     case Libreblackjack::PlayerActionRequired::None:

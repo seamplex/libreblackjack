@@ -1,4 +1,6 @@
+ * shoes (and arranged shoes)
  * handle no readline
+ * cpu and wall time in report
  * check that the card distribution is uniform
  * initial bankroll
  * report
@@ -10,7 +12,6 @@
  * to_string() for floats
  * max_splits through conf (default 3)
  * DAS
- * shoes (and arranged shoes)
  * name of the game the dealer deals
  * name of the games the player can play
  * dealers
@@ -18,18 +19,12 @@
    * blackjack switch
    * blackjack under?
    * siete y medio
+   * card war
+   * between
  * players
-   * tty
-   * stdio
-     - yes
-   * fifo  
-     - awk
-     - bash
-     - perl
-     - python
-   * internal
-     - strategy from file
-     - reko
+   * internal dumb
+   * internal reko
+   * python
    * runtime-linked in a shared object
  
  * multithreading
