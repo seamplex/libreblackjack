@@ -29,10 +29,11 @@
 
 
 Internal::Internal(Configuration &conf) {
-    
-  hard.resize(21);  // 4--20
-  soft.resize(21);  // 12--20
-  pair.resize(21);  // 2*(2--10) + 11 
+
+  // fill everything with "none"
+  hard.resize(21);
+  soft.resize(21);
+  pair.resize(21);
   
   for (int value = 0; value < 21; value++) {
     hard[value].resize(12);
@@ -45,16 +46,100 @@ Internal::Internal(Configuration &conf) {
       pair[value][upcard] = Libreblackjack::PlayerActionTaken::None;
     }
   }
-  // TODO: read a default basic strategy
+  
+  // read in a skeleton of the basic strategy
+  std::vector<std::string> default_hard(21);
+  std::vector<std::string> default_soft(21);
+  std::vector<std::string> default_pair(21);
+  
+  default_hard[20] = "  ssssssssss";  
+  default_hard[19] = "  ssssssssss";  
+  default_hard[18] = "  ssssssssss";  
+  default_hard[17] = "  ssssssssss";  
+  default_hard[16] = "  ssssshhhsh";  
+  default_hard[15] = "  ssssshhhhh";  
+  default_hard[14] = "  ssssshhhhh";  
+  default_hard[13] = "  ssssshhhhh";  
+  default_hard[12] = "  hhssshhhhh";  
+  default_hard[11] = "  dddddddddh";  
+  default_hard[10] = "  ddddddddhd";  
+  default_hard[9]  = "  hddddhhhhh";  
+  default_hard[8]  = "  hhhhhhhhhh";  
+  default_hard[7]  = "  hhhhhhhhhh";  
+  default_hard[6]  = "  hhhhhhhhhh";  
+  default_hard[5]  = "  hhhhhhhhhh";  
+  default_hard[4]  = "  hhhhhhhhhh";
+  
+  default_soft[20] = "  ssssssssss";  
+  default_soft[19] = "  ssssdsssss";  
+  default_soft[18] = "  dddddsshhh";  
+  default_soft[17] = "  hddddhhhhh";  
+  default_soft[16] = "  hhdddhhhhh";  
+  default_soft[15] = "  hhdddhhhhh";  
+  default_soft[14] = "  hhhddhhhhh";  
+  default_soft[13] = "  hhhhdhhhhh";  
+  default_soft[12] = "  hhhhdhhhhh";  
+  
+  default_pair[20] = "  nnnnnnnnnn";  
+  default_pair[18] = "  yyyyynyynn";  
+  default_pair[16] = "  yyyyyyyyyy";  
+  default_pair[14] = "  yyyyyynnnn";  
+  default_pair[12] = "  yyyyynnnnn";  
+  default_pair[11] = "  yyyyyyyyyy";  
+  default_pair[10] = "  nnnnnnnnnn";  
+  default_pair[8]  = "  nnnyynnnnn";  
+  default_pair[6]  = "  yyyyyynnnn";  
+  default_pair[4]  = "  yyyyyynnnn";  
+  
+  for (int value = 4; value < 21; value++) {
+    for (int upcard = 2; upcard < 12; upcard++) {
+        
+      if (default_hard[value] != "") {
+        switch (default_hard[value][upcard]) {
+          case 'h':
+            hard[value][upcard] = Libreblackjack::PlayerActionTaken::Hit;  
+          break;
+          case 's':
+            hard[value][upcard] = Libreblackjack::PlayerActionTaken::Stand;  
+          break;
+          case 'd':
+            hard[value][upcard] = Libreblackjack::PlayerActionTaken::Double;  
+          break;  
+        }
+      }
+
+      if (default_soft[value] != "") {
+        switch (default_soft[value][upcard]) {
+          case 'h':
+            soft[value][upcard] = Libreblackjack::PlayerActionTaken::Hit;  
+          break;
+          case 's':
+            soft[value][upcard] = Libreblackjack::PlayerActionTaken::Stand;  
+          break;
+          case 'd':
+            soft[value][upcard] = Libreblackjack::PlayerActionTaken::Double;  
+          break;  
+        }
+      }
+      
+      if (default_pair[value] != "" && default_pair[value][upcard] == 'y') {
+        pair[value][upcard] = Libreblackjack::PlayerActionTaken::Split;  
+      }
+    }
+  }  
+  
+  
+  // read the actual file
+  conf.set(strategy_file_path, {"strategy_file_path", "strategy_file", "strategy"});  
   
   // std::ifstream is RAII, i.e. no need to call close
-  std::ifstream fileStream("bs.txt");
+  std::ifstream fileStream(strategy_file_path);
   std::string line;  
   std::string token;
   
   if (fileStream.is_open()) {
     while (getline(fileStream, line)) {
-      if (line[0] == '#' || line[0] == ';' || line.empty()) {
+      if (line[0] == '#' || line[0] == ';' || line.empty() || line.find_first_not_of(" \t\r\n") == line.npos) {
         continue;
       }
 

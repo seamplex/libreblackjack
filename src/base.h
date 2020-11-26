@@ -29,6 +29,8 @@
 #include <random>
 #include <cmath>
 
+#include "conf.h"
+
 namespace Libreblackjack {
   void shortversion(void);
   void help(const char *);
@@ -328,12 +330,14 @@ class Dealer {
       double variance = 0;
     } playerStats;
 
+    std::string report_file_path;
+    int report_verbosity = 3;
+    
     void updateMeanAndVariance(void);
     
   private:
     bool done = false;
     std::list<reportItem> report;
-    int reportVerbosity = 3;
     
 };
 

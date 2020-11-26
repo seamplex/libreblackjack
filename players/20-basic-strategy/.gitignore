@@ -1,0 +1,10 @@
+*.yaml
+*.str
+*.log
+hard.txt
+soft.txt
+pair.txt
+bs.txt
+*.html
+table.md
+blackjack.conf

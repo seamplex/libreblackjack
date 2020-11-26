@@ -1,0 +1,10 @@
+pA   n  n  n  n  n  n  n  n  n  n 
+pT   n  n  n  n  n  n  n  n  n  n 
+p9   n  n  n  n  n  n  n  n  n  n 
+p8   n  n  n  n  n  n  n  n  n  n 
+p7   n  n  n  n  n  n  n  n  n  n 
+p6   n  n  n  n  n  n  n  n  n  n 
+p5   n  n  n  n  n  n  n  n  n  n 
+p4   n  n  n  n  n  n  n  n  n  n 
+p3   n  n  n  n  n  n  n  n  n  n 
+p2   n  n  n  n  n  n  n  n  n  n 

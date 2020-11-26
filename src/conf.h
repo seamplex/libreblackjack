@@ -53,11 +53,11 @@ class Configuration {
     std::string getPlayerName(void) { return player; };
 
     unsigned int max_incorrect_commands = 10;
-    std::string yaml_report_path;
+    std::string report_file_path;
+    // TODO: 
 
     unsigned int hands_per_char = false;
     
-    double error_standard_deviations;
     bool show_help = false;
     bool show_version = false;
     

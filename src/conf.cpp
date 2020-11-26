@@ -79,7 +79,6 @@ Configuration::Configuration(int argc, char **argv) {
         show_version = true;
       break;
       case 'c':
-        std::cout << "custom conf " << optarg << std::endl; 
         configFilePath = std::move(std::string(optarg));
         explicitConfigFile = true;
       break;
@@ -146,8 +145,6 @@ Configuration::Configuration(int argc, char **argv) {
   
   // common settings to all dealers and players
   set(&max_incorrect_commands, {"max_incorrect_commands"});
-  set(&error_standard_deviations, {"error_standard_deviations"});
-  set(yaml_report_path, {"yaml_report", "yaml_report_path"});
   
   return;
     

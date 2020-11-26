@@ -22,8 +22,8 @@
 
 #include <iostream>
 
-#include "base.h"
 #include "conf.h"
+#include "base.h"
 #include "blackjack.h"
 #include "tty.h"
 #include "stdinout.h"

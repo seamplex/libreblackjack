@@ -34,6 +34,7 @@ class Internal : public Player {
 
   private:
     
+    std::string strategy_file_path{"bs.txt"};
     std::vector<std::vector<Libreblackjack::PlayerActionTaken>> pair;
     std::vector<std::vector<Libreblackjack::PlayerActionTaken>> soft;
     std::vector<std::vector<Libreblackjack::PlayerActionTaken>> hard;
