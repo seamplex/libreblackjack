@@ -127,7 +127,7 @@ int Internal::play() {
     
     case Libreblackjack::PlayerActionRequired::Play:
 
-      std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
+//       std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
         
       // TODO: split
         
@@ -142,7 +142,7 @@ int Internal::play() {
           actionTaken = Libreblackjack::PlayerActionTaken::Hit;    
         }
       }  
-      std::cout << (int)(actionTaken) << std::endl;
+//       std::cout << (int)(actionTaken) << std::endl;
       
     break;  
     

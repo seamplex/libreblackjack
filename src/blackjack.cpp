@@ -128,6 +128,7 @@ void Blackjack::deal(void) {
       }
 
       info(Libreblackjack::Info::NewHand, n_hand, 1e3*playerStats.bankroll);
+//       std::cout << "new hand #" << n_hand << std::endl;
       
       if (player->flat_bet) {
           
@@ -160,15 +161,19 @@ void Blackjack::deal(void) {
       // step 3. deal the first card to each player
       playerFirstCard = drawCard(&(*playerStats.currentHand));
       info(Libreblackjack::Info::CardPlayer, playerFirstCard);
+//       std::cout << "first card " << card[playerFirstCard].utf8() << std::endl;
             
       // step 4. show dealer's upcard
       upCard = drawCard(&hand);
       info(Libreblackjack::Info::CardDealer, upCard);
+//       std::cout << "up card " << card[upCard].utf8() << std::endl;
       player->dealerValue = hand.value();
 
       // step 5. deal the second card to each player
       playerSecondCard = drawCard(&(*playerStats.currentHand));
       info(Libreblackjack::Info::CardPlayer, playerSecondCard);
+      player->playerValue = playerStats.currentHand->value();
+//       std::cout << "second card " << card[playerSecondCard].utf8() << std::endl;
       
       // step 6. deal the dealer's hole card 
       holeCard = drawCard(&hand);
@@ -198,7 +203,6 @@ void Blackjack::deal(void) {
       }
       
       // step 7.b. if either the dealer or the player has a chance to have a blackjack, check
-      player->playerValue = playerStats.currentHand->value();
       if ((card[upCard].value == 10 || card[upCard].value == 11) || std::abs(player->playerValue) == 21) {
         player->actionRequired = Libreblackjack::PlayerActionRequired::None;
         nextAction = Libreblackjack::DealerAction::CheckforBlackjacks;
@@ -217,6 +221,7 @@ void Blackjack::deal(void) {
       if (hand.blackjack()) {
         info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
         info(Libreblackjack::Info::DealerBlackjack);
+//         std::cout << "dealer blakjack " << card[holeCard].utf8() << std::endl;
         playerStats.blackjacksDealer++;
 
         if (playerStats.currentHand->insured) {
@@ -231,6 +236,7 @@ void Blackjack::deal(void) {
 
         if (playerBlackjack) {
           info(Libreblackjack::Info::PlayerBlackjackAlso);
+//           std::cout << "both blackjack " << card[holeCard].utf8() << std::endl;
 
           // give him his (her her) money back
           playerStats.bankroll += playerStats.currentHand->bet;
@@ -290,6 +296,7 @@ void Blackjack::deal(void) {
         unsigned int playerCard = drawCard(&(*playerStats.currentHand));
         player->playerValue = playerStats.currentHand->value();
         info(Libreblackjack::Info::CardPlayer, playerCard, playerStats.currentHand->id);
+//         std::cout << "card player " << card[playerCard].utf8() << std::endl;
 
         if (std::abs(player->playerValue) == 21) {
           player->actionRequired = Libreblackjack::PlayerActionRequired::None;
@@ -313,6 +320,7 @@ void Blackjack::deal(void) {
 
         if (bustedAllHands) {
           info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
+//           std::cout << "hole " << card[holeCard].utf8() << std::endl;
           
           player->actionRequired = Libreblackjack::PlayerActionRequired::None;
           nextAction = Libreblackjack::DealerAction::StartNewHand;
@@ -328,12 +336,14 @@ void Blackjack::deal(void) {
     case Libreblackjack::DealerAction::HitDealerHand:
         
       info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
+//       std::cout << "hole " << card[holeCard].utf8() << std::endl;
 
       // hit while count is less than 17 (or equal to soft 17 if hit_soft_17 is true)
       player->dealerValue = hand.value();
       while ((std::abs(player->dealerValue) < 17 || (hit_soft_17 && player->dealerValue == -17)) && hand.busted() == 0) {
         unsigned int dealerCard = drawCard(&hand);
         info(Libreblackjack::Info::CardDealer, dealerCard);
+//         std::cout << "dealer " << card[dealerCard].utf8() << std::endl;
         player->dealerValue = hand.value();
       }
         

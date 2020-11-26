@@ -340,5 +340,6 @@ class Dealer {
 };
 
 template <typename ... Args> std::string string_format( const std::string& format, Args ... args);
+template <typename ... Args> std::string string_format2( const std::string& format, Args ... args);
 
 #endif
