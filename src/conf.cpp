@@ -30,8 +30,6 @@
 #include <getopt.h>
 #include <unistd.h>
 
-// source https://www.walletfox.com/course/parseconfigfile.php
-
 Configuration::Configuration(int argc, char **argv) {
   
   const struct option longopts[] = {
@@ -154,6 +152,8 @@ Configuration::Configuration(int argc, char **argv) {
   return;
     
 }
+
+// source https://www.walletfox.com/course/parseconfigfile.php
 
 int Configuration::readConfigFile(std::string filePath, bool mandatory) {
   

@@ -33,6 +33,10 @@ class Internal : public Player {
     void info(Libreblackjack::Info = Libreblackjack::Info::None, int = 0, int = 0) override;
 
   private:
+    
+    std::vector<std::vector<Libreblackjack::PlayerActionTaken>> pair;
+    std::vector<std::vector<Libreblackjack::PlayerActionTaken>> soft;
+    std::vector<std::vector<Libreblackjack::PlayerActionTaken>> hard;
       
 };
 
