@@ -70,6 +70,11 @@ class Blackjack : public Dealer {
     double penetration = 0.75;
     double penetration_sigma = 0;
     
+    void canDoubleSplit(void) {
+      player->canDouble = playerStats.currentHand->cards.size() == 2;
+      player->canSplit = player->canDouble && (card[*(playerStats.currentHand->cards.begin())].value == card[*(++playerStats.currentHand->cards.begin())].value);
+      return;
+    }  
       
 };
 #endif

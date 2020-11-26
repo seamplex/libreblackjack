@@ -32,20 +32,17 @@ Internal::Internal(Configuration &conf) {
     
   hard.resize(21);  // 4--20
   soft.resize(21);  // 12--20
-  pair.resize(12);  // 2--11
+  pair.resize(21);  // 2*(2--10) + 11 
   
   for (int value = 0; value < 21; value++) {
     hard[value].resize(12);
     soft[value].resize(12);
-    if (value < 12) {
-      pair[value].resize(12);
-    }
+    pair[value].resize(12);
+
     for (int upcard = 0; upcard < 12; upcard++) {
       hard[value][upcard] = Libreblackjack::PlayerActionTaken::None;
       soft[value][upcard] = Libreblackjack::PlayerActionTaken::None;
-      if (value < 12) {
-        pair[value][upcard] = Libreblackjack::PlayerActionTaken::None;
-      }
+      pair[value][upcard] = Libreblackjack::PlayerActionTaken::None;
     }
   }
   // TODO: read a default basic strategy
@@ -76,6 +73,7 @@ Internal::Internal(Configuration &conf) {
         break;
         case 'p':
           strategy = &pair;
+          // see below how we handle these two cases
           if (token[1] == 'A') {
             value = 11;  
           } else if (token[1] == 'T') {
@@ -98,9 +96,21 @@ Internal::Internal(Configuration &conf) {
         } else if (token == "d") {
           (*strategy)[value][upcard] = Libreblackjack::PlayerActionTaken::Double;  
         } else if (token == "y") {
-          (*strategy)[value][upcard] = Libreblackjack::PlayerActionTaken::Split;  
+          // the pair data is different as it is not written as a function of the value
+          // but of the value of the individual cards,
+          // i.e. p8 means split a pair of eights and not a hand with two fours
+          // to avoid clashing a pair of aces with a pair of sixes, we treat the former differently
+          if (value != 11) {
+            (*strategy)[2*value][upcard] = Libreblackjack::PlayerActionTaken::Split;  
+          } else {
+            (*strategy)[11][upcard] = Libreblackjack::PlayerActionTaken::Split;  
+          }
         } else if (token == "n") {
-          (*strategy)[value][upcard] = Libreblackjack::PlayerActionTaken::None;  
+          if (value != 11) {
+            (*strategy)[2*value][upcard] = Libreblackjack::PlayerActionTaken::None;  
+          } else {
+            (*strategy)[11][upcard] = Libreblackjack::PlayerActionTaken::None;  
+          }
         }
       }
     }
@@ -115,6 +125,9 @@ void Internal::info(Libreblackjack::Info msg, int p1, int p2) {
 
 int Internal::play() {
 
+  std::size_t value;
+  std::size_t upcard;
+  
   switch (actionRequired) {
     case Libreblackjack::PlayerActionRequired::Bet:
       currentBet = 1;
@@ -127,30 +140,42 @@ int Internal::play() {
     
     case Libreblackjack::PlayerActionRequired::Play:
 
-//      std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
-        
-      // TODO: split
-        
-      // soft
-      {
-        std::size_t value = std::abs(playerValue);
-        std::size_t upcard = std::abs(dealerValue);
+#ifdef BJDEBUG
+      std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
+#endif      
+      value = std::abs(playerValue);
+      upcard = std::abs(dealerValue);
+      
+      // first, we see if we can and shold split
+      if (canSplit &&
+           ((playerValue == -12 &&    pair[11][upcard] == Libreblackjack::PlayerActionTaken::Split) ||
+                                   pair[value][upcard] == Libreblackjack::PlayerActionTaken::Split)) {
+          actionTaken = Libreblackjack::PlayerActionTaken::Split;
+
+      } else {
+      
         actionTaken = (playerValue < 0) ? soft[value][upcard] : hard[value][upcard];
         
-        // TODO: double  
-        if (actionTaken == Libreblackjack::PlayerActionTaken::Double) {
-          actionTaken = Libreblackjack::PlayerActionTaken::Hit;
+        if (canDouble == false) {
+          if (actionTaken == Libreblackjack::PlayerActionTaken::Double) {
+            actionTaken = Libreblackjack::PlayerActionTaken::Hit;
+          }
         }
-      }  
-/*      
+      }
+      
+#ifdef BJDEBUG
       if (actionTaken == Libreblackjack::PlayerActionTaken::Hit) {
         std::cout << "hit" << std::endl;
       } else if (actionTaken == Libreblackjack::PlayerActionTaken::Stand) {
         std::cout << "stand" << std::endl;
+      } else if (actionTaken == Libreblackjack::PlayerActionTaken::Split) {
+        std::cout << "split" << std::endl;
       } else {
         std::cout << "none" << std::endl;
       }
-*/    
+#endif
+      
+      
     break;  
     
     case Libreblackjack::PlayerActionRequired::None:

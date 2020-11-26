@@ -116,23 +116,19 @@ class Card {
   public:
     Card(unsigned int);
     ~Card() { };
-    // TODO: delete copy & move
     
-    // TODO: decidir si conviene usar getters o public members
-    Libreblackjack::Suit getSuit()           { return suit; };
-    unsigned int getNumber() { return number; };
-    unsigned int getValue()  { return value; };
+    Libreblackjack::Suit getSuit() { return suit; };
+    unsigned int getNumber()       { return number; };
+    unsigned int getValue()        { return value; };
 
-    std::string getNumberASCII() { return numberASCII; };
-    std::string getSuitUTF8()    { return suitUTF8;    };
+    std::string getNumberASCII()   { return numberASCII; };
+    std::string getSuitUTF8()      { return suitUTF8;    };
     
     Libreblackjack::Suit suit;
     unsigned int number;
     unsigned int value;
     
-    std::string ascii() {
-      return numberASCII + suitASCII;
-    }
+    std::string ascii()            { return numberASCII + suitASCII; };
     std::string utf8(bool single = false) {
       return single ? singleUTF8 : numberASCII + suitUTF8;
     }
@@ -211,6 +207,8 @@ class Player {
 
     int dealerValue = 0;
     int playerValue = 0;
+    bool canDouble = false;
+    bool canSplit = false;
     
     bool verbose = false;
     bool flat_bet = false;
