@@ -1,6 +1,8 @@
 #!/bin/bash
 
-for i in grep cut bc awk; do
+n_max=9999999
+
+for i in grep awk; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -73,8 +75,7 @@ EOF
    
    while [ "${best}" = "x" ]; do
     # tell the user which combination we are trying and how many we will play
-    echo -n ${t}${hand}-${upcard} \($card1 $card2\) "n="${n}
-
+    echo -ne "${t}${hand}-${upcard} ($card1 $card2)\t"$(printf %.0e ${n})
     for play in s d h; do
      
      # start with options.conf as a template and add some custom stuff
@@ -133,22 +134,22 @@ EOF
      blackjack
     
      # evaluate the results
-     ev[${t}${hand},${upcard},${play}]=$(grep mean ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}')
-     error[${t}${hand},${upcard},${play}]=$(grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%.1g", $2)}')
+     ev[${t}${hand},${upcard},${play}]=$(grep mean ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')
+     error[${t}${hand},${upcard},${play}]=$(grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')
      
     done
    
     # choose the best one
-    ev_s=$(printf %g ${ev[${t}${hand},${upcard},s]})
-    ev_d=$(printf %g ${ev[${t}${hand},${upcard},d]})
-    ev_h=$(printf %g ${ev[${t}${hand},${upcard},h]})
+    ev_s=$(echo ${ev[${t}${hand},${upcard},s]} | awk '{printf("%+.2f", 100*$1)}')
+    ev_d=$(echo ${ev[${t}${hand},${upcard},d]} | awk '{printf("%+.2f", 100*$1)}')
+    ev_h=$(echo ${ev[${t}${hand},${upcard},h]} | awk '{printf("%+.2f", 100*$1)}')
    
     
-    if [ $n -le 9999999 ]; then 
+    if [ ${n} -le ${n_max} ]; then 
      # if we still have room, take into account errors
-     error_s=${error[${t}${hand},${upcard},s]}
-     error_d=${error[${t}${hand},${upcard},d]}
-     error_h=${error[${t}${hand},${upcard},h]}
+     error_s=$(echo ${error[${t}${hand},${upcard},s]} | awk '{printf("%+.1f", 100*$1)}')
+     error_d=$(echo ${error[${t}${hand},${upcard},d]} | awk '{printf("%+.1f", 100*$1)}')
+     error_h=$(echo ${error[${t}${hand},${upcard},h]} | awk '{printf("%+.1f", 100*$1)}')
     else
      # instead of running infinite hands, above a threshold asume errors are zero
      error_s=0
@@ -156,20 +157,20 @@ EOF
      error_h=0
     fi  
  
-    echo -ne "\ts=${ev_s} (${error_s})"
-    echo -ne "\td=${ev_d} (${error_d})"
-    echo -ne "\th=${ev_h} (${error_h})"
+    echo -ne "\t${ev_s}\t(${error_s})"
+    echo -ne "\t${ev_d}\t(${error_d})"
+    echo -ne "\t${ev_h}\t(${error_h})"
    
-    if   (( $(echo "${ev_s}-${error_s} > ${ev_d}+${error_d}" | bc -l) )) &&
-         (( $(echo "${ev_s}-${error_s} > ${ev_h}+${error_h}" | bc -l) )); then
+    if   (( $(echo ${ev_s} ${error_s} ${ev_d} ${error_d} | awk '{print (($1-$2) > ($3+$4))}') )) &&
+         (( $(echo ${ev_s} ${error_s} ${ev_h} ${error_h} | awk '{print (($1-$2) > ($3+$4))}') )); then
      best="s"
      echo -e "\tstand"
-    elif (( $(echo "${ev_d}-${error_d} > ${ev_s}+${error_s}" | bc -l) )) &&
-         (( $(echo "${ev_d}-${error_d} > ${ev_h}+${error_h}" | bc -l) )); then
+    elif (( $(echo ${ev_d} ${error_d} ${ev_s} ${error_s} | awk '{print (($1-$2) > ($3+$4))}') )) &&
+         (( $(echo ${ev_d} ${error_d} ${ev_h} ${error_h} | awk '{print (($1-$2) > ($3+$4))}') )); then
      best="d"
      echo -e "\tdouble"
-    elif (( $(echo "${ev_h}-${error_h} > ${ev_s}+${error_s}" | bc -l) )) &&
-         (( $(echo "${ev_h}-${error_h} > ${ev_d}+${error_d}" | bc -l) )); then
+    elif (( $(echo ${ev_h}-${error_h} ${ev_s} ${error_s} | awk '{print (($1-$2) > ($3+$4))}') )) &&
+         (( $(echo ${ev_h}-${error_h} ${ev_d} ${error_d} | awk '{print (($1-$2) > ($3+$4))}') )); then
      best="h"
      echo -e "\thit"
     else
@@ -217,7 +218,6 @@ EOF
  done
 done
 
-exit
 
 cat << EOF >> table.md
 
@@ -232,7 +232,7 @@ type="pair"
 t="p"
 cp pair-no.txt pair.txt
 
-for hand in A T `seq 9 -1 2`; do
+for hand in A T $(seq 9 -1 2); do
  if [ "${hand}" = "A" ]; then
   pair=1
  elif [ "${hand}" = "T" ]; then
@@ -241,16 +241,16 @@ for hand in A T `seq 9 -1 2`; do
   pair=$((${hand}))
  fi
   
- cat << EOF >> ${type}.html
- <tr>
-  <td>${t}${hand}</td>
-  <td>
-   <div class="text-right">y<span class="d-none d-lg-inline">es</span></div>
-   <div class="text-right">n<span class="d-none d-lg-inline">o</span></div>
-  </td>
-EOF
+#  cat << EOF >> ${type}.html
+#  <tr>
+#   <td>${t}${hand}</td>
+#   <td>
+#    <div class="text-right">y<span class="d-none d-lg-inline">es</span></div>
+#    <div class="text-right">n<span class="d-none d-lg-inline">o</span></div>
+#   </td>
+# EOF
   
- for upcard in `seq 2 9` T A; do
+ for upcard in $(seq 2 9) T A; do
   if [ "$upcard" = "T" ]; then
     upcard_n=10
   elif [ "$upcard" = "A" ]; then
@@ -259,23 +259,23 @@ EOF
     upcard_n=$(($upcard))
   fi
  
-  n=1000    # start with n hands
+  n=10000    # start with n hands
   best="x"  # x means don't know what to so, so play
    
   while [ "${best}" = "x" ]; do
    # tell the user which combination we are trying and how many we will play
-   echo -n ${t}${hand}-${upcard} "n="${n}
+   echo -ne "${t}${hand}-${upcard}\t\t$(printf %.0e ${n})"
    
    for play in y n; do
-     
+    
     # start with options.conf as a template and add some custom stuff
     cp options.conf blackjack.conf
     cat << EOF >> blackjack.conf
 hands = ${n}
-dealer2player = internal
-arranged_cards = ${pair} $((${upcard_n} + 13)) $((${pair} + 26))
-yaml_report = ${t}${hand}-${upcard}-${play}.yaml
-log = ${t}${hand}-${upcard}-${play}.log
+player = internal
+arranged_cards = ${pair}, $((${upcard_n} + 13)), $((${pair} + 26))
+report = ${t}${hand}-${upcard}-${play}.yaml
+# log = ${t}${hand}-${upcard}-${play}.log
 EOF
  
     # read the current strategy
@@ -298,9 +298,9 @@ EOF
      
     # save the new (temporary) strategy
     rm -f ${type}.txt
-    for h in A T `seq 9 -1 2`; do
+    for h in A T $(seq 9 -1 2); do
      echo -n "${t}${h}   " >> ${type}.txt
-     for u in `seq 2 9` T A; do
+     for u in $(seq 2 9) T A; do
       echo -n "${strategy[${t}${h},${u}]}  " >> ${type}.txt
      done
      echo >> ${type}.txt
@@ -312,37 +312,37 @@ EOF
     
     # ensamble the full bs.txt
     cat hard.txt soft.txt pair.txt > bs.txt
-    
+
     # play!
-    blackjack > /dev/null
-    
+    blackjack
+
     # evaluate the results
-    ev[${t}${hand},${upcard},${play}]=`grep return ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%+g", $2)}'`
-    error[${t}${hand},${upcard},${play}]=`grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%.1g", $2)}'`
+    ev[${t}${hand},${upcard},${play}]=$(grep mean ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')
+    error[${t}${hand},${upcard},${play}]=$(grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')
     
    done
    
    # choose the best one
-   ev_y=`printf %g ${ev[${t}${hand},${upcard},y]}`
-   ev_n=`printf %g ${ev[${t}${hand},${upcard},n]}`
+   ev_y=$(echo ${ev[${t}${hand},${upcard},y]} | awk '{printf("%+.2f", 100*$1)}')
+   ev_n=$(echo ${ev[${t}${hand},${upcard},n]} | awk '{printf("%+.2f", 100*$1)}')
    
-   if [ $n -le 999999 ]; then 
+   if [ $n -le ${n_max} ]; then 
     # if we still have room, take into account errors
-    error_y=${error[${t}${hand},${upcard},y]}
-    error_n=${error[${t}${hand},${upcard},n]}
+    error_y=$(echo ${error[${t}${hand},${upcard},y]} | awk '{printf("%+.1f", 100*$1)}')
+    error_n=$(echo ${error[${t}${hand},${upcard},n]} | awk '{printf("%+.1f", 100*$1)}')
    else
     # instead of running infinite hands, above a threshold asume errors are zero
     error_y=0
     error_n=0
    fi  
  
-   echo -ne "\ty=${ev_y} (${error_y})"
-   echo -ne "\tn=${ev_n} (${error_n})"
+   echo -ne "\t${ev_y}\t(${error_y})"
+   echo -ne "\t${ev_n}\t(${error_n})"
    
-   if   (( $(echo "${ev_y}-${error_y} > ${ev_n}+${error_n}" | bc -l) )); then
+   if   (( $(echo ${ev_y} ${error_y} ${ev_n} ${error_n} | awk '{print (($1-$2) > ($3+$4))}') )); then
     best="y"
     echo -e "\tyes"
-   elif (( $(echo "${ev_n}-${error_n} > ${ev_y}+${error_y}" | bc -l) )); then
+   elif (( $(echo ${ev_n} ${error_n} ${ev_y} ${error_y} | awk '{print (($1-$2) > ($3+$4))}') )); then
     best="n"
     echo -e "\tno"
    else
@@ -354,20 +354,20 @@ EOF
 
   echo "| ${t}${hand}-${upcard} | ${n} | ${ev_y} (${error_y}) | ${ev_n} (${error_n}) |" >> table.md
   
-  echo " <!-- ${upcard} -->" >> ${type}.html
-  echo " <td>" >> ${type}.html
-  echo ${ev_y} ${error_y} | awk -f cell.awk >> ${type}.html
-  echo ${ev_n} ${error_n} | awk -f cell.awk >> ${type}.html
-  echo " </td>" >> ${type}.html
+#   echo " <!-- ${upcard} -->" >> ${type}.html
+#   echo " <td>" >> ${type}.html
+#   echo ${ev_y} ${error_y} | awk -f cell.awk >> ${type}.html
+#   echo ${ev_n} ${error_n} | awk -f cell.awk >> ${type}.html
+#   echo " </td>" >> ${type}.html
   
   
   strategy[${t}${hand},${upcard}]=${best}
    
   # save the strategy again with the best strategy
   rm -f ${type}.txt
-  for h in A T `seq 9 -1 2`; do
+  for h in A T $(seq 9 -1 2); do
    echo -n "${t}${h}   " >> ${type}.txt
-   for u in `seq 2 9` T A; do
+   for u in $(seq 2 9) T A; do
     echo -n "${strategy[${t}${h},${u}]}  " >> ${type}.txt
    done
    echo >> ${type}.txt
@@ -377,6 +377,7 @@ done
 
  
 cat header.txt hard.txt header.txt soft.txt header.txt pair.txt > bs.txt
+rm -f blackjack.conf
 if [ "${debug}" == "0" ]; then
  rm -f *.yaml
  rm -f *.str
