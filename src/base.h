@@ -287,7 +287,8 @@ class Dealer {
     // how many standard deviations does the reported error mean?
     double error_standard_deviations = 3.0;
     // default infinite number of decks (it's faster)
-    int n_decks = -1;   
+    unsigned int n_decks = 0;
+    unsigned int n_shuffles = 0;
     // default one million hands
     unsigned long int n_hands = 1000000;
     

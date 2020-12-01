@@ -81,7 +81,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
     
     case Libreblackjack::Info::CardPlayer:
-      s = "card_player " + ((p2 != 0)?(std::to_string(p2)+ " "):"") + card[p1].ascii();
+      s = "card_player " + card[p1].ascii() + " " + ((p2 != 0)?(std::to_string(p2)+ " "):"") ;
       if (p2 != static_cast<int>(currentHandId)) {
         for (currentHand = hands.begin(); currentHand != hands.end(); ++currentHand) {
           if (static_cast<int>(currentHand->id) == p2) {
@@ -134,7 +134,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
     break;
 
     case Libreblackjack::Info::PlayerSplitOk:
-      s = "player_split_ok" + ((p1 != 0)?(" #" + std::to_string(p1)):"");
+      s = "player_split_ok" + ((p1 != 0)?std::to_string(p1):"");
       handToSplit = p1;
     break;
 
@@ -163,7 +163,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
       }  
     
       currentHandId = p1;  
-      s = "new_hand " + std::to_string(p2) + " " + card[cardToSplit].ascii();
+      s = "new_split_hand " + std::to_string(p2) + " " + card[cardToSplit].ascii();
     break;
 
     case Libreblackjack::Info::PlayerDoubleInvalid:

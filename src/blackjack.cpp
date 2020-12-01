@@ -73,6 +73,15 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   if (explicit_seed) {
     rng = std::mt19937(rng_seed);
   }
+  
+  if (n_decks > 0) {
+    shoe.resize(52*n_decks);
+    for (unsigned int deck = 0; deck < n_decks; deck++) {
+      for (unsigned int c = 1; c <= 52; c++) {
+        shoe.push_back(c);
+      }
+    }
+  }
 }
 
 Blackjack::~Blackjack() {
@@ -742,15 +751,12 @@ void Blackjack::shuffle() {
     
   // for infinite decks there is no need to shuffle (how would one do it?)
   // we just pick a random card when we need to deal and that's it
-  if (n_decks == -1) {
-    return;
+  if (n_decks > 0) {
+    std::shuffle(shoe.begin(), shoe.end(), rng);
+    n_shuffles++;
   }
   
-  // TODO: shuffle shoe
-  
   return;
-    
-    
 }
 
 
@@ -758,7 +764,7 @@ unsigned int Blackjack::drawCard(Hand *hand) {
     
   unsigned int tag = 0; 
 
-  if (n_decks == -1) {
+  if (n_decks == 0) {
     if (n_arranged_cards != 0 && i_arranged_cards < n_arranged_cards) {
       // negative (or invalid) values are placeholder for random cards  
       if ((tag = arranged_cards[i_arranged_cards++]) <= 0 || tag > 52) {
@@ -769,8 +775,12 @@ unsigned int Blackjack::drawCard(Hand *hand) {
     }  
     
   } else {
-    // TODO: shoes
-    tag = 0;
+    if (pos >= 52 * n_decks) {
+      return 0;
+    }
+    
+//    lastPass = pos >= cutCardPos || shuffle_every_hand;
+    tag = shoe[pos++];
   }
     
   if (hand != nullptr) {
