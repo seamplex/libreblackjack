@@ -37,7 +37,7 @@
 import sys 
 import fileinput
 
-max_bet = 32
+max_bet = 8
 debug = False
 
 n_player_cards = 0

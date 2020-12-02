@@ -1,11 +1,14 @@
-# if test ! -e fifo; then
-#  mkfifo fifo
-# fi
-# blackjack --decks=4 --player=stdio --verbose=true -n2e4 < fifo | ./ace-five.py > fifo
+#!/bin/sh
+
+if test -z "$1"; then
+ n=1e5
+else
+ n=$1
+fi
 
 if test ! -e A; then
  mkfifo A
  mkfifo B
 fi
 python3 ace-five.py < A > B &
-blackjack --decks=4 --player=stdio --verbose=true -n1e6 > A < B 
+blackjack --decks=1 --player=stdio --verbose=true -n${1} > A < B 
