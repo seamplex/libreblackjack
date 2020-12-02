@@ -77,7 +77,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
     
     case Libreblackjack::Info::Shuffle:
       // TODO: ask the user to cut  
-      s = "shuffle";  
+      s = "shuffling";  
     break;
     
     case Libreblackjack::Info::CardPlayer:

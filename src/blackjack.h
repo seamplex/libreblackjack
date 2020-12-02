@@ -44,9 +44,10 @@ class Blackjack : public Dealer {
     std::mt19937 rng;
     std::uniform_int_distribution<unsigned int> fiftyTwoCards;
     
-    bool lastPass = false;
     std::vector<unsigned int> shoe;
-    size_t pos;
+    size_t pos = 0;
+    size_t cutCardPos = 0;
+    bool lastPass = false;
     
     unsigned int upCard;
     unsigned int holeCard;

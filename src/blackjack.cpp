@@ -74,13 +74,16 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
     rng = std::mt19937(rng_seed);
   }
   
+  // initialize shoe and perform initial shuffle
   if (n_decks > 0) {
-    shoe.resize(52*n_decks);
+    shoe.reserve(52*n_decks);
     for (unsigned int deck = 0; deck < n_decks; deck++) {
-      for (unsigned int c = 1; c <= 52; c++) {
-        shoe.push_back(c);
+      for (unsigned int tag = 1; tag <= 52; tag++) {
+        shoe.push_back(tag);
       }
     }
+    shuffle();
+    cutCardPos = static_cast<int>(penetration * 52 * n_decks);
   }
 }
 
@@ -93,8 +96,6 @@ void Blackjack::deal(void) {
   bool playerBlackjack = false;
   // let's start by assuming the player does not need to do anything
   player->actionRequired = Libreblackjack::PlayerActionRequired::None;
-
-//  std::list<PlayerHand>::iterator playerHand;
   
   switch(nextAction) {
     // -------------------------------------------------------------------------  
@@ -131,13 +132,11 @@ void Blackjack::deal(void) {
       if (lastPass) {
         info(Libreblackjack::Info::Shuffle);
           
-        // shuffle the cards          
+        // shuffle the shoe
         shuffle();        
           
         // burn as many cards as asked
-        for (unsigned int i = 0; i < number_of_burnt_cards; i++) {
-          drawCard();
-        }
+        pos += number_of_burnt_cards;
         lastPass = false;
       }
 
@@ -753,6 +752,7 @@ void Blackjack::shuffle() {
   // we just pick a random card when we need to deal and that's it
   if (n_decks > 0) {
     std::shuffle(shoe.begin(), shoe.end(), rng);
+    pos = 0;
     n_shuffles++;
   }
   
@@ -765,6 +765,7 @@ unsigned int Blackjack::drawCard(Hand *hand) {
   unsigned int tag = 0; 
 
   if (n_decks == 0) {
+      
     if (n_arranged_cards != 0 && i_arranged_cards < n_arranged_cards) {
       // negative (or invalid) values are placeholder for random cards  
       if ((tag = arranged_cards[i_arranged_cards++]) <= 0 || tag > 52) {
@@ -775,11 +776,12 @@ unsigned int Blackjack::drawCard(Hand *hand) {
     }  
     
   } else {
+      
+    lastPass = (pos >= cutCardPos) || shuffle_every_hand;
     if (pos >= 52 * n_decks) {
-      return 0;
+      shuffle();
     }
     
-//    lastPass = pos >= cutCardPos || shuffle_every_hand;
     tag = shoe[pos++];
   }
     

@@ -35,18 +35,20 @@
 #
 
 import sys 
+import fileinput
 
 max_bet = 32
+debug = False
 
 n_player_cards = 0
 count = 0
 bet = 1
 
-import fileinput
 
 for linenl in fileinput.input():
   line = linenl.rstrip()
-  #print("<- %s" % line, file = sys.stderr) 
+  if debug:
+    print("<- %s" % line, file = sys.stderr) 
   
   if line == "bye":
     sys.exit(0)
@@ -60,14 +62,16 @@ for linenl in fileinput.input():
 
   elif line == "insurance?": 
     print("no", flush = True)
+    if debug:
+      print("<- no", file = sys.stderr) 
         
   elif line == "bet?":
-    #if count <= 1:
-      #bet = 1
-    #elif bet < max_bet:
-      #bet *= 2
-    #print(bet, flush = True)
-    print("1", flush = True)
+    if count <= 1:
+      bet = 1
+    elif bet < max_bet:
+      bet *= 2
+    print(bet, flush = True)
+    #print("1", flush = True)
     
   elif line[:15] == "player_split_ok":    
     n_player_cards = 1
@@ -77,12 +81,17 @@ for linenl in fileinput.input():
     if (len(tokens) > 1):
       card = tokens[1][0]
     else:
-      card = ""
+      card = ""   # the dealer's hole card
+      
     # count aces and fives
     if card == "A":
       count -= 1
+      if debug:
+        print("ACE, count is %d" % count, file = sys.stderr) 
     elif card == "5":
       count += 1
+      if debug:
+        print("FIVE, count is %d" % count, file = sys.stderr) 
 
     if line[:11] == "card_player":
       n_player_cards += 1
@@ -97,10 +106,6 @@ for linenl in fileinput.input():
     dealer = abs(int(tokens[2]))
     action = "quit"
     
-    #print("player_cards %d" % n_player_cards, file = sys.stderr) 
-    #print("card_player_first %s" % card_player_first, file = sys.stderr) 
-    #print("card_player_second %s" % card_player_second, file = sys.stderr) 
-
     if n_player_cards == 2 and card_player_first == card_player_second and \
         ((card_player_first == "8" or card_player_first == "A") or \
          (dealer < 7 and \
@@ -155,8 +160,10 @@ for linenl in fileinput.input():
             action = "hit"                 # hit soft 16 to 18 against 7 to A
         else:
           action = "stand"                 # stand with soft 19 or more
+          
     print(action, flush = True)
-    #print("-> %s" % action, file = sys.stderr) 
+    if debug:
+      print("-> %s" % action, file = sys.stderr) 
     
   elif line == "invalid_command":
     print("I sent an invalid command!", file = sys.stderr) 
