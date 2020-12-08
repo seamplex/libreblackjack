@@ -8,7 +8,7 @@
 
 # check for needed tools
 for i in git autoreconf make m4 fmt; do
-  if test -z "`which ${i}`"; then
+  if test -z "$(which ${i})"; then
     echo "error: ${i} is not installed"
     exit 1
   fi
@@ -26,15 +26,15 @@ fi
 
 if test ${vcs} = "git"; then
  # major version is equal to the latest tag
- version=`git describe --always | sed 's/-/./'`
+ version=$(git describe --tags | sed 's/-/./')
 
  branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
- commitdate=`git log -1 --pretty=format:"%ad"`
+ commitdate=$(git log -1 --pretty=format:"%ad")
  cat << EOF > src/version-vcs.h
 #define LIBREBLACKJACK_VCS_BRANCH    "${branch}"
 #define LIBREBLACKJACK_VCS_VERSION   "${version}"
 #define LIBREBLACKJACK_VCS_DATE      "${commitdate}"
-#define LIBREBLACKJACK_VCS_CLEAN     `git status --porcelain | wc -l`
+#define LIBREBLACKJACK_VCS_CLEAN     $(git status --porcelain | wc -l)
 EOF
 
 else
@@ -58,3 +58,4 @@ fi
 git log --oneline --decorate > ChangeLog
 
 autoreconf --install
+automake --add-missing

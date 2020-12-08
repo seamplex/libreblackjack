@@ -334,89 +334,78 @@ int Tty::play() {
     // EOF means "quit"
     actionTaken = Libreblackjack::PlayerActionTaken::Quit;
     std::cout << std::endl;
-    
-  } else {
-
-    add_history(input_buffer);
-    actionTaken = Libreblackjack::PlayerActionTaken::None;
-
-    // TODO: better solution
-    std::string command = input_buffer;
-    free(input_buffer);
-    trim(command);
-    
-    
-    // check common commands first
-           if (command == "quit" || command == "q") {
-      actionTaken = Libreblackjack::PlayerActionTaken::Quit;
-    } else if (command == "help") {
-      actionTaken = Libreblackjack::PlayerActionTaken::Help;
-//    } else if (command == "count" || command == "c") {
-//      actionTaken = Libreblackjack::PlayerActionTaken::Count;
-    } else if (command == "upcard" || command == "u") {
-      actionTaken = Libreblackjack::PlayerActionTaken::UpcardValue;
-    } else if (command == "bankroll" || command == "b") {
-      actionTaken = Libreblackjack::PlayerActionTaken::Bankroll;
-    } else if (command == "hands") {
-      actionTaken = Libreblackjack::PlayerActionTaken::Hands;
-    }
-    
-    if (actionTaken == Libreblackjack::PlayerActionTaken::None) {
-      switch (actionRequired) {
-
-        case Libreblackjack::PlayerActionRequired::Bet:
-          currentBet = std::stoi(command);
-          actionTaken = Libreblackjack::PlayerActionTaken::Bet;
-        break;
-
-        case Libreblackjack::PlayerActionRequired::Insurance:
-          if (command == "y" || command == "yes") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Insure;
-          } else if (command == "n" || command == "no") {
-            actionTaken = Libreblackjack::PlayerActionTaken::DontInsure;
-          } else {
-            // TODO: chosse if we allow not(yes) == no
-            actionTaken = Libreblackjack::PlayerActionTaken::None;  
-          }
-        break;
-
-        case Libreblackjack::PlayerActionRequired::Play:
-          // TODO: sort by higher-expected response first
-                 if (command == "h" || command =="hit") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Hit;
-          } else if (command == "s" || command == "stand") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Stand;
-          } else if (command == "d" || command == "double") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Double;
-          } else if (command == "p" || command == "split" || command == "pair") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Split;
-          } else {
-            actionTaken = Libreblackjack::PlayerActionTaken::None;
-          }
-        break;
-        
-        case Libreblackjack::PlayerActionRequired::None:
-        break;
-        
-      }
-    }
+    return 0;
   }
   
+  add_history(input_buffer);
+  std::string command = input_buffer;
+  free(input_buffer);
+  trim(command);
 #else
-
+  
   std::cout << prompt;
-  std::cin >> input_buffer;
+  std::string command;
+  std::cin >> command;
+    
+#endif  
+  
+  actionTaken = Libreblackjack::PlayerActionTaken::None;
 
-  // TODO: check EOF
-  // TODO: esto puede ir en algo comun para tty y stdout
-  if (input_buffer == "hit" || input_buffer == "h") {
-    *command = Command::Hit;
-  } else {
-    *command = Command::None;
+  // check common commands first
+         if (command == "quit" || command == "q") {
+    actionTaken = Libreblackjack::PlayerActionTaken::Quit;
+  } else if (command == "help") {
+    actionTaken = Libreblackjack::PlayerActionTaken::Help;
+  //    } else if (command == "count" || command == "c") {
+  //      actionTaken = Libreblackjack::PlayerActionTaken::Count;
+  } else if (command == "upcard" || command == "u") {
+    actionTaken = Libreblackjack::PlayerActionTaken::UpcardValue;
+  } else if (command == "bankroll" || command == "b") {
+    actionTaken = Libreblackjack::PlayerActionTaken::Bankroll;
+  } else if (command == "hands") {
+    actionTaken = Libreblackjack::PlayerActionTaken::Hands;
   }
-  
-#endif
-  
+
+  if (actionTaken == Libreblackjack::PlayerActionTaken::None) {
+    switch (actionRequired) {
+
+      case Libreblackjack::PlayerActionRequired::Bet:
+        currentBet = std::stoi(command);
+        actionTaken = Libreblackjack::PlayerActionTaken::Bet;
+      break;
+
+      case Libreblackjack::PlayerActionRequired::Insurance:
+        if (command == "y" || command == "yes") {
+          actionTaken = Libreblackjack::PlayerActionTaken::Insure;
+        } else if (command == "n" || command == "no") {
+          actionTaken = Libreblackjack::PlayerActionTaken::DontInsure;
+        } else {
+          // TODO: chosse if we allow not(yes) == no
+          actionTaken = Libreblackjack::PlayerActionTaken::None;  
+        }
+      break;
+
+      case Libreblackjack::PlayerActionRequired::Play:
+        // TODO: sort by higher-expected response first
+               if (command == "h" || command =="hit") {
+          actionTaken = Libreblackjack::PlayerActionTaken::Hit;
+        } else if (command == "s" || command == "stand") {
+          actionTaken = Libreblackjack::PlayerActionTaken::Stand;
+        } else if (command == "d" || command == "double") {
+          actionTaken = Libreblackjack::PlayerActionTaken::Double;
+        } else if (command == "p" || command == "split" || command == "pair") {
+          actionTaken = Libreblackjack::PlayerActionTaken::Split;
+        } else {
+          actionTaken = Libreblackjack::PlayerActionTaken::None;
+        }
+      break;
+
+      case Libreblackjack::PlayerActionRequired::None:
+      break;
+
+    }
+  }
+
   return 0;
 }
 
@@ -521,11 +510,11 @@ void Tty::renderHand(Hand *hand, bool current) {
     
 }
 
-
 int Tty::list_index = 0;
 int Tty::len = 0;
 
 char *Tty::rl_command_generator(const char *text, int state) {
+#ifdef HAVE_READLINE
     
   if (!state) {
     list_index = 0;
@@ -538,16 +527,14 @@ char *Tty::rl_command_generator(const char *text, int state) {
       return strdup(commands[i].c_str());
     }
   }
-
+#endif
   return NULL;
 }
 
 char **Tty::rl_completion(const char *text, int start, int end) {
   char **matches = NULL;
-
-#ifdef HAVE_LIBREADLINE
+#ifdef HAVE_READLINE
   matches = rl_completion_matches(text, rl_command_generator);
 #endif
-
   return matches;
 }
