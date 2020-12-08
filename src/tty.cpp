@@ -514,7 +514,7 @@ int Tty::list_index = 0;
 int Tty::len = 0;
 
 char *Tty::rl_command_generator(const char *text, int state) {
-#ifdef HAVE_READLINE
+#ifdef HAVE_LIBREADLINE
     
   if (!state) {
     list_index = 0;
@@ -533,7 +533,7 @@ char *Tty::rl_command_generator(const char *text, int state) {
 
 char **Tty::rl_completion(const char *text, int start, int end) {
   char **matches = NULL;
-#ifdef HAVE_READLINE
+#ifdef HAVE_LIBREADLINE
   matches = rl_completion_matches(text, rl_command_generator);
 #endif
   return matches;
