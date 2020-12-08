@@ -1,8 +1,18 @@
 #!/bin/bash
 
-n_max=9999999
+   n0=80000
+n_max=9000000
 
-for i in grep awk; do
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+
+BROWN="\033[0;33m"
+MAGENTA="\e[0;35m"
+CYAN="\e[0;36m"
+
+NC="\033[0m" # No Color
+
+for i in grep awk printf blackjack; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -18,16 +28,16 @@ declare -A min
 min["hard"]=4   # from 20 to 4 in hards
 min["soft"]=12  # from 20 to 12 in softs
 
-rm -f hard.html soft.html pair.html
+rm -f table.md hard.html soft.html pair.html
 
 # --------------------------------------------------------------
 # start with standing
 cp hard-stand.txt hard.txt
 cp soft-stand.txt soft.txt
 
-cat << EOF > table.md
-| Hand | \$n\$ | Stand | Double | Hit |
-| ---- | ----- | ----- | ------ | --- |
+cat << EOF >> table.md
+|  Hand  |  \$n\$  |  Stand [%]  |  Double [%]  |  Hit [%] |   Play    |
+|:------:|:-----:|:-----------:|:------------:|:--------:|:---------:|
 EOF
 
 
@@ -70,12 +80,12 @@ EOF
      upcard_n=$(($upcard))
    fi
  
-   n=10000   # start with n hands
+   n=${n0}   # start with n0 hands
    best="x"  # x means don't know what to so, so play
    
    while [ "${best}" = "x" ]; do
     # tell the user which combination we are trying and how many we will play
-    echo -ne "${t}${hand}-${upcard} ($card1 $card2)\t"$(printf %.0e ${n})
+    echo -ne "${t}${hand}-${upcard} ($card1 $card2)\t"$(printf %.1e ${n})
     for play in s d h; do
      
      # start with options.conf as a template and add some custom stuff
@@ -147,9 +157,9 @@ EOF
     
     if [ ${n} -le ${n_max} ]; then 
      # if we still have room, take into account errors
-     error_s=$(echo ${error[${t}${hand},${upcard},s]} | awk '{printf("%+.1f", 100*$1)}')
-     error_d=$(echo ${error[${t}${hand},${upcard},d]} | awk '{printf("%+.1f", 100*$1)}')
-     error_h=$(echo ${error[${t}${hand},${upcard},h]} | awk '{printf("%+.1f", 100*$1)}')
+     error_s=$(echo ${error[${t}${hand},${upcard},s]} | awk '{printf("%.1f", 100*$1)}')
+     error_d=$(echo ${error[${t}${hand},${upcard},d]} | awk '{printf("%.1f", 100*$1)}')
+     error_h=$(echo ${error[${t}${hand},${upcard},h]} | awk '{printf("%.1f", 100*$1)}')
     else
      # instead of running infinite hands, above a threshold asume errors are zero
      error_s=0
@@ -163,35 +173,51 @@ EOF
    
     if   (( $(echo ${ev_s} ${error_s} ${ev_d} ${error_d} | awk '{print (($1-$2) > ($3+$4))}') )) &&
          (( $(echo ${ev_s} ${error_s} ${ev_h} ${error_h} | awk '{print (($1-$2) > ($3+$4))}') )); then
+         
      best="s"
-     echo -e "\tstand"
+     color=${BROWN}
+     best_string="stand"
+     
     elif (( $(echo ${ev_d} ${error_d} ${ev_s} ${error_s} | awk '{print (($1-$2) > ($3+$4))}') )) &&
          (( $(echo ${ev_d} ${error_d} ${ev_h} ${error_h} | awk '{print (($1-$2) > ($3+$4))}') )); then
+         
      best="d"
-     echo -e "\tdouble"
+     color=${CYAN}
+     best_string="double"
+     
     elif (( $(echo ${ev_h}-${error_h} ${ev_s} ${error_s} | awk '{print (($1-$2) > ($3+$4))}') )) &&
          (( $(echo ${ev_h}-${error_h} ${ev_d} ${error_d} | awk '{print (($1-$2) > ($3+$4))}') )); then
+         
      best="h"
-     echo -e "\thit"
+     color=${MAGENTA}
+     best_string="hit"
+         
     else
+    
      best="x"
-     n=$((${n} * 10))
-     echo -e "\tuncertain"
+     color=${NC}
+     best_string="uncertain"
+     
+     n=$((${n} * 4))
+     
     fi
+    
+    echo -e ${color}"\t"${best_string}${NC}
+    
    done
 
    strategy[${t}${hand},${upcard}]=${best}
    
    
    
-#    echo "| ${t}${hand}-${upcard} | ${n} | ${ev_s} (${error_s}) | ${ev_h} (${error_h}) | ${ev_d} (${error_d}) |" >> table.md
-#    
-#    echo " <!-- ${upcard} -->" >> ${type}.html
-#    echo " <td>" >> ${type}.html
-#    echo ${ev_s} ${error_s} | awk -f cell.awk >> ${type}.html
-#    echo ${ev_h} ${error_h} | awk -f cell.awk >> ${type}.html
-#    echo ${ev_d} ${error_d} | awk -f cell.awk >> ${type}.html
-#    echo " </td>" >> ${type}.html
+   echo "| ${t}${hand}-${upcard} | $(printf %.1e ${n}) | ${ev_s} (${error_s}) | ${ev_h} (${error_h}) | ${ev_d} (${error_d}) | ${best_string} | " >> table.md
+    
+   echo " <!-- ${upcard} -->" >> ${type}.html
+   echo " <td>" >> ${type}.html
+   echo ${ev_s} ${error_s} | awk -f html_cell.awk >> ${type}.html
+   echo ${ev_h} ${error_h} | awk -f html_cell.awk >> ${type}.html
+   echo ${ev_d} ${error_d} | awk -f html_cell.awk >> ${type}.html
+   echo " </td>" >> ${type}.html
    
    
    # save the strategy again with the best strategy
@@ -213,7 +239,7 @@ EOF
    done
   done
   
-  echo "</tr>" >> ${type}.html
+#   echo "</tr>" >> ${type}.html
   
  done
 done
@@ -222,8 +248,8 @@ done
 cat << EOF >> table.md
 
 
-| Hand | \$n\$ |  Yes  |  No  |
-| ---- | ----- | ----- | ---- |
+|  Hand  |  \$n\$  |   Yes [%]  |   No [%]   |
+|:------:|:-------:|:----------:|:----------:|
 EOF
 
 # --------------------------------------------------------------------
@@ -259,7 +285,7 @@ for hand in A T $(seq 9 -1 2); do
     upcard_n=$(($upcard))
   fi
  
-  n=10000    # start with n hands
+  n=${n0}   # start with n0 hands
   best="x"  # x means don't know what to so, so play
    
   while [ "${best}" = "x" ]; do
@@ -328,8 +354,8 @@ EOF
    
    if [ $n -le ${n_max} ]; then 
     # if we still have room, take into account errors
-    error_y=$(echo ${error[${t}${hand},${upcard},y]} | awk '{printf("%+.1f", 100*$1)}')
-    error_n=$(echo ${error[${t}${hand},${upcard},n]} | awk '{printf("%+.1f", 100*$1)}')
+    error_y=$(echo ${error[${t}${hand},${upcard},y]} | awk '{printf("%.1f", 100*$1)}')
+    error_n=$(echo ${error[${t}${hand},${upcard},n]} | awk '{printf("%.1f", 100*$1)}')
    else
     # instead of running infinite hands, above a threshold asume errors are zero
     error_y=0
@@ -340,25 +366,37 @@ EOF
    echo -ne "\t${ev_n}\t(${error_n})"
    
    if   (( $(echo ${ev_y} ${error_y} ${ev_n} ${error_n} | awk '{print (($1-$2) > ($3+$4))}') )); then
+   
     best="y"
-    echo -e "\tyes"
+    color=${GREEN}
+    best_string="yes"
+    
    elif (( $(echo ${ev_n} ${error_n} ${ev_y} ${error_y} | awk '{print (($1-$2) > ($3+$4))}') )); then
+   
     best="n"
-    echo -e "\tno"
+    color=${RED}
+    best_string="no"
+   
    else
+   
     best="x"
-    n=$((${n} * 10))
-    echo -e "\tuncertain"
+    color=${NC}
+    best_string="uncertain"
+    
+    n=$((${n} * 4))
+    
    fi
+   
+   echo -e ${color}"\t"${best_string}${NC}
   done
 
-  echo "| ${t}${hand}-${upcard} | ${n} | ${ev_y} (${error_y}) | ${ev_n} (${error_n}) |" >> table.md
+  echo "| ${t}${hand}-${upcard} | $(printf %.1e ${n}) | ${ev_y} (${error_y}) | ${ev_n} (${error_n}) | ${best_string} | " >> table.md
   
-#   echo " <!-- ${upcard} -->" >> ${type}.html
-#   echo " <td>" >> ${type}.html
-#   echo ${ev_y} ${error_y} | awk -f cell.awk >> ${type}.html
-#   echo ${ev_n} ${error_n} | awk -f cell.awk >> ${type}.html
-#   echo " </td>" >> ${type}.html
+  echo " <!-- ${upcard} -->" >> ${type}.html
+  echo " <td>" >> ${type}.html
+  echo ${ev_y} ${error_y} | awk -f html_cell.awk >> ${type}.html
+  echo ${ev_n} ${error_n} | awk -f html_cell.awk >> ${type}.html
+  echo " </td>" >> ${type}.html
   
   
   strategy[${t}${hand},${upcard}]=${best}
@@ -377,7 +415,7 @@ done
 
  
 cat header.txt hard.txt header.txt soft.txt header.txt pair.txt > bs.txt
-rm -f blackjack.conf
+rm -f hard.txt soft.txt pair.txt blackjack.conf
 if [ "${debug}" == "0" ]; then
  rm -f *.yaml
  rm -f *.str

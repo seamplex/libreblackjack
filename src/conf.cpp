@@ -218,8 +218,16 @@ bool Configuration::set(int *value, std::list<std::string> key) {
 }
 
 bool Configuration::set(unsigned int *value, std::list<std::string> key) {
+  // check for negative values
   for (auto it : key) {
     if (exists(*(&it))) {
+      
+      int tmp = std::stoi(data[*(&it)]);
+      if (tmp < 0) {
+        std::cerr << "key " << *(&it) << " cannot be negative" << std::endl;
+        exit(-1);
+      }
+      
       *value = std::stoi(data[*(&it)]);
       return true;
     }
