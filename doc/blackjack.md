@@ -173,11 +173,10 @@ include(../players/check.md)
 The columns are
 
  1. Case name, as discussed below.
- 2. Expected theoretical result in absolute units (i.e. -0.004 means -0.4%)
+ 2. Expected theoretical result in absolute units (i.e. -0.01 means -1%)
  3. Actual result obtained by Libre Blackjack in absolute units
  4. Estimated error equal to the standard deviation of the result
- 5. Number of played hands per second
- 6. Whether the result coincides or not with the theoretical value
+ 5. Whether the result coincides or not with the theoretical value
 
 
 include(players.md)

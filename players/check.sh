@@ -41,8 +41,8 @@ else
   player=${cases}
 fi
 
-echo 'Case                    | Expected      | Result         | Error         |  Status' | tee check.md
-echo '----------------------- | ------------- | -------------- | ------------- | -------' | tee -a check.md
+echo 'Case                    | Expected      | Result         | Error         |  Status ' | tee check.md
+echo '------------------------|---------------|--------------- |---------------|---------' | tee -a check.md
 for i in ${player}; do
   if test -d ${i} -a -x ${i}/run.sh; then
     cd ${i}
@@ -56,9 +56,8 @@ for i in ${player}; do
     
     return=$(grep mean ../${i}.yaml | awk '{print $2}')
     error=$(grep error ../${i}.yaml | awk '{print $2}')
-    hands_per_second=$(grep hands_per_second ../${i}.yaml | awk '{print $2}')
     
-    echo -ne ${return}\\t' | '${error}\\t' | '${hands_per_second}' | '
+    echo -ne ${return}\\t' | '${error}\\t' |   '
     status=$(echo ${return} | awk -v e=${expected["${i}"]} -v s=${sigma} 'END {ok = ($1>(e-s)&&$1<(e+s)); print ok?"ok":"failed"; exit !ok }')
     result=$?
     cd ..

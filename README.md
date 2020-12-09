@@ -21,7 +21,9 @@ These players can be actual human players playing in real-time through a front e
 
 
 
-## Why
+## Background
+
+The casino game known as Blackjack has converged to the current mainstream rules since the beginning of the 20th century. Assuming the cards are infinite, the best strategy for the player yields approximately a house edge which is in the order of\ 0.5%. This is a remarkable result, because the rules of the game are not trivial and the overall combination gives a very little margin for the dealer, more than five times smaller than standard single-zero roulette. In 1963, Edward Thorp published his seminal book _Beat the dealer_ where he showed---with the help of the mainframes available at that time---that it is possible to flip the margin to the player's side by taking into account that the chances of dealing the next card of a finite shoe depends on the cards that were already dealt. This was the beginning of the card counting era, and a lot of mathematicians have devoted to the analysis of probabilities in the Blackjack game---and its variations.
 
 :::{.alert .alert-light}
 > “I am often surprised that when people drive down two-lane roads, they will trust complete strangers in the oncoming lane not to swerve into their lane causing a head-on collision; but they will not trust mathematicians to create the correct strategy for Blackjack.”
@@ -41,7 +43,7 @@ If you do not know how to program, you have the _freedom_ to hire a programmer t
 
 ## How 
 
-Once you trust the blackjack engine is fair, you can model and simulate any blackjack situation you want, playing millions of times a certain hand (say a sixteen against a ten) in different ways (say hitting or standing) to obtain you own conclusions. You can even build  the [basic strategy charts](https://wizardofodds.com/games/blackjack/strategy/4-decks/) from scratch to convince yourself there is no [flaw](https://wizardofodds.com/ask-the-wizard/blackjack/).
+Once you trust the blackjack engine is fair, you can model and simulate any blackjack situation you want, playing millions of times a certain hand (say a sixteen against a ten) in different ways (say hitting or standing) to obtain you own conclusions. You can even build  the [basic strategy charts](https://wizardofodds.com/games/blackjack/strategy/4-decks/) from scratch to convince yourself there is no [“flaw.”](https://wizardofodds.com/ask-the-wizard/blackjack/#question-4)
 
 The main objective is research and optimization of playing and betting strategies depending on
 

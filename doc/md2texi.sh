@@ -9,12 +9,25 @@ for i in $(cat players); do
   echo $i
 #   grep 'define(case_title' ../players/${i}/README.m4 >> players.md
 #   awk '/> Difficulty.*/{t=1}t' ../players/${i}/README.m4 | grep -v Difficulty >> players.md
-  sed 's/title:/title_case:/' ../players/${i}/README.md |\
-    grep -v ':::' |\
+
+#   sed 's/title:/title_case:/' ../players/${i}/README.md |\
+#     grep -v ':::' |\
+#     grep -v '> Difficulty:' |\
+#     grep -v 'Index' |\
+#     grep -vw '\-\-\-\-\-\-\-' |\
+#     pandoc --shift-heading-level-by=1 --markdown-headings=atx -f markdown+pipe_tables -t markdown+pipe_tables >> players.md
+
+#   sed 's/title:/title_case:/' ../players/${i}/README.md |\
+  grep -wv 'title:' ../players/${i}/README.md |\
     grep -v '> Difficulty:' |\
     grep -v 'Index' |\
-    grep -vw '\-\-\-\-\-\-\-' |\
-    pandoc --shift-heading-level-by=1 --markdown-headings=atx -t markdown >> players.md
+    grep -ve ':::' |\
+    grep -vw -E '^\-\-\-$' |\
+    grep -vw -E '^\-\-\-\-\-\-\-$' |\
+    grep -vw '\.\.\.' |\
+    sed 's/\$n\$/Hands needed/' |\
+    sed 's/#/##/' >> players.md
+    
   echo >> players.md
   echo >> players.md
 done

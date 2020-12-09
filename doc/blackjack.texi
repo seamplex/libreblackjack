@@ -4,7 +4,7 @@
 
 @setfilename blackjack.info
 @set UPDATED December 20, 2020
-@set VERSION v0.2.4-gafba392
+@set VERSION v0.2.5-g9c5893b
 
 @copying
 This manual is for LibreBlackjack (version @value{VERSION}, @value{UPDATED}),
@@ -30,7 +30,7 @@ Texts.  A copy of the license is included in the section entitled
 @end ifnottex
 @titlepage
 @title Libre@ Blackjack
-@subtitle A free blackjack back end, v0.2.4-gafba392
+@subtitle A free blackjack back end, v0.2.5-g9c5893b
 @author Jeremy Theler
 December 20, 2020
 @page
@@ -54,23 +54,18 @@ December 20, 2020
 @node Overview
 @chapter Overview
 @anchor{#overview}
-@quotation
-A @uref{https://www.gnu.org/philosophy/free-sw.html,free}
-@uref{https://en.wikipedia.org/wiki/Blackjack,Blackjack} back end
-inspired by @uref{https://www.gnu.org/software/chess/,GNU Chess}.
-@end quotation
-@uref{https://www.seamplex.com/blackjack,Libre@ Blackjack} is a
-blackjack engine that emulates a dealer, deals (digital) cards and
-understands plain-text commands such as @code{hit} or @code{stand}. The
-basic idea is that one or more players can talk to Libre@ Blackjack
-either in an interactive or in an automated way through
+Libre@ Blackjack is a blackjack engine that emulates a dealer, deals
+(digital) cards and understands plain-text commands such as @code{hit}
+or @code{stand}. It's inspired by GNU@ Chess. The basic idea is that one
+or more players can talk to Libre@ Blackjack either in an interactive or
+in an automated way through
 
 @itemize
 @item
-the standard input and/or output (optionally using named pipes or TCP
+the standard input/output (optionally using named pipes or TCP
 (web)sockets with @code{netcat} or @code{gwsocket}), or
 @item
-C++ methods (optionally loaded at runtime from shared objects TBD).
+C++ methods (optionally loaded at runtime from shared objects---TBD).
 @end itemize
 
 These players can be actual human players playing in real-time through a
@@ -78,18 +73,32 @@ front end (a GUI application, a web-based interface, a mobile app, etc.)
 or robots that implement a certain betting and playing strategy playing
 (i.e.@ card counting) as fast as possible to study and analyze game
 statistics. There is an internal player that reads the strategy from a
-text file and plays accordingly. It can also be used to play interactive
-[ASCII blackjack].
+text file and plays accordingly. Libre@ Blackjack can also be used to
+play interactive ASCII blackjack.
 
 @menu
-* Why::
-* How::
+* Background::
 * A note on the C++ implementation::
 @end menu
 
-@node Why
-@section Why
-@anchor{#why}
+@node Background
+@section Background
+@anchor{#background}
+The casino game known as Blackjack has converged to the current
+mainstream rules since the beginning of the 20th century. Assuming the
+cards are infinite, the best strategy for the player yields
+approximately a house edge which is in the order of@ 0.5%. This is a
+remarkable result, because the rules of the game are not trivial and the
+overall combination gives a very little margin for the dealer, more than
+five times smaller than standard single-zero roulette. In 1963, Edward
+Thorp published his seminal book @emph{Beat the dealer} where he
+showed---with the help of the mainframes available at that time---that
+it is possible to flip the margin to the player's side by taking into
+account that the chances of dealing the next card of a finite shoe
+depends on the cards that were already dealt. This was the beginning of
+the card counting era, and a lot of mathematicians have devoted to the
+analysis of probabilities in the Blackjack game---and its variations.
+
 @quotation
 ``I am often surprised that when people drive down two-lane roads, they
 will trust complete strangers in the oncoming lane not to swerve into
@@ -113,20 +122,15 @@ distribute copies of your modified versions.
 @end enumerate
 
 If you do not know how to program, you have the @emph{freedom} to hire a
-programmer to do it for you. That is why
-@uref{https://www.seamplex.com/blackjack,Libre@ Blackjack} is
-@uref{https://www.gnu.org/philosophy/free-sw.html,free software}.
+programmer to do it for you. That is why Libre@ Blackjack is @emph{free
+software}.
 
-@node How
-@section How
-@anchor{#how}
 Once you trust the blackjack engine is fair, you can model and simulate
 any blackjack situation you want, playing millions of times a certain
 hand (say a sixteen against a ten) in different ways (say hitting or
-standing) to obtain you own conclusions. You can even build the
-@uref{https://wizardofodds.com/games/blackjack/strategy/4-decks/,basic
-strategy charts} from scratch to convince yourself there is no
-@uref{https://wizardofodds.com/ask-the-wizard/blackjack/,flaw}.
+standing) with different rules (does the dealer have to hit soft
+seventeens?) to obtain you own conclusions. You can even build the basic
+strategy charts from scratch to convince yourself there is no ``flaw.''
 
 The main objective is research and optimization of playing and betting
 strategies depending on
@@ -169,15 +173,13 @@ variations like
 
 @itemize
 @item
-@uref{https://wizardofodds.com/games/spanish-21/,Spanish 21}
+Spanish 21
 @item
-@uref{https://wizardofodds.com/games/down-under-blackjack/,Down under
-Blackjack}
+Down under Blackjack
 @item
-@uref{https://wizardofodds.com/games/free-bet-blackjack/,Free Bet
-Blackjack}
+Free Bet Blackjack
 @item
-@uref{https://wizardofodds.com/games/blackjack/switch/,Blackjack Switch}
+Blackjack Switch
 @end itemize
 
 or even the Spanish ``Siete y medio'' could be also implemented in the
@@ -436,7 +438,7 @@ strategy) within an allowed statistical uncertainty. This scripts writes
 the following table (actual values might vary depending on the random
 nature of the game):
 
-@multitable {Mimic the dealer} {Expected} {-0.0064075} {0.00927449} {Status} 
+@multitable {Mimic the dealer} {Expected} {-0.0075415} {0.00926715} {Status} 
 @headitem 
 Case
  @tab Expected
@@ -445,27 +447,27 @@ Case
  @tab Status
 @item 
 Internal player
- @tab -0.004
- @tab -0.0064075
- @tab 0.00348953
+ @tab -0.0065
+ @tab -0.0075415
+ @tab 0.00348656
  @tab ok
 @item 
 Always stand
  @tab -0.150
- @tab -0.15539
- @tab 0.00940931
+ @tab -0.15393
+ @tab 0.00941969
  @tab ok
 @item 
 No-bust strategy
  @tab -0.075
- @tab -0.082075
- @tab 0.00942851
+ @tab -0.077645
+ @tab 0.00944109
  @tab ok
 @item 
 Mimic the dealer
  @tab -0.055
- @tab -0.0571
- @tab 0.00927449
+ @tab -0.063785
+ @tab 0.00926715
  @tab ok
 @end multitable
 
@@ -475,13 +477,11 @@ The columns are
 @item
 Case name, as discussed below.
 @item
-Expected theoretical result in absolute units (i.e.@ -0.004 means -0.4%)
+Expected theoretical result in absolute units (i.e.@ -0.01 means -1%)
 @item
 Actual result obtained by Libre@ Blackjack in absolute units
 @item
 Estimated error equal to the standard deviation of the result
-@item
-Number of played hands per second
 @item
 Whether the result coincides or not with the theoretical value
 @end enumerate
@@ -509,7 +509,6 @@ and you will get the following report with the results of playing one
 million hands with basic strategy.
 
 @verbatim
----
 result: "(-0.7 ± 0.3) %"
 mean: -0.006799
 error: 0.00348707
@@ -520,7 +519,6 @@ bustsDealer: 0.239722
 wins: 0.448034
 pushes: 0.085913
 losses: 0.495532
-...
 @end verbatim
 
 @node Always stand
@@ -564,7 +562,6 @@ can be easily parsed, but it also allows complex objects to be
 represented (arrays, lists, etc.).
 
 @verbatim
----
 result: "(-15.8 ± 0.9) %"
 mean: -0.157675
 error: 0.00940803
@@ -575,7 +572,6 @@ bustsDealer: 0.27344
 wins: 0.38585
 pushes: 0.04807
 losses: 0.56608
-...
 @end verbatim
 
 @quotation
@@ -616,18 +612,18 @@ handle bets and insurances, and there is not need to pass the options
 anyway). Let us take a look at the Perl implementation:
 
 @verbatim
-#!/usr/bin/perl
-# this is needed to avoid deadlock with the fifo
+##!/usr/bin/perl
+## this is needed to avoid deadlock with the fifo
 STDOUT->autoflush(1);
 
 while ($command ne "bye") {
-  # do not play more than a number of commands
-  # if the argument -n was not passed to blackjack
+  ## do not play more than a number of commands
+  ## if the argument -n was not passed to blackjack
   if ($i++ == 1234567) {
     print "quit\n";
   }
   
-  # read and process the commands
+  ## read and process the commands
   chomp($command = <STDIN>);
   
   if ($command eq "bet?") {
@@ -648,7 +644,7 @@ while ($command ne "bye") {
 The very same player may be implemented as a shell script:
 
 @verbatim
-#!/bin/sh
+##!/bin/sh
 
 i=0
 while read command
@@ -702,12 +698,12 @@ player stands on hard seventeen but hits on soft seventeen.
 This time, the configuration file @code{blackjack.conf} is used. If a
 file with this name exists in the directory where @code{blackjack} is
 executed, it is read and parsed. The options should be fairly self
-descriptive. See the [configuration file] section of the manual for a
-detailed explanation of the variables and values that can be entered. In
-particular, we ask to play one hundred thousand hands at a six-deck game
-where the dealer hits soft seventeens. If the random seed is set to a
-fixed value so each execution will lead to the very same sequence of
-cards.
+descriptive. See the @ref{#configuration-file,configuration file}
+section of the manual for a detailed explanation of the variables and
+values that can be entered. In particular, we ask to play one hundred
+thousand hands at a six-deck game where the dealer hits soft seventeens.
+If the random seed is set to a fixed value so each execution will lead
+to the very same sequence of cards.
 
 Now, there are two options that tell Libre@ Blackjack how the player is
 going to talk to the backend: @code{player2dealer} and
@@ -736,8 +732,6 @@ pipes:
 
 @verbatim
 $ blackjack
-[...]
-waiting for dealer2player buffered fifo 'dealer2player'...
 @end verbatim
 
 In another terminal run the player
@@ -762,7 +756,7 @@ and a negative number for soft hands. The instructions @code{fflush()}
 are needed in order to avoid deadlocks on the named pipes:
 
 @verbatim
-#!/usr/bin/gawk -f
+##!/usr/bin/gawk -f
 function abs(x){return ( x >= 0 ) ? x : -x } 
 
 /bet\?/ {
@@ -776,8 +770,8 @@ function abs(x){return ( x >= 0 ) ? x : -x }
 }
 
 /play\?/ {
-  # mimic the dealer: hit until 17 (hit soft 17)
-  if (abs($2) < 17 || $2 == -17) {   # soft hands are negative
+  ## mimic the dealer: hit until 17 (hit soft 17)
+  if (abs($2) < 17 || $2 == -17) {   ## soft hands are negative
     print "hit";
   } else {
     print "stand";
@@ -791,7 +785,6 @@ function abs(x){return ( x >= 0 ) ? x : -x }
 @end verbatim
 
 @verbatim
----
 result: "(-5.7 ± 0.9) %"
 mean: -0.05716
 error: 0.00926292
@@ -802,7 +795,6 @@ bustsDealer: 0.18905
 wins: 0.41088
 pushes: 0.09888
 losses: 0.49024
-...
 @end verbatim
 
 @quotation
@@ -838,7 +830,6 @@ h20-6 (10 10)   8.0e+04 +67.80  (1.1)   -171.07 (1.1)   -85.59  (0.5)   stand
 h20-7 (10 10)   8.0e+04 +77.44  (1.1)   -170.53 (1.1)   -85.44  (0.5)   stand
 h20-8 (10 10)   8.0e+04 +79.11  (1.1)   -170.08 (1.1)   -85.02  (0.6)   stand
 h20-9 (10 10)   8.0e+04 +75.77  (1.1)   -170.31 (1.1)   -84.87  (0.6)   stand
-[...]
 p2-6            8e+04   +24.78  (2.9)   +3.07   (1.0)   yes
 p2-7            8e+04   +1.48   (2.0)   -8.90   (1.0)   yes
 p2-8            8e+04   -17.57  (2.0)   -16.33  (1.0)   uncertain
@@ -852,7 +843,7 @@ A new text file called @code{bs.txt} with the strategy should be created
 from scratch:
 
 @verbatim
-#    2  3  4  5  6  7  8  9  T  A
+##    2  3  4  5  6  7  8  9  T  A
 h20  s  s  s  s  s  s  s  s  s  s  
 h19  s  s  s  s  s  s  s  s  s  s  
 h18  s  s  s  s  s  s  s  s  s  s  
@@ -870,7 +861,7 @@ h7   h  h  h  h  h  h  h  h  h  h
 h6   h  h  h  h  h  h  h  h  h  h  
 h5   h  h  h  h  h  h  h  h  h  h  
 h4   h  h  h  h  h  h  h  h  h  h  
-#    2  3  4  5  6  7  8  9  T  A
+##    2  3  4  5  6  7  8  9  T  A
 s20  s  s  s  s  s  s  s  s  s  s  
 s19  s  s  s  s  d  s  s  s  s  s  
 s18  d  d  d  d  d  s  s  h  h  h  
@@ -880,7 +871,7 @@ s15  h  h  d  d  d  h  h  h  h  h
 s14  h  h  h  d  d  h  h  h  h  h  
 s13  h  h  h  h  d  h  h  h  h  h  
 s12  h  h  h  h  d  h  h  h  h  h  
-#    2  3  4  5  6  7  8  9  T  A
+##    2  3  4  5  6  7  8  9  T  A
 pA   y  y  y  y  y  y  y  y  y  y  
 pT   n  n  n  n  n  n  n  n  n  n  
 p9   y  y  y  y  y  n  y  y  n  n  
@@ -911,428 +902,2343 @@ pairs)
 The results are given as the expected value in percentage with the
 uncertainty (one standard deviation) in the last significant digit.
 
-@ Hand | @math{n} | Stand [%] | Double [%] | Hit [%] | Play |@*
-h20-2 | 8.0e+04 | +63.23 (1.1) | -85.32 (0.5) | -171.17 (1.1) | stand
-|@*
-h20-3 | 8.0e+04 | +64.54 (1.1) | -85.50 (0.5) | -171.50 (1.1) | stand
-|@*
-h20-4 | 8.0e+04 | +65.55 (1.1) | -85.50 (0.5) | -170.33 (1.1) | stand
-|@*
-h20-5 | 8.0e+04 | +66.65 (1.1) | -85.51 (0.5) | -171.25 (1.1) | stand
-|@*
-h20-6 | 8.0e+04 | +67.80 (1.1) | -85.59 (0.5) | -171.07 (1.1) | stand
-|@*
-h20-7 | 8.0e+04 | +77.44 (1.1) | -85.44 (0.5) | -170.53 (1.1) | stand
-|@*
-h20-8 | 8.0e+04 | +79.11 (1.1) | -85.02 (0.6) | -170.08 (1.1) | stand
-|@*
-h20-9 | 8.0e+04 | +75.77 (1.1) | -84.87 (0.6) | -170.31 (1.1) | stand
-|@*
-h20-T | 8.0e+04 | +43.47 (1.1) | -85.86 (0.5) | -164.14 (1.1) | stand
-|@*
-h20-A | 8.0e+04 | +10.32 (1.0) | -89.73 (0.5) | -149.01 (1.0) | stand
-|@*
-h19-2 | 8.0e+04 | +37.61 (1.4) | -73.52 (0.7) | -146.58 (1.4) | stand
-|@*
-h19-3 | 8.0e+04 | +39.34 (1.4) | -72.58 (0.7) | -145.41 (1.4) | stand
-|@*
-h19-4 | 8.0e+04 | +41.60 (1.4) | -72.88 (0.7) | -145.28 (1.4) | stand
-|@*
-h19-5 | 8.0e+04 | +43.51 (1.4) | -72.98 (0.7) | -145.12 (1.4) | stand
-|@*
-h19-6 | 8.0e+04 | +45.41 (1.4) | -72.56 (0.7) | -144.94 (1.4) | stand
-|@*
-h19-7 | 8.0e+04 | +61.77 (1.5) | -71.07 (0.7) | -142.94 (1.5) | stand
-|@*
-h19-8 | 8.0e+04 | +59.05 (1.5) | -71.22 (0.7) | -143.04 (1.5) | stand
-|@*
-h19-9 | 8.0e+04 | +28.52 (1.5) | -71.93 (0.7) | -143.09 (1.5) | stand
-|@*
-h19-T | 8.0e+04 | -1.96 (1.4) | -75.09 (0.7) | -142.54 (1.4) | stand |@*
-h19-A | 8.0e+04 | -17.95 (1.2) | -80.99 (0.6) | -131.78 (1.2) | stand
-|@*
-h18-2 | 8.0e+04 | +10.97 (1.6) | -61.93 (0.8) | -124.23 (1.6) | stand
-|@*
-h18-3 | 8.0e+04 | +13.15 (1.6) | -62.50 (0.8) | -124.98 (1.6) | stand
-|@*
-h18-4 | 8.0e+04 | +16.93 (1.6) | -61.94 (0.8) | -123.60 (1.6) | stand
-|@*
-h18-5 | 8.0e+04 | +19.25 (1.6) | -62.22 (0.8) | -123.74 (1.6) | stand
-|@*
-h18-6 | 8.0e+04 | +22.23 (1.6) | -61.47 (0.8) | -122.43 (1.6) | stand
-|@*
-h18-7 | 8.0e+04 | +39.60 (1.7) | -58.93 (0.8) | -118.77 (1.7) | stand
-|@*
-h18-8 | 8.0e+04 | +11.02 (1.7) | -59.17 (0.8) | -118.63 (1.7) | stand
-|@*
-h18-9 | 8.0e+04 | -18.50 (1.6) | -61.67 (0.8) | -122.96 (1.6) | stand
-|@*
-h18-T | 8.0e+04 | -24.23 (1.5) | -67.40 (0.8) | -126.70 (1.5) | stand
-|@*
-h18-A | 8.0e+04 | -46.34 (1.3) | -74.66 (0.7) | -118.34 (1.3) | stand
-|@*
-h17-2 | 8.0e+04 | -16.04 (1.7) | -53.84 (0.9) | -107.43 (1.7) | stand
-|@*
-h17-3 | 8.0e+04 | -11.84 (1.7) | -53.28 (0.9) | -107.23 (1.7) | stand
-|@*
-h17-4 | 8.0e+04 | -7.85 (1.8) | -52.66 (0.9) | -105.90 (1.8) | stand |@*
-h17-5 | 8.0e+04 | -4.57 (1.8) | -52.56 (0.9) | -103.96 (1.8) | stand |@*
-h17-6 | 8.0e+04 | -0.04 (1.8) | -51.63 (0.9) | -104.55 (1.8) | stand |@*
-h17-7 | 8.0e+04 | -10.94 (1.8) | -48.70 (0.9) | -96.41 (1.8) | stand |@*
-h17-8 | 8.0e+04 | -37.84 (1.8) | -50.88 (0.9) | -101.70 (1.8) | stand
-|@*
-h17-9 | 8.0e+04 | -42.50 (1.7) | -55.60 (0.8) | -109.70 (1.7) | stand
-|@*
-h17-T | 8.0e+04 | -46.71 (1.6) | -61.73 (0.8) | -116.13 (1.6) | stand
-|@*
-h17-A | 8.0e+04 | -66.37 (1.4) | -70.97 (0.7) | -111.14 (1.4) | stand
-|@*
-h16-2 | 8.0e+04 | -28.77 (1.8) | -47.30 (0.9) | -95.43 (1.8) | stand |@*
-h16-3 | 8.0e+04 | -24.29 (1.8) | -46.54 (0.9) | -92.83 (1.8) | stand |@*
-h16-4 | 8.0e+04 | -20.04 (1.8) | -46.18 (0.9) | -91.87 (1.8) | stand |@*
-h16-5 | 8.0e+04 | -16.86 (1.8) | -45.19 (0.9) | -89.29 (1.8) | stand |@*
-h16-6 | 8.0e+04 | -11.67 (1.9) | -44.23 (0.9) | -88.78 (1.9) | stand |@*
-h16-7 | 8.0e+04 | -47.23 (1.9) | -41.86 (0.9) | -83.70 (1.9) | hit |@*
-h16-8 | 8.0e+04 | -51.20 (1.8) | -46.31 (0.9) | -91.59 (1.8) | hit |@*
-h16-9 | 8.0e+04 | -54.18 (1.7) | -51.19 (0.9) | -102.23 (1.7) | hit |@*
-h16-T | 2.0e+07 | -57.57 (0) | -57.55 (0) | -107.33 (0) | hit |@*
-h16-A | 8.0e+04 | -72.19 (1.4) | -68.30 (0.7) | -105.39 (1.4) | hit |@*
-h15-2 | 8.0e+04 | -28.22 (1.9) | -41.63 (0.9) | -82.97 (1.9) | stand |@*
-h15-3 | 8.0e+04 | -24.40 (1.9) | -41.04 (0.9) | -80.75 (1.9) | stand |@*
-h15-4 | 8.0e+04 | -20.61 (1.9) | -39.80 (0.9) | -79.58 (1.9) | stand |@*
-h15-5 | 8.0e+04 | -16.64 (1.9) | -38.18 (1.0) | -76.95 (1.9) | stand |@*
-h15-6 | 8.0e+04 | -12.54 (1.9) | -37.21 (1.0) | -75.91 (1.9) | stand |@*
-h15-7 | 8.0e+04 | -47.73 (1.9) | -37.35 (0.9) | -73.94 (1.9) | hit |@*
-h15-8 | 8.0e+04 | -50.75 (1.9) | -41.05 (0.9) | -84.62 (1.9) | hit |@*
-h15-9 | 8.0e+04 | -54.44 (1.8) | -47.05 (0.9) | -95.42 (1.8) | hit |@*
-h15-T | 8.0e+04 | -57.26 (1.7) | -54.23 (0.9) | -100.92 (1.7) | hit |@*
-h15-A | 8.0e+04 | -72.42 (1.4) | -66.47 (0.8) | -101.91 (1.4) | hit |@*
-h14-2 | 8.0e+04 | -28.04 (1.9) | -36.34 (1.0) | -71.61 (1.9) | stand |@*
-h14-3 | 8.0e+04 | -24.76 (1.9) | -34.74 (1.0) | -70.47 (1.9) | stand |@*
-h14-4 | 8.0e+04 | -20.69 (1.9) | -33.14 (1.0) | -68.04 (1.9) | stand |@*
-h14-5 | 8.0e+04 | -16.68 (2.0) | -31.75 (1.0) | -64.69 (2.0) | stand |@*
-h14-6 | 8.0e+04 | -12.21 (2.0) | -30.33 (1.0) | -60.55 (2.0) | stand |@*
-h14-7 | 8.0e+04 | -47.78 (1.9) | -31.73 (1.0) | -66.56 (1.9) | hit |@*
-h14-8 | 8.0e+04 | -50.59 (1.9) | -36.85 (0.9) | -75.91 (1.9) | hit |@*
-h14-9 | 8.0e+04 | -54.02 (1.8) | -43.78 (0.9) | -87.29 (1.8) | hit |@*
-h14-T | 8.0e+04 | -57.53 (1.7) | -50.98 (0.9) | -94.12 (1.7) | hit |@*
-h14-A | 8.0e+04 | -71.95 (1.5) | -63.33 (0.8) | -97.81 (1.5) | hit |@*
-h13-2 | 3.2e+05 | -28.71 (1.0) | -30.93 (0.5) | -61.09 (1.0) | stand |@*
-h13-3 | 8.0e+04 | -24.71 (2.0) | -29.25 (1.0) | -57.88 (2.0) | stand |@*
-h13-4 | 8.0e+04 | -20.47 (2.0) | -27.32 (1.0) | -55.06 (2.0) | stand |@*
-h13-5 | 8.0e+04 | -16.25 (2.0) | -25.88 (1.0) | -52.01 (2.0) | stand |@*
-h13-6 | 8.0e+04 | -11.78 (2.0) | -24.12 (1.0) | -47.83 (2.0) | stand |@*
-h13-7 | 8.0e+04 | -47.69 (2.0) | -26.36 (1.0) | -58.47 (2.0) | hit |@*
-h13-8 | 8.0e+04 | -51.19 (1.9) | -32.25 (1.0) | -69.55 (1.9) | hit |@*
-h13-9 | 8.0e+04 | -54.03 (1.9) | -38.96 (0.9) | -81.88 (1.9) | hit |@*
-h13-T | 8.0e+04 | -57.83 (1.8) | -46.80 (0.9) | -88.48 (1.8) | hit |@*
-h13-A | 8.0e+04 | -72.42 (1.5) | -60.37 (0.8) | -93.03 (1.5) | hit |@*
-h12-2 | 8.0e+04 | -29.07 (2.0) | -25.61 (1.0) | -49.41 (2.0) | hit |@*
-h12-3 | 3.2e+05 | -24.62 (1.0) | -23.31 (0.5) | -47.37 (1.0) | hit |@*
-h12-4 | 1.3e+06 | -20.56 (0.5) | -21.52 (0.3) | -42.79 (0.5) | stand |@*
-h12-5 | 8.0e+04 | -16.46 (2.0) | -19.95 (1.0) | -38.43 (2.0) | stand |@*
-h12-6 | 8.0e+04 | -12.05 (2.0) | -17.28 (1.0) | -33.47 (2.0) | stand |@*
-h12-7 | 8.0e+04 | -47.30 (2.0) | -21.83 (1.0) | -50.18 (2.0) | hit |@*
-h12-8 | 8.0e+04 | -51.08 (2.0) | -27.00 (1.0) | -61.37 (2.0) | hit |@*
-h12-9 | 8.0e+04 | -54.15 (1.9) | -34.39 (0.9) | -73.59 (1.9) | hit |@*
-h12-T | 8.0e+04 | -57.87 (1.8) | -42.68 (0.9) | -81.48 (1.8) | hit |@*
-h12-A | 8.0e+04 | -72.38 (1.5) | -56.80 (0.8) | -89.31 (1.5) | hit |@*
-h11-2 | 8.0e+04 | -28.87 (2.0) | +23.35 (1.0) | +47.39 (2.0) | double
-|@*
-h11-3 | 8.0e+04 | -24.76 (2.0) | +25.98 (1.0) | +52.29 (2.0) | double
-|@*
-h11-4 | 8.0e+04 | -20.67 (2.0) | +28.62 (1.0) | +57.21 (2.0) | double
-|@*
-h11-5 | 8.0e+04 | -16.73 (1.9) | +30.55 (1.0) | +62.32 (1.9) | double
-|@*
-h11-6 | 8.0e+04 | -11.69 (1.9) | +33.02 (1.0) | +66.25 (1.9) | double
-|@*
-h11-7 | 8.0e+04 | -47.69 (2.0) | +29.68 (1.0) | +45.78 (2.0) | double
-|@*
-h11-8 | 8.0e+04 | -52.13 (2.0) | +23.74 (1.0) | +35.93 (2.0) | double
-|@*
-h11-9 | 8.0e+04 | -54.25 (2.0) | +16.06 (1.0) | +22.66 (2.0) | double
-|@*
-h11-T | 8.0e+04 | -57.92 (2.0) | +3.19 (1.0) | +9.06 (2.0) | double |@*
-h11-A | 8.2e+07 | -72.22 (0) | -23.66 (0) | -23.64 (0) | double |@*
-h10-2 | 8.0e+04 | -28.12 (2.0) | +18.19 (1.0) | +36.23 (2.0) | double
-|@*
-h10-3 | 8.0e+04 | -24.40 (2.0) | +20.90 (1.0) | +40.69 (2.0) | double
-|@*
-h10-4 | 8.0e+04 | -20.09 (2.0) | +22.58 (1.0) | +46.54 (2.0) | double
-|@*
-h10-5 | 8.0e+04 | -16.16 (2.0) | +25.57 (1.0) | +49.92 (2.0) | double
-|@*
-h10-6 | 8.0e+04 | -12.23 (2.0) | +28.35 (1.0) | +56.55 (2.0) | double
-|@*
-h10-7 | 8.0e+04 | -47.69 (2.0) | +26.37 (1.0) | +39.07 (2.0) | double
-|@*
-h10-8 | 8.0e+04 | -50.60 (2.0) | +19.50 (1.0) | +27.72 (2.0) | double
-|@*
-h10-9 | 8.0e+04 | -54.75 (2.0) | +11.43 (1.0) | +15.10 (2.0) | double
-|@*
-h10-T | 8.0e+04 | -57.90 (1.9) | -5.37 (1.0) | -9.06 (1.9) | hit |@*
-h10-A | 8.0e+04 | -71.92 (1.7) | -28.02 (1.0) | -34.12 (1.7) | hit |@*
-h9-2 | 3.2e+05 | -28.52 (1.0) | +7.07 (0.5) | +5.21 (1.0) | hit |@*
-h9-3 | 3.2e+05 | -24.80 (1.0) | +9.97 (0.5) | +11.98 (1.0) | double |@*
-h9-4 | 8.0e+04 | -20.79 (2.0) | +12.80 (1.0) | +18.47 (2.0) | double |@*
-h9-5 | 8.0e+04 | -16.32 (2.0) | +15.69 (1.0) | +23.70 (2.0) | double |@*
-h9-6 | 8.0e+04 | -12.80 (2.0) | +18.20 (1.0) | +30.52 (2.0) | double |@*
-h9-7 | 8.0e+04 | -48.00 (2.0) | +17.03 (1.0) | +10.60 (2.0) | hit |@*
-h9-8 | 8.0e+04 | -51.36 (2.0) | +10.40 (1.0) | -1.84 (2.0) | hit |@*
-h9-9 | 8.0e+04 | -54.51 (1.9) | -4.82 (1.0) | -29.67 (1.9) | hit |@*
-h9-T | 8.0e+04 | -56.87 (1.9) | -22.03 (1.0) | -50.65 (1.9) | hit |@*
-h9-A | 8.0e+04 | -72.07 (1.6) | -39.82 (0.9) | -62.20 (1.6) | hit |@*
-h8-2 | 8.0e+04 | -28.53 (2.0) | -2.26 (1.0) | -20.42 (2.0) | hit |@*
-h8-3 | 8.0e+04 | -24.15 (2.0) | +0.65 (1.0) | -13.16 (2.0) | hit |@*
-h8-4 | 8.0e+04 | -20.23 (2.1) | +3.90 (1.0) | -5.21 (2.1) | hit |@*
-h8-5 | 8.0e+04 | -16.14 (2.1) | +7.09 (1.0) | -0.54 (2.1) | hit |@*
-h8-6 | 3.2e+05 | -12.14 (1.0) | +10.20 (0.5) | +7.84 (1.0) | hit |@*
-h8-7 | 8.0e+04 | -47.05 (2.0) | +8.66 (1.0) | -19.70 (2.0) | hit |@*
-h8-8 | 8.0e+04 | -50.79 (1.9) | -5.83 (1.0) | -45.53 (1.9) | hit |@*
-h8-9 | 8.0e+04 | -54.13 (1.9) | -21.18 (1.0) | -71.69 (1.9) | hit |@*
-h8-T | 8.0e+04 | -57.28 (1.8) | -30.79 (1.0) | -76.30 (1.8) | hit |@*
-h8-A | 8.0e+04 | -71.71 (1.5) | -49.20 (0.9) | -88.72 (1.5) | hit |@*
-h7-2 | 8.0e+04 | -28.98 (2.0) | -10.50 (1.0) | -43.26 (2.0) | hit |@*
-h7-3 | 8.0e+04 | -24.01 (2.0) | -7.75 (1.0) | -35.53 (2.0) | hit |@*
-h7-4 | 8.0e+04 | -20.99 (2.1) | -3.92 (1.0) | -26.25 (2.1) | hit |@*
-h7-5 | 8.0e+04 | -16.47 (2.1) | +0.08 (1.0) | -20.59 (2.1) | hit |@*
-h7-6 | 8.0e+04 | -12.61 (2.1) | +2.82 (1.0) | -10.05 (2.1) | hit |@*
-h7-7 | 8.0e+04 | -48.34 (1.9) | -6.79 (1.0) | -59.20 (1.9) | hit |@*
-h7-8 | 8.0e+04 | -51.35 (1.8) | -21.21 (1.0) | -84.58 (1.8) | hit |@*
-h7-9 | 8.0e+04 | -54.69 (1.8) | -28.72 (1.0) | -94.97 (1.8) | hit |@*
-h7-T | 8.0e+04 | -57.65 (1.7) | -37.00 (0.9) | -96.37 (1.7) | hit |@*
-h7-A | 8.0e+04 | -72.44 (1.4) | -55.11 (0.8) | -106.65 (1.4) | hit |@*
-h6-2 | 8.0e+04 | -28.57 (2.0) | -15.43 (1.0) | -54.59 (2.0) | hit |@*
-h6-3 | 8.0e+04 | -24.56 (2.0) | -11.04 (1.0) | -47.59 (2.0) | hit |@*
-h6-4 | 8.0e+04 | -20.00 (2.1) | -8.47 (1.0) | -38.90 (2.1) | hit |@*
-h6-5 | 8.0e+04 | -16.08 (2.1) | -4.01 (1.0) | -31.24 (2.1) | hit |@*
-h6-6 | 8.0e+04 | -11.99 (2.1) | -0.87 (1.0) | -21.55 (2.1) | hit |@*
-h6-7 | 8.0e+04 | -47.56 (1.9) | -16.78 (1.0) | -89.83 (1.9) | hit |@*
-h6-8 | 8.0e+04 | -51.12 (1.8) | -24.33 (1.0) | -99.55 (1.8) | hit |@*
-h6-9 | 8.0e+04 | -54.73 (1.8) | -31.31 (1.0) | -106.21 (1.8) | hit |@*
-h6-T | 8.0e+04 | -57.42 (1.7) | -41.13 (0.9) | -105.18 (1.7) | hit |@*
-h6-A | 8.0e+04 | -72.60 (1.4) | -56.24 (0.8) | -112.72 (1.4) | hit |@*
-h5-2 | 8.0e+04 | -29.05 (2.0) | -14.61 (1.0) | -56.03 (2.0) | hit |@*
-h5-3 | 8.0e+04 | -24.45 (2.1) | -11.41 (1.0) | -50.65 (2.1) | hit |@*
-h5-4 | 8.0e+04 | -20.23 (2.1) | -7.78 (1.0) | -40.43 (2.1) | hit |@*
-h5-5 | 8.0e+04 | -16.31 (2.1) | -3.84 (1.0) | -33.26 (2.1) | hit |@*
-h5-6 | 8.0e+04 | -11.79 (2.1) | -0.37 (1.0) | -25.05 (2.1) | hit |@*
-h5-7 | 8.0e+04 | -47.60 (1.9) | -15.39 (1.0) | -95.71 (1.9) | hit |@*
-h5-8 | 8.0e+04 | -51.23 (1.8) | -22.53 (1.0) | -101.98 (1.8) | hit |@*
-h5-9 | 8.0e+04 | -54.04 (1.8) | -29.29 (1.0) | -108.81 (1.8) | hit |@*
-h5-T | 8.0e+04 | -57.95 (1.7) | -39.00 (0.9) | -107.75 (1.7) | hit |@*
-h5-A | 8.0e+04 | -72.13 (1.4) | -54.85 (0.8) | -112.28 (1.4) | hit |@*
-h4-2 | 8.0e+04 | -28.50 (2.0) | -14.23 (1.0) | -56.99 (2.0) | hit |@*
-h4-3 | 8.0e+04 | -24.78 (2.1) | -10.80 (1.0) | -49.65 (2.1) | hit |@*
-h4-4 | 8.0e+04 | -20.49 (2.1) | -6.87 (1.0) | -41.52 (2.1) | hit |@*
-h4-5 | 8.0e+04 | -16.77 (2.1) | -3.61 (1.0) | -32.45 (2.1) | hit |@*
-h4-6 | 8.0e+04 | -11.80 (2.1) | +1.55 (1.0) | -24.32 (2.1) | hit |@*
-h4-7 | 8.0e+04 | -47.75 (1.9) | -13.39 (1.0) | -95.12 (1.9) | hit |@*
-h4-8 | 8.0e+04 | -51.73 (1.8) | -19.55 (1.0) | -101.77 (1.8) | hit |@*
-h4-9 | 8.0e+04 | -54.22 (1.8) | -27.76 (1.0) | -108.31 (1.8) | hit |@*
-h4-T | 8.0e+04 | -58.04 (1.7) | -37.09 (0.9) | -107.42 (1.7) | hit |@*
-h4-A | 8.0e+04 | -72.31 (1.4) | -53.45 (0.9) | -114.02 (1.4) | hit |@*
-s20-2 | 8.0e+04 | +63.62 (2.0) | +18.06 (1.0) | +35.23 (2.0) | stand |@*
-s20-3 | 8.0e+04 | +64.71 (2.0) | +20.31 (1.0) | +39.62 (2.0) | stand |@*
-s20-4 | 8.0e+04 | +65.86 (2.0) | +23.05 (1.0) | +45.11 (2.0) | stand |@*
-s20-5 | 8.0e+04 | +67.00 (2.0) | +25.96 (1.0) | +51.24 (2.0) | stand |@*
-s20-6 | 8.0e+04 | +68.16 (2.0) | +28.27 (1.0) | +55.63 (2.0) | stand |@*
-s20-7 | 8.0e+04 | +77.47 (2.0) | +25.35 (1.0) | +40.40 (2.0) | stand |@*
-s20-8 | 8.0e+04 | +79.10 (2.0) | +20.23 (1.0) | +28.37 (2.0) | stand |@*
-s20-9 | 8.0e+04 | +76.12 (2.0) | +11.22 (1.0) | +14.64 (2.0) | stand |@*
-s20-T | 8.0e+04 | +43.51 (1.9) | -5.46 (1.0) | -8.53 (1.9) | stand |@*
-s20-A | 8.0e+04 | +10.77 (1.7) | -28.26 (1.0) | -33.48 (1.7) | stand |@*
-s19-2 | 8.0e+04 | +38.20 (2.0) | +11.75 (1.0) | +23.54 (2.0) | stand |@*
-s19-3 | 8.0e+04 | +39.82 (2.0) | +15.29 (1.0) | +29.62 (2.0) | stand |@*
-s19-4 | 8.0e+04 | +42.18 (2.0) | +17.78 (1.0) | +35.08 (2.0) | stand |@*
-s19-5 | 3.2e+05 | +43.54 (1.0) | +20.12 (0.5) | +40.89 (1.0) | stand |@*
-s19-6 | 5.1e+06 | +45.35 (0.2) | +23.10 (0.1) | +46.20 (0.2) | double
-|@*
-s19-7 | 8.0e+04 | +61.59 (2.0) | +21.74 (1.0) | +31.70 (2.0) | stand |@*
-s19-8 | 8.0e+04 | +59.31 (2.0) | +15.31 (1.0) | +20.15 (2.0) | stand |@*
-s19-9 | 8.0e+04 | +28.43 (2.0) | +0.63 (1.0) | -8.21 (2.0) | stand |@*
-s19-T | 8.0e+04 | -1.71 (1.9) | -16.07 (1.0) | -28.88 (1.9) | stand |@*
-s19-A | 8.0e+04 | -18.13 (1.7) | -35.40 (0.9) | -46.73 (1.7) | stand |@*
-s18-2 | 2.0e+07 | +11.03 (0) | +5.99 (0) | +11.48 (0) | double |@*
-s18-3 | 3.2e+05 | +13.61 (1.0) | +8.83 (0.5) | +17.60 (1.0) | double |@*
-s18-4 | 8.0e+04 | +16.17 (2.0) | +11.32 (1.0) | +22.57 (2.0) | double
-|@*
-s18-5 | 8.0e+04 | +19.92 (2.0) | +14.49 (1.0) | +28.95 (2.0) | double
-|@*
-s18-6 | 8.0e+04 | +22.64 (2.0) | +15.59 (1.0) | +34.71 (2.0) | double
-|@*
-s18-7 | 8.0e+04 | +39.60 (2.0) | +16.92 (1.0) | +22.37 (2.0) | stand |@*
-s18-8 | 8.0e+04 | +10.50 (2.0) | +4.49 (1.0) | -3.59 (2.0) | stand |@*
-s18-9 | 8.0e+04 | -18.75 (2.0) | -9.78 (1.0) | -29.28 (2.0) | hit |@*
-s18-T | 8.0e+04 | -24.01 (1.9) | -20.91 (1.0) | -38.83 (1.9) | hit |@*
-s18-A | 8.0e+04 | -46.67 (1.7) | -41.65 (0.9) | -59.24 (1.7) | hit |@*
-s17-2 | 2.0e+07 | -15.66 (0) | -0.55 (0) | -0.87 (0) | hit |@*
-s17-3 | 3.2e+05 | -11.98 (1.0) | +2.36 (0.5) | +5.48 (1.0) | double |@*
-s17-4 | 8.0e+04 | -8.31 (2.0) | +5.04 (1.0) | +11.89 (2.0) | double |@*
-s17-5 | 8.0e+04 | -4.91 (2.0) | +8.85 (1.0) | +17.72 (2.0) | double |@*
-s17-6 | 8.0e+04 | -0.74 (2.0) | +10.12 (1.0) | +24.25 (2.0) | double |@*
-s17-7 | 8.0e+04 | -10.35 (2.0) | +5.08 (1.0) | -0.47 (2.0) | hit |@*
-s17-8 | 8.0e+04 | -38.37 (2.0) | -7.07 (1.0) | -26.13 (2.0) | hit |@*
-s17-9 | 8.0e+04 | -41.81 (2.0) | -15.16 (1.0) | -40.21 (2.0) | hit |@*
-s17-T | 8.0e+04 | -45.89 (1.9) | -25.72 (1.0) | -50.87 (1.9) | hit |@*
-s17-A | 8.0e+04 | -66.48 (1.6) | -46.33 (0.9) | -69.24 (1.6) | hit |@*
-s16-2 | 8.0e+04 | -28.80 (2.1) | -2.39 (1.0) | -6.32 (2.1) | hit |@*
-s16-3 | 3.2e+05 | -24.88 (1.0) | +0.60 (0.5) | -0.97 (1.0) | hit |@*
-s16-4 | 8.0e+04 | -21.20 (2.1) | +3.23 (1.0) | +6.64 (2.1) | double |@*
-s16-5 | 8.0e+04 | -15.99 (2.1) | +6.72 (1.0) | +13.54 (2.1) | double |@*
-s16-6 | 8.0e+04 | -12.50 (2.1) | +8.31 (1.0) | +19.84 (2.1) | double |@*
-s16-7 | 8.0e+04 | -47.17 (2.0) | -1.23 (1.0) | -18.63 (2.0) | hit |@*
-s16-8 | 8.0e+04 | -50.91 (2.0) | -6.98 (1.0) | -31.09 (2.0) | hit |@*
-s16-9 | 8.0e+04 | -54.43 (2.0) | -14.67 (1.0) | -46.42 (2.0) | hit |@*
-s16-T | 8.0e+04 | -57.58 (1.9) | -26.70 (1.0) | -55.38 (1.9) | hit |@*
-s16-A | 8.0e+04 | -72.33 (1.6) | -44.35 (0.9) | -71.31 (1.6) | hit |@*
-s15-2 | 8.0e+04 | -29.03 (2.1) | -0.58 (1.0) | -5.65 (2.1) | hit |@*
-s15-3 | 8.0e+04 | -24.71 (2.1) | +3.31 (1.0) | -1.28 (2.1) | hit |@*
-s15-4 | 1.3e+06 | -20.58 (0.5) | +5.60 (0.3) | +6.44 (0.5) | double |@*
-s15-5 | 3.2e+05 | -16.62 (1.0) | +8.86 (0.5) | +12.74 (1.0) | double |@*
-s15-6 | 8.0e+04 | -12.09 (2.1) | +10.13 (1.0) | +19.13 (2.1) | double
-|@*
-s15-7 | 8.0e+04 | -47.61 (2.0) | +4.21 (1.0) | -19.48 (2.0) | hit |@*
-s15-8 | 8.0e+04 | -51.16 (2.0) | -2.81 (1.0) | -30.90 (2.0) | hit |@*
-s15-9 | 8.0e+04 | -54.31 (2.0) | -11.18 (1.0) | -46.93 (2.0) | hit |@*
-s15-T | 8.0e+04 | -57.49 (1.9) | -23.85 (1.0) | -54.93 (1.9) | hit |@*
-s15-A | 8.0e+04 | -71.98 (1.6) | -42.68 (0.9) | -71.58 (1.6) | hit |@*
-s14-2 | 8.0e+04 | -28.59 (2.1) | +1.42 (1.0) | -6.73 (2.1) | hit |@*
-s14-3 | 8.0e+04 | -24.89 (2.1) | +4.04 (1.0) | -0.41 (2.1) | hit |@*
-s14-4 | 8.0e+04 | -20.84 (2.1) | +7.58 (1.0) | +5.13 (2.1) | hit |@*
-s14-5 | 3.2e+05 | -16.36 (1.0) | +10.61 (0.5) | +12.72 (1.0) | double
-|@*
-s14-6 | 8.0e+04 | -12.19 (2.1) | +12.30 (1.0) | +19.62 (2.1) | double
-|@*
-s14-7 | 8.0e+04 | -47.42 (2.1) | +7.66 (1.0) | -18.33 (2.1) | hit |@*
-s14-8 | 8.0e+04 | -50.95 (2.0) | +0.96 (1.0) | -30.90 (2.0) | hit |@*
-s14-9 | 8.0e+04 | -54.73 (2.0) | -7.82 (1.0) | -46.11 (2.0) | hit |@*
-s14-T | 8.0e+04 | -57.51 (1.9) | -21.19 (1.0) | -55.00 (1.9) | hit |@*
-s14-A | 8.0e+04 | -72.28 (1.6) | -40.00 (0.9) | -71.64 (1.6) | hit |@*
-s13-2 | 8.0e+04 | -28.76 (2.1) | +3.98 (1.0) | -7.66 (2.1) | hit |@*
-s13-3 | 8.0e+04 | -25.07 (2.1) | +7.23 (1.0) | -0.04 (2.1) | hit |@*
-s13-4 | 8.0e+04 | -20.02 (2.1) | +9.31 (1.0) | +4.88 (2.1) | hit |@*
-s13-5 | 2.0e+07 | -16.49 (0) | +12.84 (0) | +12.70 (0) | hit |@*
-s13-6 | 8.0e+04 | -12.39 (2.1) | +13.78 (1.0) | +18.69 (2.1) | double
-|@*
-s13-7 | 8.0e+04 | -47.43 (2.1) | +12.59 (1.0) | -18.10 (2.1) | hit |@*
-s13-8 | 8.0e+04 | -50.86 (2.0) | +5.47 (1.0) | -31.53 (2.0) | hit |@*
-s13-9 | 8.0e+04 | -54.25 (2.0) | -4.04 (1.0) | -46.51 (2.0) | hit |@*
-s13-T | 8.0e+04 | -57.70 (1.9) | -16.62 (1.0) | -54.45 (1.9) | hit |@*
-s13-A | 8.0e+04 | -71.53 (1.7) | -37.98 (0.9) | -69.91 (1.7) | hit |@*
-s12-2 | 8.0e+04 | -28.39 (2.1) | +7.36 (1.0) | -6.07 (2.1) | hit |@*
-s12-3 | 8.0e+04 | -25.70 (2.1) | +9.50 (1.0) | -0.03 (2.1) | hit |@*
-s12-4 | 8.0e+04 | -20.48 (2.1) | +12.65 (1.0) | +6.24 (2.1) | hit |@*
-s12-5 | 3.2e+05 | -16.42 (1.0) | +15.18 (0.5) | +13.22 (1.0) | hit |@*
-s12-6 | 8.0e+04 | -11.66 (2.1) | +15.42 (1.0) | +19.62 (2.1) | double
-|@*
-s12-7 | 8.0e+04 | -47.27 (2.1) | +16.31 (1.0) | -16.99 (2.1) | hit |@*
-s12-8 | 8.0e+04 | -51.51 (2.0) | +9.36 (1.0) | -30.70 (2.0) | hit |@*
-s12-9 | 8.0e+04 | -54.23 (2.0) | -0.10 (1.0) | -44.47 (2.0) | hit |@*
-s12-T | 8.0e+04 | -57.77 (1.9) | -14.11 (1.0) | -57.03 (1.9) | hit |@*
-s12-A | 8.0e+04 | -72.70 (1.6) | -34.54 (0.9) | -70.64 (1.6) | hit |
-@ Hand | @math{n} | Yes [%] | No [%] |@*
-pA-2 | 8.0e+04 | +47.20 (1.7) | +6.91 (1.0) | yes |@*
-pA-3 | 8.0e+04 | +53.01 (1.7) | +8.95 (1.0) | yes |@*
-pA-4 | 8.0e+04 | +55.98 (1.7) | +11.49 (1.0) | yes |@*
-pA-5 | 8.0e+04 | +60.89 (1.7) | +14.66 (1.0) | yes |@*
-pA-6 | 8.0e+04 | +66.26 (1.7) | +20.80 (2.1) | yes |@*
-pA-7 | 8.0e+04 | +46.06 (1.6) | +16.94 (1.0) | yes |@*
-pA-8 | 8.0e+04 | +35.38 (1.6) | +9.52 (1.0) | yes |@*
-pA-9 | 8.0e+04 | +22.97 (1.6) | -0.20 (1.0) | yes |@*
-pA-T | 8.0e+04 | +8.41 (1.6) | -14.49 (1.0) | yes |@*
-pA-A | 8.0e+04 | -23.73 (1.5) | -34.77 (0.9) | yes |@*
-pT-2 | 8.0e+04 | -7.22 (3.8) | +63.33 (0.7) | no |@*
-pT-3 | 8.0e+04 | +1.85 (3.8) | +64.34 (0.7) | no |@*
-pT-4 | 8.0e+04 | +15.20 (4.0) | +65.82 (0.7) | no |@*
-pT-5 | 8.0e+04 | +24.91 (4.0) | +66.75 (0.7) | no |@*
-pT-6 | 8.0e+04 | +37.30 (4.0) | +67.83 (0.7) | no |@*
-pT-7 | 8.0e+04 | +9.41 (2.6) | +76.75 (0.6) | no |@*
-pT-8 | 8.0e+04 | -23.72 (2.5) | +79.31 (0.6) | no |@*
-pT-9 | 8.0e+04 | -59.32 (2.6) | +75.92 (0.6) | no |@*
-pT-T | 8.0e+04 | -77.52 (2.6) | +43.30 (0.7) | no |@*
-pT-A | 8.0e+04 | -85.16 (2.2) | +10.82 (1.0) | no |@*
-p9-2 | 8.0e+04 | +20.02 (2.2) | +11.24 (1.0) | yes |@*
-p9-3 | 8.0e+04 | +25.25 (2.2) | +13.40 (1.0) | yes |@*
-p9-4 | 8.0e+04 | +33.27 (2.2) | +16.87 (1.0) | yes |@*
-p9-5 | 8.0e+04 | +39.23 (2.2) | +19.21 (1.0) | yes |@*
-p9-6 | 8.0e+04 | +45.68 (2.2) | +22.91 (1.0) | yes |@*
-p9-7 | 8.0e+04 | +36.00 (1.9) | +40.30 (0.9) | no |@*
-p9-8 | 8.0e+04 | +23.61 (1.9) | +10.59 (0.8) | yes |@*
-p9-9 | 8.0e+04 | -6.82 (1.8) | -18.28 (1.0) | yes |@*
-p9-T | 8.0e+04 | -36.80 (1.9) | -23.83 (1.0) | no |@*
-p9-A | 3.2e+05 | -48.13 (0.8) | -46.28 (0.4) | no |@*
-p8-2 | 8.0e+04 | +5.68 (2.4) | -28.12 (1.0) | yes |@*
-p8-3 | 8.0e+04 | +13.29 (2.4) | -24.45 (1.0) | yes |@*
-p8-4 | 8.0e+04 | +20.18 (2.5) | -20.57 (1.0) | yes |@*
-p8-5 | 8.0e+04 | +28.86 (2.5) | -15.92 (1.0) | yes |@*
-p8-6 | 8.0e+04 | +38.58 (2.7) | -12.18 (1.1) | yes |@*
-p8-7 | 8.0e+04 | +32.62 (2.1) | -41.09 (0.9) | yes |@*
-p8-8 | 8.0e+04 | -1.93 (2.1) | -46.30 (0.9) | yes |@*
-p8-9 | 8.0e+04 | -39.65 (2.2) | -50.97 (0.9) | yes |@*
-p8-T | 8.0e+04 | -51.78 (1.9) | -57.43 (0.8) | yes |@*
-p8-A | 3.2e+05 | -66.56 (0.8) | -68.26 (0.4) | yes |@*
-p7-2 | 8.0e+04 | -14.09 (2.6) | -28.55 (1.0) | yes |@*
-p7-3 | 8.0e+04 | -5.00 (2.8) | -25.59 (1.0) | yes |@*
-p7-4 | 8.0e+04 | +5.68 (2.9) | -20.86 (1.0) | yes |@*
-p7-5 | 8.0e+04 | +15.57 (2.9) | -16.37 (1.0) | yes |@*
-p7-6 | 8.0e+04 | +25.52 (2.9) | -12.25 (1.1) | yes |@*
-p7-7 | 8.0e+04 | -5.23 (2.1) | -31.97 (1.0) | yes |@*
-p7-8 | 3.2e+05 | -39.50 (1.0) | -37.19 (0.5) | no |@*
-p7-9 | 8.0e+04 | -57.79 (2.1) | -42.92 (0.9) | no |@*
-p7-T | 8.0e+04 | -68.47 (1.8) | -50.66 (0.9) | no |@*
-p7-A | 8.0e+04 | -81.50 (1.5) | -63.51 (0.8) | no |@*
-p6-2 | 8.0e+04 | -17.82 (2.5) | -26.09 (1.0) | yes |@*
-p6-3 | 8.0e+04 | -11.19 (2.9) | -23.68 (1.0) | yes |@*
-p6-4 | 8.0e+04 | -0.23 (2.9) | -20.51 (1.0) | yes |@*
-p6-5 | 8.0e+04 | +8.19 (2.9) | -16.81 (1.0) | yes |@*
-p6-6 | 8.0e+04 | +18.21 (2.9) | -12.51 (1.1) | yes |@*
-p6-7 | 8.0e+04 | -26.43 (2.0) | -21.52 (1.0) | no |@*
-p6-8 | 8.0e+04 | -41.81 (2.0) | -27.45 (1.0) | no |@*
-p6-9 | 8.0e+04 | -61.03 (1.9) | -33.82 (1.0) | no |@*
-p6-T | 8.0e+04 | -74.39 (1.7) | -43.03 (0.9) | no |@*
-p6-A | 8.0e+04 | -82.19 (1.4) | -57.43 (0.8) | no |@*
-p5-2 | 8.0e+04 | -28.56 (2.3) | +36.16 (2.0) | no |@*
-p5-3 | 8.0e+04 | -19.64 (2.5) | +40.18 (2.0) | no |@*
-p5-4 | 8.0e+04 | -12.32 (2.8) | +45.78 (2.0) | no |@*
-p5-5 | 8.0e+04 | -5.05 (2.8) | +52.02 (2.0) | no |@*
-p5-6 | 8.0e+04 | +8.49 (2.8) | +57.75 (2.0) | no |@*
-p5-7 | 8.0e+04 | -29.66 (1.8) | +38.20 (2.0) | no |@*
-p5-8 | 8.0e+04 | -45.66 (1.8) | +29.62 (2.0) | no |@*
-p5-9 | 8.0e+04 | -63.47 (1.7) | +14.03 (2.0) | no |@*
-p5-T | 8.0e+04 | -75.39 (1.7) | -5.08 (1.0) | no |@*
-p5-A | 8.0e+04 | -83.27 (1.4) | -28.59 (1.0) | no |@*
-p4-2 | 8.0e+04 | -18.11 (2.5) | -2.44 (1.0) | no |@*
-p4-3 | 8.0e+04 | -11.18 (2.7) | +0.19 (1.0) | no |@*
-p4-4 | 8.0e+04 | -0.79 (2.9) | +3.43 (1.0) | no |@*
-p4-5 | 1.3e+06 | +8.28 (0.7) | +7.07 (0.3) | yes |@*
-p4-6 | 8.0e+04 | +18.98 (3.0) | +8.70 (1.0) | yes |@*
-p4-7 | 8.0e+04 | -16.47 (2.0) | +7.80 (1.0) | no |@*
-p4-8 | 8.0e+04 | -32.77 (2.0) | -6.00 (1.0) | no |@*
-p4-9 | 8.0e+04 | -50.81 (2.0) | -20.81 (1.0) | no |@*
-p4-T | 8.0e+04 | -65.67 (1.7) | -30.72 (1.0) | no |@*
-p4-A | 8.0e+04 | -74.66 (1.5) | -49.18 (0.9) | no |@*
-p3-2 | 2.0e+07 | -13.64 (0) | -13.80 (0) | yes |@*
-p3-3 | 8.0e+04 | -5.32 (2.6) | -10.45 (1.0) | yes |@*
-p3-4 | 8.0e+04 | +4.08 (2.7) | -7.45 (1.0) | yes |@*
-p3-5 | 8.0e+04 | +12.53 (2.9) | -3.04 (1.0) | yes |@*
-p3-6 | 8.0e+04 | +22.61 (2.9) | +0.47 (1.0) | yes |@*
-p3-7 | 8.0e+04 | -4.91 (2.0) | -14.91 (1.0) | yes |@*
-p3-8 | 3.2e+05 | -23.20 (1.0) | -21.69 (0.5) | no |@*
-p3-9 | 8.0e+04 | -43.61 (2.0) | -29.14 (1.0) | no |@*
-p3-T | 8.0e+04 | -58.65 (1.7) | -38.95 (0.9) | no |@*
-p3-A | 8.0e+04 | -70.06 (1.5) | -54.59 (0.8) | no |@*
-p2-2 | 3.2e+05 | -8.69 (1.1) | -11.47 (0.5) | yes |@*
-p2-3 | 8.0e+04 | -1.93 (2.5) | -8.55 (1.0) | yes |@*
-p2-4 | 8.0e+04 | +6.19 (2.7) | -4.95 (1.0) | yes |@*
-p2-5 | 8.0e+04 | +15.78 (2.7) | -1.24 (1.0) | yes |@*
-p2-6 | 8.0e+04 | +24.78 (2.9) | +3.07 (1.0) | yes |@*
-p2-7 | 8.0e+04 | +1.48 (2.0) | -8.90 (1.0) | yes |@*
-p2-8 | 3.2e+05 | -17.88 (1.0) | -16.10 (0.5) | no |@*
-p2-9 | 8.0e+04 | -38.73 (2.0) | -24.38 (1.0) | no |@*
-p2-T | 8.0e+04 | -54.45 (1.8) | -34.92 (0.9) | no |@*
-p2-A | 8.0e+04 | -67.11 (1.5) | -51.59 (0.9) | no |
+@multitable {s12-A} {Hands needed} {-72.15 (1.6)} {-35.17 (0.9)} {-113.22 (1.4)} {double} 
+@headitem 
+Hand
+ @tab Hands needed
+ @tab Stand [%]
+ @tab Double [%]
+ @tab Hit [%]
+ @tab Play
+@item 
+h20-2
+ @tab 8.0e+04
+ @tab +63.55 (1.1)
+ @tab -85.62 (0.5)
+ @tab -171.16 (1.1)
+ @tab stand
+@item 
+h20-3
+ @tab 8.0e+04
+ @tab +64.58 (1.1)
+ @tab -85.56 (0.5)
+ @tab -170.56 (1.1)
+ @tab stand
+@item 
+h20-4
+ @tab 8.0e+04
+ @tab +65.30 (1.1)
+ @tab -85.70 (0.5)
+ @tab -171.10 (1.1)
+ @tab stand
+@item 
+h20-5
+ @tab 8.0e+04
+ @tab +67.04 (1.1)
+ @tab -85.52 (0.5)
+ @tab -171.34 (1.1)
+ @tab stand
+@item 
+h20-6
+ @tab 8.0e+04
+ @tab +67.81 (1.1)
+ @tab -85.17 (0.5)
+ @tab -170.61 (1.1)
+ @tab stand
+@item 
+h20-7
+ @tab 8.0e+04
+ @tab +77.12 (1.1)
+ @tab -85.13 (0.6)
+ @tab -170.32 (1.1)
+ @tab stand
+@item 
+h20-8
+ @tab 8.0e+04
+ @tab +79.14 (1.1)
+ @tab -84.99 (0.6)
+ @tab -170.46 (1.1)
+ @tab stand
+@item 
+h20-9
+ @tab 8.0e+04
+ @tab +75.94 (1.1)
+ @tab -85.00 (0.6)
+ @tab -169.53 (1.1)
+ @tab stand
+@item 
+h20-T
+ @tab 8.0e+04
+ @tab +43.51 (1.1)
+ @tab -86.06 (0.5)
+ @tab -164.02 (1.1)
+ @tab stand
+@item 
+h20-A
+ @tab 8.0e+04
+ @tab +10.86 (1.0)
+ @tab -89.62 (0.5)
+ @tab -149.06 (1.0)
+ @tab stand
+@item 
+h19-2
+ @tab 8.0e+04
+ @tab +37.41 (1.4)
+ @tab -73.09 (0.7)
+ @tab -146.25 (1.4)
+ @tab stand
+@item 
+h19-3
+ @tab 8.0e+04
+ @tab +40.09 (1.4)
+ @tab -72.96 (0.7)
+ @tab -145.29 (1.4)
+ @tab stand
+@item 
+h19-4
+ @tab 8.0e+04
+ @tab +41.38 (1.4)
+ @tab -72.80 (0.7)
+ @tab -146.07 (1.4)
+ @tab stand
+@item 
+h19-5
+ @tab 8.0e+04
+ @tab +43.76 (1.4)
+ @tab -72.76 (0.7)
+ @tab -144.19 (1.4)
+ @tab stand
+@item 
+h19-6
+ @tab 8.0e+04
+ @tab +45.80 (1.4)
+ @tab -72.62 (0.7)
+ @tab -145.14 (1.4)
+ @tab stand
+@item 
+h19-7
+ @tab 8.0e+04
+ @tab +61.39 (1.5)
+ @tab -71.50 (0.7)
+ @tab -143.39 (1.5)
+ @tab stand
+@item 
+h19-8
+ @tab 8.0e+04
+ @tab +59.58 (1.5)
+ @tab -71.36 (0.7)
+ @tab -143.03 (1.5)
+ @tab stand
+@item 
+h19-9
+ @tab 8.0e+04
+ @tab +28.15 (1.5)
+ @tab -71.59 (0.7)
+ @tab -143.42 (1.5)
+ @tab stand
+@item 
+h19-T
+ @tab 8.0e+04
+ @tab -2.00 (1.3)
+ @tab -74.91 (0.7)
+ @tab -142.88 (1.3)
+ @tab stand
+@item 
+h19-A
+ @tab 8.0e+04
+ @tab -18.04 (1.2)
+ @tab -81.43 (0.6)
+ @tab -131.46 (1.2)
+ @tab stand
+@item 
+h18-2
+ @tab 8.0e+04
+ @tab +11.02 (1.6)
+ @tab -62.22 (0.8)
+ @tab -123.71 (1.6)
+ @tab stand
+@item 
+h18-3
+ @tab 8.0e+04
+ @tab +13.20 (1.6)
+ @tab -61.53 (0.8)
+ @tab -124.35 (1.6)
+ @tab stand
+@item 
+h18-4
+ @tab 8.0e+04
+ @tab +16.92 (1.6)
+ @tab -61.80 (0.8)
+ @tab -123.86 (1.6)
+ @tab stand
+@item 
+h18-5
+ @tab 8.0e+04
+ @tab +19.35 (1.6)
+ @tab -61.38 (0.8)
+ @tab -123.62 (1.6)
+ @tab stand
+@item 
+h18-6
+ @tab 8.0e+04
+ @tab +22.36 (1.6)
+ @tab -61.35 (0.8)
+ @tab -121.85 (1.6)
+ @tab stand
+@item 
+h18-7
+ @tab 8.0e+04
+ @tab +39.35 (1.7)
+ @tab -59.36 (0.8)
+ @tab -118.48 (1.7)
+ @tab stand
+@item 
+h18-8
+ @tab 8.0e+04
+ @tab +10.34 (1.7)
+ @tab -58.35 (0.8)
+ @tab -117.43 (1.7)
+ @tab stand
+@item 
+h18-9
+ @tab 8.0e+04
+ @tab -18.74 (1.6)
+ @tab -61.52 (0.8)
+ @tab -123.34 (1.6)
+ @tab stand
+@item 
+h18-T
+ @tab 8.0e+04
+ @tab -23.84 (1.5)
+ @tab -67.55 (0.8)
+ @tab -127.96 (1.5)
+ @tab stand
+@item 
+h18-A
+ @tab 8.0e+04
+ @tab -46.97 (1.3)
+ @tab -74.64 (0.7)
+ @tab -118.63 (1.3)
+ @tab stand
+@item 
+h17-2
+ @tab 8.0e+04
+ @tab -15.44 (1.7)
+ @tab -53.93 (0.9)
+ @tab -108.61 (1.7)
+ @tab stand
+@item 
+h17-3
+ @tab 8.0e+04
+ @tab -12.18 (1.8)
+ @tab -53.57 (0.9)
+ @tab -105.83 (1.8)
+ @tab stand
+@item 
+h17-4
+ @tab 8.0e+04
+ @tab -8.33 (1.8)
+ @tab -52.86 (0.9)
+ @tab -105.69 (1.8)
+ @tab stand
+@item 
+h17-5
+ @tab 8.0e+04
+ @tab -4.55 (1.8)
+ @tab -51.66 (0.9)
+ @tab -105.34 (1.8)
+ @tab stand
+@item 
+h17-6
+ @tab 8.0e+04
+ @tab -1.15 (1.8)
+ @tab -51.94 (0.9)
+ @tab -104.07 (1.8)
+ @tab stand
+@item 
+h17-7
+ @tab 8.0e+04
+ @tab -10.79 (1.8)
+ @tab -48.10 (0.9)
+ @tab -96.43 (1.8)
+ @tab stand
+@item 
+h17-8
+ @tab 8.0e+04
+ @tab -38.74 (1.8)
+ @tab -50.44 (0.9)
+ @tab -101.03 (1.8)
+ @tab stand
+@item 
+h17-9
+ @tab 8.0e+04
+ @tab -42.54 (1.7)
+ @tab -55.42 (0.8)
+ @tab -111.46 (1.7)
+ @tab stand
+@item 
+h17-T
+ @tab 8.0e+04
+ @tab -46.12 (1.6)
+ @tab -61.91 (0.8)
+ @tab -115.53 (1.6)
+ @tab stand
+@item 
+h17-A
+ @tab 8.0e+04
+ @tab -66.10 (1.4)
+ @tab -70.80 (0.7)
+ @tab -110.62 (1.4)
+ @tab stand
+@item 
+h16-2
+ @tab 8.0e+04
+ @tab -28.62 (1.8)
+ @tab -47.46 (0.9)
+ @tab -95.12 (1.8)
+ @tab stand
+@item 
+h16-3
+ @tab 8.0e+04
+ @tab -24.81 (1.8)
+ @tab -46.52 (0.9)
+ @tab -93.95 (1.8)
+ @tab stand
+@item 
+h16-4
+ @tab 8.0e+04
+ @tab -20.67 (1.8)
+ @tab -45.46 (0.9)
+ @tab -91.92 (1.8)
+ @tab stand
+@item 
+h16-5
+ @tab 8.0e+04
+ @tab -16.48 (1.8)
+ @tab -45.18 (0.9)
+ @tab -89.56 (1.8)
+ @tab stand
+@item 
+h16-6
+ @tab 8.0e+04
+ @tab -11.55 (1.9)
+ @tab -44.39 (0.9)
+ @tab -87.64 (1.9)
+ @tab stand
+@item 
+h16-7
+ @tab 8.0e+04
+ @tab -47.14 (1.9)
+ @tab -41.27 (0.9)
+ @tab -84.33 (1.9)
+ @tab hit
+@item 
+h16-8
+ @tab 8.0e+04
+ @tab -50.94 (1.8)
+ @tab -45.95 (0.9)
+ @tab -92.12 (1.8)
+ @tab hit
+@item 
+h16-9
+ @tab 8.0e+04
+ @tab -54.50 (1.7)
+ @tab -50.71 (0.9)
+ @tab -102.58 (1.7)
+ @tab hit
+@item 
+h16-T
+ @tab 2.0e+07
+ @tab -57.57 (0)
+ @tab -57.53 (0)
+ @tab -107.34 (0)
+ @tab hit
+@item 
+h16-A
+ @tab 8.0e+04
+ @tab -72.39 (1.4)
+ @tab -68.19 (0.7)
+ @tab -105.24 (1.4)
+ @tab hit
+@item 
+h15-2
+ @tab 8.0e+04
+ @tab -28.36 (1.9)
+ @tab -41.53 (0.9)
+ @tab -83.65 (1.9)
+ @tab stand
+@item 
+h15-3
+ @tab 8.0e+04
+ @tab -25.21 (1.9)
+ @tab -40.72 (0.9)
+ @tab -81.48 (1.9)
+ @tab stand
+@item 
+h15-4
+ @tab 8.0e+04
+ @tab -20.66 (1.9)
+ @tab -39.38 (0.9)
+ @tab -78.86 (1.9)
+ @tab stand
+@item 
+h15-5
+ @tab 8.0e+04
+ @tab -16.55 (1.9)
+ @tab -38.38 (1.0)
+ @tab -77.57 (1.9)
+ @tab stand
+@item 
+h15-6
+ @tab 8.0e+04
+ @tab -11.88 (1.9)
+ @tab -37.86 (1.0)
+ @tab -75.22 (1.9)
+ @tab stand
+@item 
+h15-7
+ @tab 8.0e+04
+ @tab -48.09 (1.9)
+ @tab -37.04 (0.9)
+ @tab -75.35 (1.9)
+ @tab hit
+@item 
+h15-8
+ @tab 8.0e+04
+ @tab -50.84 (1.9)
+ @tab -41.53 (0.9)
+ @tab -83.94 (1.9)
+ @tab hit
+@item 
+h15-9
+ @tab 8.0e+04
+ @tab -54.38 (1.8)
+ @tab -47.30 (0.9)
+ @tab -95.06 (1.8)
+ @tab hit
+@item 
+h15-T
+ @tab 8.0e+04
+ @tab -57.73 (1.7)
+ @tab -54.62 (0.9)
+ @tab -99.81 (1.7)
+ @tab hit
+@item 
+h15-A
+ @tab 8.0e+04
+ @tab -72.00 (1.5)
+ @tab -65.80 (0.8)
+ @tab -101.33 (1.5)
+ @tab hit
+@item 
+h14-2
+ @tab 8.0e+04
+ @tab -28.56 (1.9)
+ @tab -36.62 (1.0)
+ @tab -72.17 (1.9)
+ @tab stand
+@item 
+h14-3
+ @tab 8.0e+04
+ @tab -24.12 (1.9)
+ @tab -34.63 (1.0)
+ @tab -70.90 (1.9)
+ @tab stand
+@item 
+h14-4
+ @tab 8.0e+04
+ @tab -20.48 (1.9)
+ @tab -33.73 (1.0)
+ @tab -68.97 (1.9)
+ @tab stand
+@item 
+h14-5
+ @tab 8.0e+04
+ @tab -16.54 (2.0)
+ @tab -31.93 (1.0)
+ @tab -64.39 (2.0)
+ @tab stand
+@item 
+h14-6
+ @tab 8.0e+04
+ @tab -12.19 (2.0)
+ @tab -30.64 (1.0)
+ @tab -60.75 (2.0)
+ @tab stand
+@item 
+h14-7
+ @tab 8.0e+04
+ @tab -47.85 (1.9)
+ @tab -32.25 (1.0)
+ @tab -66.44 (1.9)
+ @tab hit
+@item 
+h14-8
+ @tab 8.0e+04
+ @tab -51.09 (1.9)
+ @tab -37.59 (0.9)
+ @tab -76.59 (1.9)
+ @tab hit
+@item 
+h14-9
+ @tab 8.0e+04
+ @tab -54.41 (1.8)
+ @tab -43.27 (0.9)
+ @tab -87.80 (1.8)
+ @tab hit
+@item 
+h14-T
+ @tab 8.0e+04
+ @tab -57.74 (1.7)
+ @tab -50.71 (0.9)
+ @tab -94.55 (1.7)
+ @tab hit
+@item 
+h14-A
+ @tab 8.0e+04
+ @tab -72.11 (1.5)
+ @tab -62.81 (0.8)
+ @tab -97.57 (1.5)
+ @tab hit
+@item 
+h13-2
+ @tab 3.2e+05
+ @tab -28.58 (1.0)
+ @tab -30.97 (0.5)
+ @tab -61.58 (1.0)
+ @tab stand
+@item 
+h13-3
+ @tab 8.0e+04
+ @tab -24.61 (2.0)
+ @tab -29.17 (1.0)
+ @tab -58.99 (2.0)
+ @tab stand
+@item 
+h13-4
+ @tab 8.0e+04
+ @tab -21.15 (2.0)
+ @tab -27.05 (1.0)
+ @tab -55.31 (2.0)
+ @tab stand
+@item 
+h13-5
+ @tab 8.0e+04
+ @tab -16.88 (2.0)
+ @tab -26.15 (1.0)
+ @tab -50.31 (2.0)
+ @tab stand
+@item 
+h13-6
+ @tab 8.0e+04
+ @tab -12.35 (2.0)
+ @tab -24.12 (1.0)
+ @tab -47.91 (2.0)
+ @tab stand
+@item 
+h13-7
+ @tab 8.0e+04
+ @tab -47.50 (2.0)
+ @tab -26.69 (1.0)
+ @tab -58.47 (2.0)
+ @tab hit
+@item 
+h13-8
+ @tab 8.0e+04
+ @tab -51.33 (1.9)
+ @tab -32.22 (1.0)
+ @tab -70.19 (1.9)
+ @tab hit
+@item 
+h13-9
+ @tab 8.0e+04
+ @tab -54.31 (1.9)
+ @tab -38.57 (0.9)
+ @tab -80.97 (1.9)
+ @tab hit
+@item 
+h13-T
+ @tab 8.0e+04
+ @tab -56.99 (1.8)
+ @tab -46.49 (0.9)
+ @tab -87.36 (1.8)
+ @tab hit
+@item 
+h13-A
+ @tab 8.0e+04
+ @tab -72.39 (1.5)
+ @tab -60.33 (0.8)
+ @tab -92.36 (1.5)
+ @tab hit
+@item 
+h12-2
+ @tab 8.0e+04
+ @tab -28.53 (2.0)
+ @tab -25.26 (1.0)
+ @tab -50.10 (2.0)
+ @tab hit
+@item 
+h12-3
+ @tab 3.2e+05
+ @tab -24.74 (1.0)
+ @tab -23.20 (0.5)
+ @tab -47.17 (1.0)
+ @tab hit
+@item 
+h12-4
+ @tab 5.1e+06
+ @tab -20.50 (0.3)
+ @tab -21.34 (0.1)
+ @tab -42.80 (0.3)
+ @tab stand
+@item 
+h12-5
+ @tab 3.2e+05
+ @tab -16.67 (1.0)
+ @tab -19.49 (0.5)
+ @tab -38.59 (1.0)
+ @tab stand
+@item 
+h12-6
+ @tab 8.0e+04
+ @tab -11.57 (2.0)
+ @tab -17.45 (1.0)
+ @tab -34.91 (2.0)
+ @tab stand
+@item 
+h12-7
+ @tab 8.0e+04
+ @tab -47.16 (2.0)
+ @tab -21.22 (1.0)
+ @tab -49.56 (2.0)
+ @tab hit
+@item 
+h12-8
+ @tab 8.0e+04
+ @tab -51.23 (2.0)
+ @tab -26.82 (1.0)
+ @tab -61.96 (2.0)
+ @tab hit
+@item 
+h12-9
+ @tab 8.0e+04
+ @tab -54.02 (1.9)
+ @tab -33.93 (1.0)
+ @tab -74.10 (1.9)
+ @tab hit
+@item 
+h12-T
+ @tab 8.0e+04
+ @tab -58.14 (1.8)
+ @tab -43.03 (0.9)
+ @tab -82.21 (1.8)
+ @tab hit
+@item 
+h12-A
+ @tab 8.0e+04
+ @tab -72.60 (1.5)
+ @tab -57.38 (0.8)
+ @tab -88.89 (1.5)
+ @tab hit
+@item 
+h11-2
+ @tab 8.0e+04
+ @tab -27.73 (2.0)
+ @tab +23.74 (1.0)
+ @tab +46.68 (2.0)
+ @tab double
+@item 
+h11-3
+ @tab 8.0e+04
+ @tab -24.81 (2.0)
+ @tab +26.30 (1.0)
+ @tab +50.86 (2.0)
+ @tab double
+@item 
+h11-4
+ @tab 8.0e+04
+ @tab -20.28 (2.0)
+ @tab +28.91 (1.0)
+ @tab +56.46 (2.0)
+ @tab double
+@item 
+h11-5
+ @tab 8.0e+04
+ @tab -16.10 (1.9)
+ @tab +31.08 (1.0)
+ @tab +60.58 (1.9)
+ @tab double
+@item 
+h11-6
+ @tab 8.0e+04
+ @tab -12.18 (1.9)
+ @tab +33.16 (1.0)
+ @tab +67.19 (1.9)
+ @tab double
+@item 
+h11-7
+ @tab 8.0e+04
+ @tab -47.49 (2.0)
+ @tab +29.49 (1.0)
+ @tab +46.09 (2.0)
+ @tab double
+@item 
+h11-8
+ @tab 8.0e+04
+ @tab -51.29 (2.0)
+ @tab +22.39 (1.0)
+ @tab +34.94 (2.0)
+ @tab double
+@item 
+h11-9
+ @tab 8.0e+04
+ @tab -54.41 (2.0)
+ @tab +15.62 (1.0)
+ @tab +23.72 (2.0)
+ @tab double
+@item 
+h11-T
+ @tab 8.0e+04
+ @tab -57.70 (2.0)
+ @tab +3.21 (1.0)
+ @tab +9.84 (2.0)
+ @tab double
+@item 
+h11-A
+ @tab 2.0e+07
+ @tab -72.22 (0)
+ @tab -23.67 (0)
+ @tab -23.56 (0)
+ @tab double
+@item 
+h10-2
+ @tab 8.0e+04
+ @tab -28.45 (2.0)
+ @tab +18.25 (1.0)
+ @tab +35.73 (2.0)
+ @tab double
+@item 
+h10-3
+ @tab 8.0e+04
+ @tab -23.99 (2.0)
+ @tab +20.70 (1.0)
+ @tab +40.59 (2.0)
+ @tab double
+@item 
+h10-4
+ @tab 8.0e+04
+ @tab -21.31 (2.0)
+ @tab +23.14 (1.0)
+ @tab +46.54 (2.0)
+ @tab double
+@item 
+h10-5
+ @tab 8.0e+04
+ @tab -16.23 (2.0)
+ @tab +25.77 (1.0)
+ @tab +51.66 (2.0)
+ @tab double
+@item 
+h10-6
+ @tab 8.0e+04
+ @tab -12.01 (2.0)
+ @tab +28.63 (1.0)
+ @tab +56.36 (2.0)
+ @tab double
+@item 
+h10-7
+ @tab 8.0e+04
+ @tab -47.40 (2.0)
+ @tab +25.23 (1.0)
+ @tab +38.38 (2.0)
+ @tab double
+@item 
+h10-8
+ @tab 8.0e+04
+ @tab -51.35 (2.0)
+ @tab +20.43 (1.0)
+ @tab +28.63 (2.0)
+ @tab double
+@item 
+h10-9
+ @tab 3.2e+05
+ @tab -54.13 (1.0)
+ @tab +11.81 (0.5)
+ @tab +15.23 (1.0)
+ @tab double
+@item 
+h10-T
+ @tab 8.0e+04
+ @tab -58.04 (1.9)
+ @tab -5.84 (1.0)
+ @tab -7.94 (1.9)
+ @tab hit
+@item 
+h10-A
+ @tab 8.0e+04
+ @tab -72.46 (1.7)
+ @tab -28.90 (1.0)
+ @tab -33.54 (1.7)
+ @tab hit
+@item 
+h9-2
+ @tab 3.2e+05
+ @tab -28.82 (1.0)
+ @tab +7.62 (0.5)
+ @tab +5.95 (1.0)
+ @tab hit
+@item 
+h9-3
+ @tab 3.2e+05
+ @tab -24.59 (1.0)
+ @tab +9.93 (0.5)
+ @tab +11.94 (1.0)
+ @tab double
+@item 
+h9-4
+ @tab 8.0e+04
+ @tab -20.79 (2.0)
+ @tab +12.15 (1.0)
+ @tab +17.76 (2.0)
+ @tab double
+@item 
+h9-5
+ @tab 8.0e+04
+ @tab -16.50 (2.0)
+ @tab +15.92 (1.0)
+ @tab +23.51 (2.0)
+ @tab double
+@item 
+h9-6
+ @tab 8.0e+04
+ @tab -12.35 (2.0)
+ @tab +19.57 (1.0)
+ @tab +30.65 (2.0)
+ @tab double
+@item 
+h9-7
+ @tab 8.0e+04
+ @tab -47.62 (2.0)
+ @tab +17.20 (1.0)
+ @tab +10.00 (2.0)
+ @tab hit
+@item 
+h9-8
+ @tab 8.0e+04
+ @tab -50.97 (2.0)
+ @tab +10.15 (1.0)
+ @tab -2.38 (2.0)
+ @tab hit
+@item 
+h9-9
+ @tab 8.0e+04
+ @tab -53.95 (1.9)
+ @tab -4.61 (1.0)
+ @tab -29.84 (1.9)
+ @tab hit
+@item 
+h9-T
+ @tab 8.0e+04
+ @tab -57.78 (1.9)
+ @tab -21.96 (1.0)
+ @tab -52.36 (1.9)
+ @tab hit
+@item 
+h9-A
+ @tab 8.0e+04
+ @tab -72.33 (1.7)
+ @tab -38.77 (0.9)
+ @tab -61.26 (1.7)
+ @tab hit
+@item 
+h8-2
+ @tab 8.0e+04
+ @tab -29.03 (2.0)
+ @tab -1.76 (1.0)
+ @tab -19.15 (2.0)
+ @tab hit
+@item 
+h8-3
+ @tab 8.0e+04
+ @tab -25.61 (2.1)
+ @tab +0.33 (1.0)
+ @tab -13.68 (2.1)
+ @tab hit
+@item 
+h8-4
+ @tab 8.0e+04
+ @tab -20.69 (2.1)
+ @tab +3.82 (1.0)
+ @tab -7.66 (2.1)
+ @tab hit
+@item 
+h8-5
+ @tab 8.0e+04
+ @tab -16.06 (2.1)
+ @tab +7.53 (1.0)
+ @tab +0.32 (2.1)
+ @tab hit
+@item 
+h8-6
+ @tab 3.2e+05
+ @tab -12.16 (1.0)
+ @tab +10.49 (0.5)
+ @tab +7.43 (1.0)
+ @tab hit
+@item 
+h8-7
+ @tab 8.0e+04
+ @tab -47.34 (2.0)
+ @tab +8.56 (1.0)
+ @tab -16.64 (2.0)
+ @tab hit
+@item 
+h8-8
+ @tab 8.0e+04
+ @tab -51.56 (1.9)
+ @tab -6.18 (1.0)
+ @tab -46.07 (1.9)
+ @tab hit
+@item 
+h8-9
+ @tab 8.0e+04
+ @tab -54.44 (1.9)
+ @tab -21.65 (1.0)
+ @tab -71.64 (1.9)
+ @tab hit
+@item 
+h8-T
+ @tab 8.0e+04
+ @tab -57.15 (1.8)
+ @tab -30.78 (1.0)
+ @tab -76.35 (1.8)
+ @tab hit
+@item 
+h8-A
+ @tab 8.0e+04
+ @tab -72.01 (1.5)
+ @tab -49.02 (0.9)
+ @tab -88.47 (1.5)
+ @tab hit
+@item 
+h7-2
+ @tab 8.0e+04
+ @tab -29.15 (2.0)
+ @tab -11.08 (1.0)
+ @tab -42.53 (2.0)
+ @tab hit
+@item 
+h7-3
+ @tab 8.0e+04
+ @tab -24.37 (2.0)
+ @tab -7.51 (1.0)
+ @tab -34.68 (2.0)
+ @tab hit
+@item 
+h7-4
+ @tab 8.0e+04
+ @tab -19.40 (2.1)
+ @tab -3.90 (1.0)
+ @tab -27.57 (2.1)
+ @tab hit
+@item 
+h7-5
+ @tab 8.0e+04
+ @tab -16.84 (2.1)
+ @tab -0.53 (1.0)
+ @tab -20.59 (2.1)
+ @tab hit
+@item 
+h7-6
+ @tab 8.0e+04
+ @tab -11.93 (2.1)
+ @tab +2.53 (1.0)
+ @tab -10.66 (2.1)
+ @tab hit
+@item 
+h7-7
+ @tab 8.0e+04
+ @tab -47.22 (1.9)
+ @tab -7.33 (1.0)
+ @tab -59.71 (1.9)
+ @tab hit
+@item 
+h7-8
+ @tab 8.0e+04
+ @tab -50.71 (1.8)
+ @tab -20.35 (1.0)
+ @tab -85.02 (1.8)
+ @tab hit
+@item 
+h7-9
+ @tab 8.0e+04
+ @tab -54.12 (1.8)
+ @tab -29.11 (1.0)
+ @tab -96.16 (1.8)
+ @tab hit
+@item 
+h7-T
+ @tab 8.0e+04
+ @tab -57.52 (1.7)
+ @tab -37.06 (0.9)
+ @tab -95.95 (1.7)
+ @tab hit
+@item 
+h7-A
+ @tab 8.0e+04
+ @tab -72.23 (1.4)
+ @tab -55.54 (0.8)
+ @tab -104.99 (1.4)
+ @tab hit
+@item 
+h6-2
+ @tab 8.0e+04
+ @tab -28.38 (2.0)
+ @tab -15.59 (1.0)
+ @tab -56.44 (2.0)
+ @tab hit
+@item 
+h6-3
+ @tab 8.0e+04
+ @tab -24.34 (2.1)
+ @tab -11.56 (1.0)
+ @tab -46.62 (2.1)
+ @tab hit
+@item 
+h6-4
+ @tab 8.0e+04
+ @tab -21.46 (2.1)
+ @tab -8.03 (1.0)
+ @tab -39.24 (2.1)
+ @tab hit
+@item 
+h6-5
+ @tab 8.0e+04
+ @tab -16.68 (2.1)
+ @tab -4.95 (1.0)
+ @tab -31.10 (2.1)
+ @tab hit
+@item 
+h6-6
+ @tab 8.0e+04
+ @tab -12.40 (2.1)
+ @tab -0.76 (1.0)
+ @tab -22.49 (2.1)
+ @tab hit
+@item 
+h6-7
+ @tab 8.0e+04
+ @tab -47.58 (1.9)
+ @tab -16.43 (1.0)
+ @tab -89.56 (1.9)
+ @tab hit
+@item 
+h6-8
+ @tab 8.0e+04
+ @tab -50.72 (1.8)
+ @tab -24.13 (1.0)
+ @tab -98.62 (1.8)
+ @tab hit
+@item 
+h6-9
+ @tab 8.0e+04
+ @tab -54.32 (1.8)
+ @tab -31.34 (1.0)
+ @tab -107.41 (1.8)
+ @tab hit
+@item 
+h6-T
+ @tab 8.0e+04
+ @tab -57.56 (1.7)
+ @tab -40.02 (0.9)
+ @tab -105.28 (1.7)
+ @tab hit
+@item 
+h6-A
+ @tab 8.0e+04
+ @tab -72.04 (1.4)
+ @tab -56.31 (0.8)
+ @tab -112.37 (1.4)
+ @tab hit
+@item 
+h5-2
+ @tab 8.0e+04
+ @tab -28.46 (2.0)
+ @tab -14.09 (1.0)
+ @tab -56.05 (2.0)
+ @tab hit
+@item 
+h5-3
+ @tab 8.0e+04
+ @tab -24.73 (2.1)
+ @tab -11.80 (1.0)
+ @tab -49.48 (2.1)
+ @tab hit
+@item 
+h5-4
+ @tab 8.0e+04
+ @tab -20.62 (2.1)
+ @tab -8.01 (1.0)
+ @tab -42.69 (2.1)
+ @tab hit
+@item 
+h5-5
+ @tab 8.0e+04
+ @tab -16.47 (2.1)
+ @tab -4.45 (1.0)
+ @tab -32.88 (2.1)
+ @tab hit
+@item 
+h5-6
+ @tab 8.0e+04
+ @tab -12.29 (2.1)
+ @tab -0.24 (1.0)
+ @tab -24.41 (2.1)
+ @tab hit
+@item 
+h5-7
+ @tab 8.0e+04
+ @tab -47.07 (1.9)
+ @tab -16.19 (1.0)
+ @tab -94.28 (1.9)
+ @tab hit
+@item 
+h5-8
+ @tab 8.0e+04
+ @tab -51.00 (1.8)
+ @tab -22.25 (1.0)
+ @tab -101.66 (1.8)
+ @tab hit
+@item 
+h5-9
+ @tab 8.0e+04
+ @tab -54.20 (1.8)
+ @tab -29.74 (1.0)
+ @tab -107.96 (1.8)
+ @tab hit
+@item 
+h5-T
+ @tab 8.0e+04
+ @tab -57.42 (1.7)
+ @tab -38.76 (0.9)
+ @tab -107.09 (1.7)
+ @tab hit
+@item 
+h5-A
+ @tab 8.0e+04
+ @tab -72.39 (1.4)
+ @tab -54.71 (0.8)
+ @tab -114.03 (1.4)
+ @tab hit
+@item 
+h4-2
+ @tab 8.0e+04
+ @tab -28.76 (2.0)
+ @tab -12.93 (1.0)
+ @tab -57.47 (2.0)
+ @tab hit
+@item 
+h4-3
+ @tab 8.0e+04
+ @tab -24.68 (2.1)
+ @tab -10.48 (1.0)
+ @tab -49.92 (2.1)
+ @tab hit
+@item 
+h4-4
+ @tab 8.0e+04
+ @tab -20.67 (2.1)
+ @tab -7.36 (1.0)
+ @tab -41.23 (2.1)
+ @tab hit
+@item 
+h4-5
+ @tab 8.0e+04
+ @tab -16.91 (2.1)
+ @tab -3.43 (1.0)
+ @tab -32.59 (2.1)
+ @tab hit
+@item 
+h4-6
+ @tab 8.0e+04
+ @tab -12.25 (2.1)
+ @tab +0.40 (1.0)
+ @tab -23.57 (2.1)
+ @tab hit
+@item 
+h4-7
+ @tab 8.0e+04
+ @tab -47.75 (1.9)
+ @tab -12.72 (1.0)
+ @tab -94.73 (1.9)
+ @tab hit
+@item 
+h4-8
+ @tab 8.0e+04
+ @tab -50.76 (1.8)
+ @tab -19.63 (1.0)
+ @tab -103.23 (1.8)
+ @tab hit
+@item 
+h4-9
+ @tab 8.0e+04
+ @tab -54.06 (1.8)
+ @tab -28.13 (1.0)
+ @tab -108.57 (1.8)
+ @tab hit
+@item 
+h4-T
+ @tab 8.0e+04
+ @tab -56.86 (1.7)
+ @tab -36.62 (0.9)
+ @tab -107.18 (1.7)
+ @tab hit
+@item 
+h4-A
+ @tab 8.0e+04
+ @tab -72.38 (1.4)
+ @tab -53.76 (0.9)
+ @tab -113.22 (1.4)
+ @tab hit
+@item 
+s20-2
+ @tab 8.0e+04
+ @tab +63.48 (2.0)
+ @tab +18.05 (1.0)
+ @tab +36.30 (2.0)
+ @tab stand
+@item 
+s20-3
+ @tab 8.0e+04
+ @tab +64.51 (2.0)
+ @tab +19.96 (1.0)
+ @tab +41.60 (2.0)
+ @tab stand
+@item 
+s20-4
+ @tab 8.0e+04
+ @tab +65.47 (2.0)
+ @tab +22.51 (1.0)
+ @tab +45.96 (2.0)
+ @tab stand
+@item 
+s20-5
+ @tab 8.0e+04
+ @tab +66.59 (2.0)
+ @tab +26.19 (1.0)
+ @tab +50.69 (2.0)
+ @tab stand
+@item 
+s20-6
+ @tab 8.0e+04
+ @tab +68.22 (2.0)
+ @tab +28.20 (1.0)
+ @tab +56.57 (2.0)
+ @tab stand
+@item 
+s20-7
+ @tab 8.0e+04
+ @tab +77.45 (2.0)
+ @tab +26.05 (1.0)
+ @tab +40.16 (2.0)
+ @tab stand
+@item 
+s20-8
+ @tab 8.0e+04
+ @tab +79.03 (2.0)
+ @tab +19.32 (1.0)
+ @tab +28.44 (2.0)
+ @tab stand
+@item 
+s20-9
+ @tab 8.0e+04
+ @tab +76.09 (2.0)
+ @tab +11.81 (1.0)
+ @tab +15.62 (2.0)
+ @tab stand
+@item 
+s20-T
+ @tab 8.0e+04
+ @tab +43.83 (1.9)
+ @tab -5.43 (1.0)
+ @tab -8.42 (1.9)
+ @tab stand
+@item 
+s20-A
+ @tab 8.0e+04
+ @tab +10.71 (1.7)
+ @tab -28.46 (1.0)
+ @tab -34.57 (1.7)
+ @tab stand
+@item 
+s19-2
+ @tab 8.0e+04
+ @tab +37.55 (2.0)
+ @tab +12.16 (1.0)
+ @tab +23.28 (2.0)
+ @tab stand
+@item 
+s19-3
+ @tab 8.0e+04
+ @tab +39.32 (2.0)
+ @tab +14.45 (1.0)
+ @tab +28.76 (2.0)
+ @tab stand
+@item 
+s19-4
+ @tab 8.0e+04
+ @tab +41.67 (2.0)
+ @tab +17.97 (1.0)
+ @tab +34.49 (2.0)
+ @tab stand
+@item 
+s19-5
+ @tab 3.2e+05
+ @tab +43.87 (1.0)
+ @tab +20.25 (0.5)
+ @tab +39.76 (1.0)
+ @tab stand
+@item 
+s19-6
+ @tab 5.1e+06
+ @tab +45.30 (0.2)
+ @tab +23.06 (0.1)
+ @tab +46.24 (0.2)
+ @tab double
+@item 
+s19-7
+ @tab 8.0e+04
+ @tab +62.00 (2.0)
+ @tab +22.80 (1.0)
+ @tab +32.42 (2.0)
+ @tab stand
+@item 
+s19-8
+ @tab 8.0e+04
+ @tab +59.68 (2.0)
+ @tab +15.07 (1.0)
+ @tab +20.09 (2.0)
+ @tab stand
+@item 
+s19-9
+ @tab 8.0e+04
+ @tab +28.83 (2.0)
+ @tab +1.29 (1.0)
+ @tab -7.06 (2.0)
+ @tab stand
+@item 
+s19-T
+ @tab 8.0e+04
+ @tab -1.88 (1.9)
+ @tab -15.44 (1.0)
+ @tab -29.40 (1.9)
+ @tab stand
+@item 
+s19-A
+ @tab 8.0e+04
+ @tab -17.63 (1.7)
+ @tab -34.41 (0.9)
+ @tab -46.94 (1.7)
+ @tab stand
+@item 
+s18-2
+ @tab 2.0e+07
+ @tab +11.01 (0)
+ @tab +6.00 (0)
+ @tab +11.43 (0)
+ @tab double
+@item 
+s18-3
+ @tab 3.2e+05
+ @tab +13.74 (1.0)
+ @tab +8.81 (0.5)
+ @tab +17.70 (1.0)
+ @tab double
+@item 
+s18-4
+ @tab 8.0e+04
+ @tab +16.38 (2.0)
+ @tab +12.04 (1.0)
+ @tab +22.38 (2.0)
+ @tab double
+@item 
+s18-5
+ @tab 8.0e+04
+ @tab +19.67 (2.0)
+ @tab +14.12 (1.0)
+ @tab +29.11 (2.0)
+ @tab double
+@item 
+s18-6
+ @tab 8.0e+04
+ @tab +22.24 (2.0)
+ @tab +15.83 (1.0)
+ @tab +35.89 (2.0)
+ @tab double
+@item 
+s18-7
+ @tab 8.0e+04
+ @tab +39.95 (2.0)
+ @tab +17.00 (1.0)
+ @tab +21.63 (2.0)
+ @tab stand
+@item 
+s18-8
+ @tab 8.0e+04
+ @tab +10.59 (2.0)
+ @tab +3.79 (1.0)
+ @tab -2.20 (2.0)
+ @tab stand
+@item 
+s18-9
+ @tab 8.0e+04
+ @tab -18.25 (2.0)
+ @tab -10.19 (1.0)
+ @tab -27.83 (2.0)
+ @tab hit
+@item 
+s18-T
+ @tab 8.0e+04
+ @tab -23.79 (1.9)
+ @tab -20.45 (1.0)
+ @tab -38.84 (1.9)
+ @tab hit
+@item 
+s18-A
+ @tab 8.0e+04
+ @tab -46.31 (1.7)
+ @tab -41.64 (0.9)
+ @tab -59.63 (1.7)
+ @tab hit
+@item 
+s17-2
+ @tab 2.0e+07
+ @tab -15.67 (0)
+ @tab -0.59 (0)
+ @tab -0.88 (0)
+ @tab hit
+@item 
+s17-3
+ @tab 3.2e+05
+ @tab -12.35 (1.0)
+ @tab +2.42 (0.5)
+ @tab +5.90 (1.0)
+ @tab double
+@item 
+s17-4
+ @tab 8.0e+04
+ @tab -8.13 (2.0)
+ @tab +5.14 (1.0)
+ @tab +11.54 (2.0)
+ @tab double
+@item 
+s17-5
+ @tab 8.0e+04
+ @tab -4.49 (2.0)
+ @tab +9.23 (1.0)
+ @tab +18.59 (2.0)
+ @tab double
+@item 
+s17-6
+ @tab 8.0e+04
+ @tab -0.39 (2.0)
+ @tab +10.43 (1.0)
+ @tab +25.67 (2.0)
+ @tab double
+@item 
+s17-7
+ @tab 8.0e+04
+ @tab -10.70 (2.0)
+ @tab +5.76 (1.0)
+ @tab -2.08 (2.0)
+ @tab hit
+@item 
+s17-8
+ @tab 8.0e+04
+ @tab -37.98 (2.0)
+ @tab -7.55 (1.0)
+ @tab -24.83 (2.0)
+ @tab hit
+@item 
+s17-9
+ @tab 8.0e+04
+ @tab -42.52 (2.0)
+ @tab -14.14 (1.0)
+ @tab -39.49 (2.0)
+ @tab hit
+@item 
+s17-T
+ @tab 8.0e+04
+ @tab -46.49 (1.9)
+ @tab -25.88 (1.0)
+ @tab -50.28 (1.9)
+ @tab hit
+@item 
+s17-A
+ @tab 8.0e+04
+ @tab -66.85 (1.6)
+ @tab -46.56 (0.9)
+ @tab -68.92 (1.6)
+ @tab hit
+@item 
+s16-2
+ @tab 8.0e+04
+ @tab -28.87 (2.1)
+ @tab -1.93 (1.0)
+ @tab -7.79 (2.1)
+ @tab hit
+@item 
+s16-3
+ @tab 3.2e+05
+ @tab -24.68 (1.0)
+ @tab +0.27 (0.5)
+ @tab -1.15 (1.0)
+ @tab hit
+@item 
+s16-4
+ @tab 3.2e+05
+ @tab -20.67 (1.0)
+ @tab +3.56 (0.5)
+ @tab +5.67 (1.0)
+ @tab double
+@item 
+s16-5
+ @tab 8.0e+04
+ @tab -16.41 (2.1)
+ @tab +6.62 (1.0)
+ @tab +13.59 (2.1)
+ @tab double
+@item 
+s16-6
+ @tab 8.0e+04
+ @tab -12.54 (2.1)
+ @tab +8.47 (1.0)
+ @tab +19.52 (2.1)
+ @tab double
+@item 
+s16-7
+ @tab 8.0e+04
+ @tab -47.66 (2.1)
+ @tab -0.28 (1.0)
+ @tab -17.54 (2.1)
+ @tab hit
+@item 
+s16-8
+ @tab 8.0e+04
+ @tab -51.11 (2.0)
+ @tab -6.82 (1.0)
+ @tab -31.42 (2.0)
+ @tab hit
+@item 
+s16-9
+ @tab 8.0e+04
+ @tab -54.37 (2.0)
+ @tab -14.60 (1.0)
+ @tab -45.25 (2.0)
+ @tab hit
+@item 
+s16-T
+ @tab 8.0e+04
+ @tab -57.80 (1.9)
+ @tab -26.81 (1.0)
+ @tab -55.92 (1.9)
+ @tab hit
+@item 
+s16-A
+ @tab 8.0e+04
+ @tab -72.59 (1.6)
+ @tab -44.41 (0.9)
+ @tab -71.66 (1.6)
+ @tab hit
+@item 
+s15-2
+ @tab 8.0e+04
+ @tab -28.34 (2.1)
+ @tab -0.67 (1.0)
+ @tab -7.00 (2.1)
+ @tab hit
+@item 
+s15-3
+ @tab 8.0e+04
+ @tab -24.95 (2.1)
+ @tab +2.82 (1.0)
+ @tab -0.19 (2.1)
+ @tab hit
+@item 
+s15-4
+ @tab 5.1e+06
+ @tab -20.55 (0.3)
+ @tab +5.57 (0.1)
+ @tab +6.16 (0.3)
+ @tab double
+@item 
+s15-5
+ @tab 8.0e+04
+ @tab -16.27 (2.1)
+ @tab +8.83 (1.0)
+ @tab +13.72 (2.1)
+ @tab double
+@item 
+s15-6
+ @tab 8.0e+04
+ @tab -12.97 (2.1)
+ @tab +9.96 (1.0)
+ @tab +20.24 (2.1)
+ @tab double
+@item 
+s15-7
+ @tab 8.0e+04
+ @tab -47.65 (2.1)
+ @tab +3.09 (1.0)
+ @tab -18.41 (2.1)
+ @tab hit
+@item 
+s15-8
+ @tab 8.0e+04
+ @tab -51.20 (2.0)
+ @tab -2.86 (1.0)
+ @tab -31.79 (2.0)
+ @tab hit
+@item 
+s15-9
+ @tab 8.0e+04
+ @tab -55.02 (2.0)
+ @tab -11.42 (1.0)
+ @tab -46.42 (2.0)
+ @tab hit
+@item 
+s15-T
+ @tab 8.0e+04
+ @tab -57.45 (1.9)
+ @tab -23.91 (1.0)
+ @tab -54.95 (1.9)
+ @tab hit
+@item 
+s15-A
+ @tab 8.0e+04
+ @tab -72.00 (1.6)
+ @tab -42.42 (0.9)
+ @tab -72.09 (1.6)
+ @tab hit
+@item 
+s14-2
+ @tab 8.0e+04
+ @tab -28.06 (2.1)
+ @tab +1.78 (1.0)
+ @tab -6.21 (2.1)
+ @tab hit
+@item 
+s14-3
+ @tab 8.0e+04
+ @tab -24.41 (2.1)
+ @tab +4.42 (1.0)
+ @tab -0.62 (2.1)
+ @tab hit
+@item 
+s14-4
+ @tab 8.0e+04
+ @tab -20.41 (2.1)
+ @tab +8.31 (1.0)
+ @tab +5.82 (2.1)
+ @tab hit
+@item 
+s14-5
+ @tab 3.2e+05
+ @tab -16.31 (1.0)
+ @tab +10.82 (0.5)
+ @tab +12.34 (1.0)
+ @tab double
+@item 
+s14-6
+ @tab 8.0e+04
+ @tab -12.35 (2.1)
+ @tab +11.90 (1.0)
+ @tab +19.57 (2.1)
+ @tab double
+@item 
+s14-7
+ @tab 8.0e+04
+ @tab -47.52 (2.0)
+ @tab +7.95 (1.0)
+ @tab -18.64 (2.0)
+ @tab hit
+@item 
+s14-8
+ @tab 8.0e+04
+ @tab -51.41 (2.0)
+ @tab +2.01 (1.0)
+ @tab -32.23 (2.0)
+ @tab hit
+@item 
+s14-9
+ @tab 8.0e+04
+ @tab -54.26 (2.0)
+ @tab -7.57 (1.0)
+ @tab -45.45 (2.0)
+ @tab hit
+@item 
+s14-T
+ @tab 8.0e+04
+ @tab -57.20 (1.9)
+ @tab -20.14 (1.0)
+ @tab -56.20 (1.9)
+ @tab hit
+@item 
+s14-A
+ @tab 8.0e+04
+ @tab -72.41 (1.6)
+ @tab -39.75 (0.9)
+ @tab -70.94 (1.6)
+ @tab hit
+@item 
+s13-2
+ @tab 8.0e+04
+ @tab -28.79 (2.1)
+ @tab +4.29 (1.0)
+ @tab -7.07 (2.1)
+ @tab hit
+@item 
+s13-3
+ @tab 8.0e+04
+ @tab -24.39 (2.1)
+ @tab +7.00 (1.0)
+ @tab -0.33 (2.1)
+ @tab hit
+@item 
+s13-4
+ @tab 8.0e+04
+ @tab -20.39 (2.1)
+ @tab +10.23 (1.0)
+ @tab +5.20 (2.1)
+ @tab hit
+@item 
+s13-5
+ @tab 2.0e+07
+ @tab -16.46 (0)
+ @tab +12.88 (0)
+ @tab +12.73 (0)
+ @tab hit
+@item 
+s13-6
+ @tab 8.0e+04
+ @tab -12.67 (2.1)
+ @tab +13.75 (1.0)
+ @tab +18.93 (2.1)
+ @tab double
+@item 
+s13-7
+ @tab 8.0e+04
+ @tab -47.64 (2.1)
+ @tab +12.41 (1.0)
+ @tab -18.59 (2.1)
+ @tab hit
+@item 
+s13-8
+ @tab 8.0e+04
+ @tab -51.47 (2.0)
+ @tab +5.50 (1.0)
+ @tab -32.61 (2.0)
+ @tab hit
+@item 
+s13-9
+ @tab 8.0e+04
+ @tab -54.33 (2.0)
+ @tab -3.30 (1.0)
+ @tab -45.89 (2.0)
+ @tab hit
+@item 
+s13-T
+ @tab 8.0e+04
+ @tab -57.17 (1.9)
+ @tab -17.29 (1.0)
+ @tab -55.28 (1.9)
+ @tab hit
+@item 
+s13-A
+ @tab 8.0e+04
+ @tab -71.95 (1.6)
+ @tab -37.21 (0.9)
+ @tab -72.33 (1.6)
+ @tab hit
+@item 
+s12-2
+ @tab 8.0e+04
+ @tab -28.81 (2.1)
+ @tab +7.24 (1.0)
+ @tab -5.99 (2.1)
+ @tab hit
+@item 
+s12-3
+ @tab 8.0e+04
+ @tab -24.61 (2.1)
+ @tab +9.89 (1.0)
+ @tab -0.34 (2.1)
+ @tab hit
+@item 
+s12-4
+ @tab 8.0e+04
+ @tab -20.33 (2.1)
+ @tab +12.28 (1.0)
+ @tab +6.36 (2.1)
+ @tab hit
+@item 
+s12-5
+ @tab 8.0e+04
+ @tab -16.22 (2.1)
+ @tab +15.13 (1.0)
+ @tab +12.78 (2.1)
+ @tab hit
+@item 
+s12-6
+ @tab 8.0e+04
+ @tab -12.16 (2.1)
+ @tab +15.30 (1.0)
+ @tab +21.02 (2.1)
+ @tab double
+@item 
+s12-7
+ @tab 8.0e+04
+ @tab -46.97 (2.1)
+ @tab +16.64 (1.0)
+ @tab -18.22 (2.1)
+ @tab hit
+@item 
+s12-8
+ @tab 8.0e+04
+ @tab -50.98 (2.0)
+ @tab +9.38 (1.0)
+ @tab -31.23 (2.0)
+ @tab hit
+@item 
+s12-9
+ @tab 8.0e+04
+ @tab -54.01 (2.0)
+ @tab +0.31 (1.0)
+ @tab -45.30 (2.0)
+ @tab hit
+@item 
+s12-T
+ @tab 8.0e+04
+ @tab -58.03 (1.9)
+ @tab -14.72 (1.0)
+ @tab -56.96 (1.9)
+ @tab hit
+@item 
+s12-A
+ @tab 8.0e+04
+ @tab -72.15 (1.6)
+ @tab -35.17 (0.9)
+ @tab -72.39 (1.6)
+ @tab hit
+@end multitable
+
+@multitable {p2-A} {Hands needed} {-67.42 (1.5)} {-51.15 (0.9)} 
+@headitem 
+Hand
+ @tab Hands needed
+ @tab Yes [%]
+ @tab No [%]
+@item 
+pA-2
+ @tab 8.0e+04
+ @tab +47.79 (1.7)
+ @tab +7.70 (1.0)
+@item 
+pA-3
+ @tab 8.0e+04
+ @tab +51.89 (1.7)
+ @tab +9.80 (1.0)
+@item 
+pA-4
+ @tab 8.0e+04
+ @tab +56.73 (1.7)
+ @tab +11.81 (1.0)
+@item 
+pA-5
+ @tab 8.0e+04
+ @tab +61.10 (1.7)
+ @tab +15.76 (1.0)
+@item 
+pA-6
+ @tab 8.0e+04
+ @tab +66.09 (1.7)
+ @tab +20.40 (2.1)
+@item 
+pA-7
+ @tab 8.0e+04
+ @tab +46.61 (1.6)
+ @tab +15.82 (1.0)
+@item 
+pA-8
+ @tab 8.0e+04
+ @tab +35.34 (1.6)
+ @tab +9.87 (1.0)
+@item 
+pA-9
+ @tab 8.0e+04
+ @tab +23.05 (1.6)
+ @tab -0.13 (1.0)
+@item 
+pA-T
+ @tab 8.0e+04
+ @tab +8.79 (1.6)
+ @tab -14.01 (1.0)
+@item 
+pA-A
+ @tab 8.0e+04
+ @tab -24.16 (1.5)
+ @tab -35.35 (0.9)
+@item 
+pT-2
+ @tab 8.0e+04
+ @tab -4.29 (3.7)
+ @tab +63.29 (0.7)
+@item 
+pT-3
+ @tab 8.0e+04
+ @tab +4.76 (3.8)
+ @tab +64.28 (0.7)
+@item 
+pT-4
+ @tab 8.0e+04
+ @tab +15.42 (4.0)
+ @tab +65.64 (0.7)
+@item 
+pT-5
+ @tab 8.0e+04
+ @tab +27.51 (4.1)
+ @tab +66.77 (0.7)
+@item 
+pT-6
+ @tab 8.0e+04
+ @tab +37.88 (4.1)
+ @tab +67.89 (0.7)
+@item 
+pT-7
+ @tab 8.0e+04
+ @tab +8.98 (2.6)
+ @tab +77.52 (0.6)
+@item 
+pT-8
+ @tab 8.0e+04
+ @tab -22.83 (2.5)
+ @tab +79.04 (0.6)
+@item 
+pT-9
+ @tab 8.0e+04
+ @tab -61.33 (2.6)
+ @tab +76.23 (0.6)
+@item 
+pT-T
+ @tab 8.0e+04
+ @tab -76.47 (2.7)
+ @tab +43.58 (0.7)
+@item 
+pT-A
+ @tab 8.0e+04
+ @tab -85.74 (2.2)
+ @tab +11.11 (1.0)
+@item 
+p9-2
+ @tab 8.0e+04
+ @tab +20.25 (2.2)
+ @tab +10.96 (1.0)
+@item 
+p9-3
+ @tab 8.0e+04
+ @tab +25.62 (2.2)
+ @tab +13.70 (1.0)
+@item 
+p9-4
+ @tab 8.0e+04
+ @tab +32.53 (2.2)
+ @tab +16.16 (1.0)
+@item 
+p9-5
+ @tab 8.0e+04
+ @tab +39.22 (2.2)
+ @tab +19.08 (1.0)
+@item 
+p9-6
+ @tab 8.0e+04
+ @tab +47.19 (2.2)
+ @tab +22.75 (1.0)
+@item 
+p9-7
+ @tab 3.2e+05
+ @tab +36.59 (0.9)
+ @tab +40.03 (0.4)
+@item 
+p9-8
+ @tab 8.0e+04
+ @tab +23.50 (1.9)
+ @tab +10.05 (0.8)
+@item 
+p9-9
+ @tab 8.0e+04
+ @tab -8.46 (1.8)
+ @tab -18.37 (1.0)
+@item 
+p9-T
+ @tab 8.0e+04
+ @tab -36.82 (1.9)
+ @tab -23.97 (1.0)
+@item 
+p9-A
+ @tab 3.2e+05
+ @tab -48.36 (0.8)
+ @tab -46.75 (0.4)
+@item 
+p8-2
+ @tab 8.0e+04
+ @tab +7.89 (2.4)
+ @tab -29.06 (1.0)
+@item 
+p8-3
+ @tab 8.0e+04
+ @tab +14.84 (2.4)
+ @tab -23.82 (1.0)
+@item 
+p8-4
+ @tab 8.0e+04
+ @tab +21.02 (2.5)
+ @tab -20.67 (1.0)
+@item 
+p8-5
+ @tab 8.0e+04
+ @tab +29.77 (2.5)
+ @tab -16.36 (1.0)
+@item 
+p8-6
+ @tab 8.0e+04
+ @tab +39.44 (2.7)
+ @tab -11.93 (1.1)
+@item 
+p8-7
+ @tab 8.0e+04
+ @tab +31.80 (2.1)
+ @tab -41.83 (0.9)
+@item 
+p8-8
+ @tab 8.0e+04
+ @tab -2.54 (2.1)
+ @tab -45.57 (0.9)
+@item 
+p8-9
+ @tab 8.0e+04
+ @tab -39.27 (2.2)
+ @tab -50.67 (0.9)
+@item 
+p8-T
+ @tab 8.0e+04
+ @tab -51.15 (1.9)
+ @tab -57.31 (0.8)
+@item 
+p8-A
+ @tab 3.2e+05
+ @tab -66.55 (0.8)
+ @tab -68.39 (0.4)
+@item 
+p7-2
+ @tab 8.0e+04
+ @tab -12.93 (2.6)
+ @tab -28.38 (1.0)
+@item 
+p7-3
+ @tab 8.0e+04
+ @tab -5.76 (2.8)
+ @tab -24.45 (1.0)
+@item 
+p7-4
+ @tab 8.0e+04
+ @tab +7.32 (2.9)
+ @tab -21.06 (1.0)
+@item 
+p7-5
+ @tab 8.0e+04
+ @tab +16.33 (2.9)
+ @tab -16.50 (1.0)
+@item 
+p7-6
+ @tab 8.0e+04
+ @tab +24.66 (2.9)
+ @tab -12.31 (1.1)
+@item 
+p7-7
+ @tab 8.0e+04
+ @tab -4.49 (2.1)
+ @tab -31.70 (1.0)
+@item 
+p7-8
+ @tab 3.2e+05
+ @tab -39.47 (1.0)
+ @tab -36.94 (0.5)
+@item 
+p7-9
+ @tab 8.0e+04
+ @tab -57.27 (2.1)
+ @tab -43.25 (0.9)
+@item 
+p7-T
+ @tab 8.0e+04
+ @tab -68.16 (1.8)
+ @tab -51.02 (0.9)
+@item 
+p7-A
+ @tab 8.0e+04
+ @tab -81.66 (1.6)
+ @tab -62.96 (0.8)
+@item 
+p6-2
+ @tab 8.0e+04
+ @tab -20.02 (2.5)
+ @tab -24.94 (1.0)
+@item 
+p6-3
+ @tab 8.0e+04
+ @tab -13.43 (2.9)
+ @tab -22.86 (1.0)
+@item 
+p6-4
+ @tab 8.0e+04
+ @tab -1.32 (2.9)
+ @tab -20.97 (1.0)
+@item 
+p6-5
+ @tab 8.0e+04
+ @tab +8.77 (2.9)
+ @tab -16.47 (1.0)
+@item 
+p6-6
+ @tab 8.0e+04
+ @tab +18.02 (2.9)
+ @tab -11.89 (1.1)
+@item 
+p6-7
+ @tab 8.0e+04
+ @tab -25.77 (2.0)
+ @tab -21.03 (1.0)
+@item 
+p6-8
+ @tab 8.0e+04
+ @tab -42.37 (2.0)
+ @tab -26.97 (1.0)
+@item 
+p6-9
+ @tab 8.0e+04
+ @tab -61.32 (1.9)
+ @tab -33.82 (1.0)
+@item 
+p6-T
+ @tab 8.0e+04
+ @tab -73.60 (1.7)
+ @tab -42.98 (0.9)
+@item 
+p6-A
+ @tab 8.0e+04
+ @tab -81.35 (1.5)
+ @tab -57.46 (0.8)
+@item 
+p5-2
+ @tab 8.0e+04
+ @tab -29.29 (2.3)
+ @tab +35.74 (2.0)
+@item 
+p5-3
+ @tab 8.0e+04
+ @tab -21.10 (2.5)
+ @tab +40.83 (2.0)
+@item 
+p5-4
+ @tab 8.0e+04
+ @tab -14.02 (2.8)
+ @tab +46.13 (2.0)
+@item 
+p5-5
+ @tab 8.0e+04
+ @tab -2.07 (2.8)
+ @tab +51.38 (2.0)
+@item 
+p5-6
+ @tab 8.0e+04
+ @tab +7.69 (2.8)
+ @tab +55.49 (2.0)
+@item 
+p5-7
+ @tab 8.0e+04
+ @tab -29.78 (1.8)
+ @tab +38.74 (2.0)
+@item 
+p5-8
+ @tab 8.0e+04
+ @tab -45.59 (1.8)
+ @tab +29.74 (2.0)
+@item 
+p5-9
+ @tab 8.0e+04
+ @tab -63.38 (1.7)
+ @tab +15.31 (2.0)
+@item 
+p5-T
+ @tab 8.0e+04
+ @tab -75.56 (1.7)
+ @tab -5.45 (1.0)
+@item 
+p5-A
+ @tab 8.0e+04
+ @tab -83.48 (1.4)
+ @tab -28.71 (1.0)
+@item 
+p4-2
+ @tab 8.0e+04
+ @tab -18.34 (2.4)
+ @tab -2.08 (1.0)
+@item 
+p4-3
+ @tab 8.0e+04
+ @tab -10.15 (2.7)
+ @tab -0.10 (1.0)
+@item 
+p4-4
+ @tab 8.0e+04
+ @tab -1.53 (2.9)
+ @tab +4.20 (1.0)
+@item 
+p4-5
+ @tab 1.3e+06
+ @tab +8.32 (0.7)
+ @tab +6.94 (0.3)
+@item 
+p4-6
+ @tab 8.0e+04
+ @tab +18.54 (2.9)
+ @tab +9.10 (1.0)
+@item 
+p4-7
+ @tab 8.0e+04
+ @tab -17.13 (2.0)
+ @tab +8.29 (1.0)
+@item 
+p4-8
+ @tab 8.0e+04
+ @tab -32.41 (2.0)
+ @tab -5.80 (1.0)
+@item 
+p4-9
+ @tab 8.0e+04
+ @tab -52.03 (2.0)
+ @tab -21.40 (1.0)
+@item 
+p4-T
+ @tab 8.0e+04
+ @tab -65.35 (1.7)
+ @tab -30.80 (1.0)
+@item 
+p4-A
+ @tab 8.0e+04
+ @tab -75.64 (1.5)
+ @tab -48.85 (0.9)
+@item 
+p3-2
+ @tab 2.0e+07
+ @tab -13.55 (0)
+ @tab -13.84 (0)
+@item 
+p3-3
+ @tab 3.2e+05
+ @tab -4.62 (1.3)
+ @tab -10.55 (0.5)
+@item 
+p3-4
+ @tab 8.0e+04
+ @tab +4.29 (2.7)
+ @tab -7.50 (1.0)
+@item 
+p3-5
+ @tab 8.0e+04
+ @tab +12.98 (2.9)
+ @tab -2.79 (1.0)
+@item 
+p3-6
+ @tab 8.0e+04
+ @tab +22.13 (2.9)
+ @tab +0.27 (1.0)
+@item 
+p3-7
+ @tab 8.0e+04
+ @tab -5.64 (2.0)
+ @tab -14.75 (1.0)
+@item 
+p3-8
+ @tab 3.2e+05
+ @tab -23.16 (1.0)
+ @tab -21.60 (0.5)
+@item 
+p3-9
+ @tab 8.0e+04
+ @tab -43.38 (2.0)
+ @tab -29.61 (1.0)
+@item 
+p3-T
+ @tab 8.0e+04
+ @tab -59.02 (1.7)
+ @tab -38.86 (0.9)
+@item 
+p3-A
+ @tab 8.0e+04
+ @tab -70.21 (1.5)
+ @tab -54.10 (0.9)
+@item 
+p2-2
+ @tab 8.0e+04
+ @tab -7.83 (2.3)
+ @tab -11.55 (1.0)
+@item 
+p2-3
+ @tab 8.0e+04
+ @tab -1.63 (2.5)
+ @tab -8.20 (1.0)
+@item 
+p2-4
+ @tab 8.0e+04
+ @tab +5.17 (2.7)
+ @tab -4.49 (1.0)
+@item 
+p2-5
+ @tab 8.0e+04
+ @tab +16.51 (2.7)
+ @tab -1.33 (1.0)
+@item 
+p2-6
+ @tab 8.0e+04
+ @tab +25.65 (2.9)
+ @tab +2.57 (1.0)
+@item 
+p2-7
+ @tab 8.0e+04
+ @tab +0.70 (2.0)
+ @tab -8.63 (1.0)
+@item 
+p2-8
+ @tab 1.3e+06
+ @tab -17.84 (0.5)
+ @tab -15.96 (0.2)
+@item 
+p2-9
+ @tab 8.0e+04
+ @tab -40.15 (2.0)
+ @tab -23.95 (1.0)
+@item 
+p2-T
+ @tab 8.0e+04
+ @tab -53.36 (1.8)
+ @tab -34.25 (0.9)
+@item 
+p2-A
+ @tab 8.0e+04
+ @tab -67.42 (1.5)
+ @tab -51.15 (0.9)
+@end multitable
 
 @node Detailed explanation
 @subsection Detailed explanation
@@ -1453,7 +3359,7 @@ updates the strategy file
 @end itemize
 
 @verbatim
-#!/bin/bash
+##!/bin/bash
 
    n0=80000
 n_max=9000000
@@ -1465,7 +3371,7 @@ BROWN="\033[0;33m"
 MAGENTA="\e[0;35m"
 CYAN="\e[0;36m"
 
-NC="\033[0m" # No Color
+NC="\033[0m" ## No Color
 
 for i in grep awk printf blackjack; do
  if [ -z "$(which $i)" ]; then
@@ -1480,24 +3386,26 @@ declare -A strategy
 declare -A ev
 
 declare -A min
-min["hard"]=4   # from 20 to 4 in hards
-min["soft"]=12  # from 20 to 12 in softs
+min["hard"]=4   ## from 20 to 4 in hards
+min["soft"]=12  ## from 20 to 12 in softs
 
 rm -f table.md hard.html soft.html pair.html
 
-# start with standing
+## --------------------------------------------------------------
+## start with standing
 cp hard-stand.txt hard.txt
 cp soft-stand.txt soft.txt
 
 cat << EOF >> table.md
 |  Hand  |  \$n\$  |  Stand [%]  |  Double [%]  |  Hit [%] |   Play    |
+|:------:|:-----:|:-----------:|:------------:|:--------:|:---------:|
 EOF
 
 
 for type in hard soft; do
  for hand in $(seq 20 -1 ${min[${type}]}); do
  
-  # choose two random cards that make up the player's assumed total
+  ## choose two random cards that make up the player's assumed total
   if [ ${type} = "hard" ]; then
    t="h"
    card1=11
@@ -1508,7 +3416,7 @@ for type in hard soft; do
    done
   elif [ ${type} = "soft" ]; then
    t="s"
-   # one card is an ace
+   ## one card is an ace
    card1=1
    card2=$((${hand} - 10 - ${card1}))
   fi
@@ -1533,27 +3441,27 @@ EOF
      upcard_n=$(($upcard))
    fi
  
-   n=${n0}   # start with n0 hands
-   best="x"  # x means don't know what to so, so play
+   n=${n0}   ## start with n0 hands
+   best="x"  ## x means don't know what to so, so play
    
    while [ "${best}" = "x" ]; do
-    # tell the user which combination we are trying and how many we will play
+    ## tell the user which combination we are trying and how many we will play
     echo -ne "${t}${hand}-${upcard} ($card1 $card2)\t"$(printf %.1e ${n})
     for play in s d h; do
      
-     # start with options.conf as a template and add some custom stuff
+     ## start with options.conf as a template and add some custom stuff
      cp options.conf blackjack.conf
      cat << EOF >> blackjack.conf
 hands = ${n}
 player = internal
 arranged_cards = ${card1}, $((${upcard_n} + 13)), $((${card2} + 26))
 report = ${t}${hand}-${upcard}-${play}.yaml
-#log = ${t}${hand}-${upcard}-${play}.log
+##log = ${t}${hand}-${upcard}-${play}.log
 EOF
  
-     # read the current strategy
+     ## read the current strategy
      while read w p2 p3 p4 p5 p6 p7 p8 p9 pT pA; do
-      # w already has the "h" or the "s"
+      ## w already has the "h" or the "s"
       strategy[${w},2]=$p2   
       strategy[${w},3]=$p3
       strategy[${w},4]=$p4    
@@ -1566,15 +3474,15 @@ EOF
       strategy[${w},A]=$pA    
      done < ${type}.txt
      
-     # override the read strategy with the explicit play: s, d or h
+     ## override the read strategy with the explicit play: s, d or h
      strategy[${t}${hand},${upcard}]=${play}
      
-     # save the new (temporary) strategy
+     ## save the new (temporary) strategy
      rm -f ${type}.txt
      for h in $(seq 20 -1 ${min[${type}]}); do
       echo -n "${t}${h}  " >> ${type}.txt
       
-      # extra space if h < 10
+      ## extra space if h < 10
       if [ ${h} -lt 10 ]; then
        echo -n " " >> ${type}.txt
       fi 
@@ -1585,36 +3493,36 @@ EOF
       echo >> ${type}.txt
      done
 
-     # debug, comment for production
+     ## debug, comment for production
      if [ "${debug}" != "0" ]; then
       cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
      fi
     
-     # ensamble the full bs.txt with no pairing
+     ## ensamble the full bs.txt with no pairing
      cat hard.txt soft.txt pair-no.txt > bs.txt
      
-     # play!
+     ## play!
      blackjack
     
-     # evaluate the results
+     ## evaluate the results
      ev[${t}${hand},${upcard},${play}]=$(grep mean ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')
      error[${t}${hand},${upcard},${play}]=$(grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')
      
     done
    
-    # choose the best one
+    ## choose the best one
     ev_s=$(echo ${ev[${t}${hand},${upcard},s]} | awk '{printf("%+.2f", 100*$1)}')
     ev_d=$(echo ${ev[${t}${hand},${upcard},d]} | awk '{printf("%+.2f", 100*$1)}')
     ev_h=$(echo ${ev[${t}${hand},${upcard},h]} | awk '{printf("%+.2f", 100*$1)}')
    
     
     if [ ${n} -le ${n_max} ]; then 
-     # if we still have room, take into account errors
+     ## if we still have room, take into account errors
      error_s=$(echo ${error[${t}${hand},${upcard},s]} | awk '{printf("%.1f", 100*$1)}')
      error_d=$(echo ${error[${t}${hand},${upcard},d]} | awk '{printf("%.1f", 100*$1)}')
      error_h=$(echo ${error[${t}${hand},${upcard},h]} | awk '{printf("%.1f", 100*$1)}')
     else
-     # instead of running infinite hands, above a threshold asume errors are zero
+     ## instead of running infinite hands, above a threshold asume errors are zero
      error_s=0
      error_d=0
      error_h=0
@@ -1673,12 +3581,12 @@ EOF
    echo " </td>" >> ${type}.html
    
    
-   # save the strategy again with the best strategy
+   ## save the strategy again with the best strategy
    rm -f ${type}.txt
    for h in $(seq 20 -1 ${min[${type}]}); do
     echo -n "${t}${h}  " >> ${type}.txt
     
-    # extra space if h < 10
+    ## extra space if h < 10
     if [ ${h} -lt 10 ]; then
      echo -n " " >> ${type}.txt
     fi 
@@ -1692,7 +3600,7 @@ EOF
    done
   done
   
-#   echo "</tr>" >> ${type}.html
+##   echo "</tr>" >> ${type}.html
   
  done
 done
@@ -1702,9 +3610,11 @@ cat << EOF >> table.md
 
 
 |  Hand  |  \$n\$  |   Yes [%]  |   No [%]   |
+|:------:|:-------:|:----------:|:----------:|
 EOF
 
-# pairs
+## --------------------------------------------------------------------
+## pairs
 type="pair"
 t="p"
 cp pair-no.txt pair.txt
@@ -1718,14 +3628,14 @@ for hand in A T $(seq 9 -1 2); do
   pair=$((${hand}))
  fi
   
-#  cat << EOF >> ${type}.html
-#  <tr>
-#   <td>${t}${hand}</td>
-#   <td>
-#    <div class="text-right">y<span class="d-none d-lg-inline">es</span></div>
-#    <div class="text-right">n<span class="d-none d-lg-inline">o</span></div>
-#   </td>
-# EOF
+##  cat << EOF >> ${type}.html
+##  <tr>
+##   <td>${t}${hand}</td>
+##   <td>
+##    <div class="text-right">y<span class="d-none d-lg-inline">es</span></div>
+##    <div class="text-right">n<span class="d-none d-lg-inline">o</span></div>
+##   </td>
+## EOF
   
  for upcard in $(seq 2 9) T A; do
   if [ "$upcard" = "T" ]; then
@@ -1736,28 +3646,28 @@ for hand in A T $(seq 9 -1 2); do
     upcard_n=$(($upcard))
   fi
  
-  n=${n0}   # start with n0 hands
-  best="x"  # x means don't know what to so, so play
+  n=${n0}   ## start with n0 hands
+  best="x"  ## x means don't know what to so, so play
    
   while [ "${best}" = "x" ]; do
-   # tell the user which combination we are trying and how many we will play
+   ## tell the user which combination we are trying and how many we will play
    echo -ne "${t}${hand}-${upcard}\t\t$(printf %.0e ${n})"
    
    for play in y n; do
     
-    # start with options.conf as a template and add some custom stuff
+    ## start with options.conf as a template and add some custom stuff
     cp options.conf blackjack.conf
     cat << EOF >> blackjack.conf
 hands = ${n}
 player = internal
 arranged_cards = ${pair}, $((${upcard_n} + 13)), $((${pair} + 26))
 report = ${t}${hand}-${upcard}-${play}.yaml
-# log = ${t}${hand}-${upcard}-${play}.log
+## log = ${t}${hand}-${upcard}-${play}.log
 EOF
  
-    # read the current strategy
+    ## read the current strategy
     while read w p2 p3 p4 p5 p6 p7 p8 p9 pT pA; do
-     # w already has the "p"
+     ## w already has the "p"
      strategy[${w},2]=$p2   
      strategy[${w},3]=$p3
      strategy[${w},4]=$p4    
@@ -1770,10 +3680,10 @@ EOF
      strategy[${w},A]=$pA    
     done < ${type}.txt
      
-    # override the read strategy with the explicit play: y or n
+    ## override the read strategy with the explicit play: y or n
     strategy[${t}${hand},${upcard}]=${play}
      
-    # save the new (temporary) strategy
+    ## save the new (temporary) strategy
     rm -f ${type}.txt
     for h in A T $(seq 9 -1 2); do
      echo -n "${t}${h}   " >> ${type}.txt
@@ -1787,28 +3697,28 @@ EOF
      cp ${type}.txt ${t}${hand}-${upcard}-${play}.str
     fi  
     
-    # ensamble the full bs.txt
+    ## ensamble the full bs.txt
     cat hard.txt soft.txt pair.txt > bs.txt
 
-    # play!
+    ## play!
     blackjack
 
-    # evaluate the results
+    ## evaluate the results
     ev[${t}${hand},${upcard},${play}]=$(grep mean ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')
     error[${t}${hand},${upcard},${play}]=$(grep error ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')
     
    done
    
-   # choose the best one
+   ## choose the best one
    ev_y=$(echo ${ev[${t}${hand},${upcard},y]} | awk '{printf("%+.2f", 100*$1)}')
    ev_n=$(echo ${ev[${t}${hand},${upcard},n]} | awk '{printf("%+.2f", 100*$1)}')
    
    if [ $n -le ${n_max} ]; then 
-    # if we still have room, take into account errors
+    ## if we still have room, take into account errors
     error_y=$(echo ${error[${t}${hand},${upcard},y]} | awk '{printf("%.1f", 100*$1)}')
     error_n=$(echo ${error[${t}${hand},${upcard},n]} | awk '{printf("%.1f", 100*$1)}')
    else
-    # instead of running infinite hands, above a threshold asume errors are zero
+    ## instead of running infinite hands, above a threshold asume errors are zero
     error_y=0
     error_n=0
    fi  
@@ -1852,7 +3762,7 @@ EOF
   
   strategy[${t}${hand},${upcard}]=${best}
    
-  # save the strategy again with the best strategy
+  ## save the strategy again with the best strategy
   rm -f ${type}.txt
   for h in A T $(seq 9 -1 2); do
    echo -n "${t}${h}   " >> ${type}.txt
