@@ -114,7 +114,7 @@ To play through a TCP socket, call `blackjack` within `netcat`. On one host, do
 
 ```
 rm -f /tmp/f; mkfifo /tmp/f
-cat /tmp/f | blackjack 2>&1 | nc -l 127.0.0.1 1234 > /tmp/f
+cat /tmp/f | blackjack  | nc -l 127.0.0.1 1234 > /tmp/f
 ```
 
 On the other one, connect to the first host on port 1234:
@@ -123,11 +123,7 @@ On the other one, connect to the first host on port 1234:
 nc host 1234
 ```
 
-# Licensing
-
-Libre Blackjack is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
-
-# A note on the C++ implemenation
+## A note on the C++ implementation
 
 The first Libre Blackjack version (v0.1) was written in C. This version (v0.2) is a re-implementation of nearly the same functionality but written completely from scratch in C++. I am not a fan of C++ and still prefer old plain C for most of my programming projects, but for the particular case of Libre Blackjack these advantages of C++ over C ought to be noted:
 
@@ -138,13 +134,18 @@ The first Libre Blackjack version (v0.1) was written in C. This version (v0.2) 
     - [Free Bet Blackjack](https://wizardofodds.com/games/free-bet-blackjack/)
     - [Blackjack Switch](https://wizardofodds.com/games/blackjack/switch/)
     
-   or even the Spanish “Siete y medio” could be also implemented in the same framework.  
+   or even the Spanish “Siete y medio” could be also implemented in the same framework (the card deck should also be changed though). But also playing variations like a dealer that exposes the hole card a certain amount of the time (say 1% or 2% of the hands) could also be studied by extending the base blackjack dealer class.
 
  * the private members of the C++ classes allow information to be hidden between the dealer and the player, so a far better separation of information can be achieved. This also prevents “cheating” in players by looking at information which is not available for them (such as the dealer’s hole card or the content of the shoe).
  
- * the virtual members of derived players and even be linked to other high-level programming languages parsers (such as Python or Julia) allowing to use the vast variety of AI/ML libraries available for these languages to implement advanced playing strategies.
+ * the virtual members of derived players and even be linked to other high-level programming language parsers (such as Python or Julia) allowing to use the vast variety of AI/ML libraries available for these languages to implement advanced playing strategies.
  
  * the usage of STL containers, methods and algorithms allows for a faster and cleaner implementation of cards, hands, decks and shoes.
+
+# Licensing
+
+Libre Blackjack is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
 
 # Further information
 

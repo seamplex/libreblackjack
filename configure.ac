@@ -32,5 +32,5 @@ cat << EOF > src/version-conf.h
 EOF
 
 #AC_CONFIG_FILES([Makefile doc/Makefile po/Makefile.in])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile])
 AC_OUTPUT

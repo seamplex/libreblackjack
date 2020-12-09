@@ -1,1 +1,1 @@
-yes stand | blackjack -n1e5 --flat_bet --no_insurance > /dev/null
+yes stand | blackjack -n1e5 --flat_bet=true --no_insurance=true > /dev/null

@@ -4,6 +4,7 @@
 # There is NO WARRANTY, to the extent permitted by law.
 
 # SUBDIRS = doc po
+SUBDIRS = doc
 AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README doc/blackjack.texi
 

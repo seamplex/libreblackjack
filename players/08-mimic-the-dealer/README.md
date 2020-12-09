@@ -14,15 +14,7 @@ This time, the configuration file `blackjack.conf` is used. If a file with this 
 Now, there are two options that tell Libre Blackjack how the player is going to talk to the backend: `player2dealer` and `dealer2player`. The first one sets the communication mechanism from the player to the dealer (by default is `blackjack`’s standard input), and the second one sets the mechanism from the dealer to the player (by default `blackjack`’s standard output). In this case, the configuration file reads:
 
 ```ini
-hands = 1e5
-decks = 6
-hit_soft_17 = 1
-# uncomment to obtain the same cards each time
-# rng_seed = 1  
-
-player2dealer = fifo mimic_p2d
-dealer2player = fifo mimic_d2p
-buffered_fifo = 1
+h17 = true
 ```
 
 This means that two FIFOs (a.k.a. named pipes) are to be used for communication, `player2dealer` from the player to the dealer and `dealer2player` for the dealer to the player. If these FIFOs do not exist, they are created by `blackjack` upon execution. 
@@ -44,10 +36,9 @@ $ ./mimic-the-dealer.awk < dealer2player > player2dealer
 Both dealer and player may be run in the same terminal putting the first one on the background:
 
 ```terminal
-rm -f mimic_d2p mimic_p2d
-mkfifo mimic_d2p mimic_p2d
-blackjack &
-gawk -f mimic-the-dealer.awk < mimic_d2p > mimic_p2d
+rm -f d2p p2d; mkfifo d2p p2d
+gawk -f mimic-the-dealer.awk < d2p > p2d &
+blackjack -n1e5 > d2p < p2d 
 ```
 
 To understand the decisions taken by the player, we have to remember that when Libre Blackjack receives the command `count` asking for the current player's count, it returns a positive number for hard hands and a negative number for soft hands. The instructions `fflush()` are needed in order to avoid deadlocks on the named pipes:
@@ -67,9 +58,8 @@ function abs(x){return ( x >= 0 ) ? x : -x }
 }
 
 /play\?/ {
-  count = $2
   # mimic the dealer: hit until 17 (hit soft 17)
-  if (abs(count) < 17 || count == -17) {   # soft hands are negative
+  if (abs($2) < 17 || $2 == -17) {   # soft hands are negative
     print "hit";
   } else {
     print "stand";
@@ -84,46 +74,16 @@ function abs(x){return ( x >= 0 ) ? x : -x }
 
 ```yaml
 ---
-rules:
-  decks:                  6
-  hands:                  100000
-  hit_soft_17:            1
-  double_after_split:     1
-  blackjack_pays:         1.5
-  rng_seed:               -1448949563
-  number_of_burnt_cards:  0
-  no_negative_bankroll:   0
-  max_bet:                0
-  penetration:            0.75
-  penetration_sigma:      0.05
-cpu:
-  user:             0.631905
-  system:           1.19576
-  wall:             2.15273
-  second_per_hand:  2.2e-05
-  hands_per_second: 4.6e+04
-player: 
-  wins:               0.41044
-  pushes:             0.09695
-  losses:             0.49261
-  dealer_blackjacks:  0.04658
-  player_blackjacks:  0.04663
-  dealer_busts:       0.18984
-  player_busts:       0.27268
-  doubled_hands:      0
-  doubled_wins:       0
-  insured_hands:      0
-  insured_wins:       0
-  number_of_hands:    100000
-  number_of_shuffles: 2326
-  total_money_waged:  100000
-  worst_bankroll:     -5996.5
-  final_bankroll:     -5994.5
-  return:             -0.059945
-  variance:            0.955017
-  deviation:           0.97725
-  error:               0.00309034
-  result:             "(-6.0 ± 0.6) %"
+result: "(-5.7 ± 0.9) %"
+mean: -0.05716
+error: 0.00926292
+hands: 100000
+bankroll: -5716
+bustsPlayer: 0.27064
+bustsDealer: 0.18905
+wins: 0.41088
+pushes: 0.09888
+losses: 0.49024
 ...
 
 ```
