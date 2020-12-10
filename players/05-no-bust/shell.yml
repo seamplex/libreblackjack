@@ -1,12 +1,12 @@
 ---
-result: "(-7.6 ± 0.9) %"
-mean: -0.076185
-error: 0.00943779
-hands: 100000
-bankroll: -7618.5
+result: "(-6 ± 3) %"
+mean: -0.06075
+error: 0.0299277
+hands: 10000
+bankroll: -607.5
 bustsPlayer: 0
-bustsDealer: 0.27408
-wins: 0.42048
-pushes: 0.06047
-losses: 0.51905
+bustsDealer: 0.2808
+wins: 0.4296
+pushes: 0.0575
+losses: 0.5129
 ...

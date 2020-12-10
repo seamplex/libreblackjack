@@ -4,7 +4,7 @@ i=0
 while read command
 do
   i=$((i+1))
-  if test ${i} -ge 12345; then
+  if test ${i} -ge 1234567; then
     echo "quit"
   elif test "${command}" = 'bye'; then
     exit

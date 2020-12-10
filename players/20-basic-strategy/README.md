@@ -75,6 +75,9 @@ p3   y  y  y  y  y  y  n  n  n  n
 p2   y  y  y  y  y  y  n  n  n  n  
 ```
 
+This is the format that the internal player (i.e. `blackjack -i`) can read and undertand.
+
+
 ## Full table with results
 
 The script computes the expected value of each combination
@@ -1779,9 +1782,10 @@ The results are given as the expected value in percentage with the uncertainty (
 | p2-A | 8.0e+04 | -67.42 (1.5) | -51.15 (0.9) | no | 
 
 
+
 ## Detailed explanation
 
-We want to derive the basic strategy from scratch, i.e. without making any assumption. What we are going to do is to play a large (more on what _large_ means below) number of hands by fixing our first two cards and the dealer upcard and sequentially standing, doubling or hitting the first card. Then we will compare the results for the three cases and select as the proper strategy the best one of the three possible choices.
+We want to derive the basic strategy from scratch, i.e. without making any assumptions. What we are going to do is to play a large (more on what _large_ means below) number of hands by fixing our first two cards and the dealer upcard and sequentially standing, doubling or hitting the first card. Then we will compare the results for the three cases and select as the proper strategy the best one of the three possible choices.
 
 Standing and doubling are easy plays, because after we stand or double down then the dealer plays accordingly to the rules: she hits until seventeen, possibly hitting soft seventeen.  But if we hit on our hand, we might need to make another decision whether to stand or hit again. As we do not want to assume anything, we have to play in such an order that if we do need to make another decision, we already know which is the best one. 
 
@@ -2251,5 +2255,5 @@ fi
 
 -------
 :::{.text-center}
-[Previous](../08-mimic-the-dealer) | [Index](../) | [Next](../)
+[Previous](../08-mimic-the-dealer) | [Index](../) | [Next](../30-ace-five)
 :::

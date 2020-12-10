@@ -7,7 +7,7 @@ title: Internal player
 
 > Difficulty: 00/100
 
-If `blackjack` is called with the `-i` option, it uses an _internal_ player to play against itself. By default it plays basic strategy. Run 
+If `blackjack` is called with the `-i` option, it uses an _internal_ player to play against itself. By default it plays basic strategy, although it can read a text file with the strategy. Run 
 
 ```terminal
 blackjack -i

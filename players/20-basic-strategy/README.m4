@@ -37,6 +37,9 @@ A new text file called `bs.txt` with the strategy should be created from scratch
 include(bs.txt)dnl
 ```
 
+This is the format that the internal player (i.e. `blackjack -i`) can read and undertand.
+
+
 ## Full table with results
 
 The script computes the expected value of each combination
@@ -84,9 +87,10 @@ include(hard.html)
 
 include(table.md)
 
+
 ## Detailed explanation
 
-We want to derive the basic strategy from scratch, i.e. without making any assumption. What we are going to do is to play a large (more on what _large_ means below) number of hands by fixing our first two cards and the dealer upcard and sequentially standing, doubling or hitting the first card. Then we will compare the results for the three cases and select as the proper strategy the best one of the three possible choices.
+We want to derive the basic strategy from scratch, i.e. without making any assumptions. What we are going to do is to play a large (more on what _large_ means below) number of hands by fixing our first two cards and the dealer upcard and sequentially standing, doubling or hitting the first card. Then we will compare the results for the three cases and select as the proper strategy the best one of the three possible choices.
 
 Standing and doubling are easy plays, because after we stand or double down then the dealer plays accordingly to the rules: she hits until seventeen, possibly hitting soft seventeen.  But if we hit on our hand, we might need to make another decision whether to stand or hit again. As we do not want to assume anything, we have to play in such an order that if we do need to make another decision, we already know which is the best one. 
 
