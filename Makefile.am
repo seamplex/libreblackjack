@@ -9,7 +9,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README doc/blackjack.texi
 
 TESTS = check-internal.sh check-stand.sh
-EXTRA_DIST = config.rpath m4/ChangeLog  players $(TESTS)
+EXTRA_DIST = ChangeLog  players $(TESTS)
 
 ACLOCAL_AMFLAGS = -I m4
 bin_PROGRAMS = blackjack
