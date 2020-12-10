@@ -26,3 +26,13 @@ blackjack_SOURCES = \
  src/stdinout.cpp \
  src/tty.cpp \
  src/internal.cpp
+
+noinst_HEADERS = \
+ src/base.h \
+ src/blackjack.h \
+ src/conf.h \
+ src/internal.h \
+ src/stdinout.h \
+ src/tty.h \
+ src/version-conf.h \
+ src/version-vcs.h
