@@ -3,8 +3,8 @@ title: Libre Blackjack
 subtitle:  A free blackjack back end
 desc: a completely free-as-in-freedom blackjack engine designed to study and analyze the game statistics using different playing strategies ranging from simple card counting up to other complex algorithms based on artificial intelligence.
 author: Jeremy Theler
-date: December 20, 2020
-version: libreblackjackversion
+date: esyscmd(date -d@$(git log -1 --format="%ct") "+%d %b %Y")dnl
+version: v0.2
 infoname: blackjack
 lang: en-US
 ---

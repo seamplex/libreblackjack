@@ -3,8 +3,8 @@
 @documentencoding UTF-8
 
 @setfilename blackjack.info
-@set UPDATED December 20, 2020
-@set VERSION v0.2.5-g9c5893b
+@set UPDATED 10 Dec 2020
+@set VERSION v0.2
 
 @copying
 This manual is for LibreBlackjack (version @value{VERSION}, @value{UPDATED}),
@@ -30,9 +30,9 @@ Texts.  A copy of the license is included in the section entitled
 @end ifnottex
 @titlepage
 @title Libre@ Blackjack
-@subtitle A free blackjack back end, v0.2.5-g9c5893b
+@subtitle A free blackjack back end, v0.2
 @author Jeremy Theler
-December 20, 2020
+10 Dec 2020
 @page
 @vskip 0pt plus 1filll
 @insertcopying
