@@ -59,7 +59,7 @@ These automatic players can range from simple no-bust or mimic-the-dealer hitter
 
 
 ```
-sudo apt-get install git autoconf make gcc
+sudo apt-get install git autoconf make g++
 git clone https://github.com/seamplex/libreblackjack.git
 cd libreblackjack
 ./autogen.sh
@@ -93,7 +93,7 @@ The subdirectory `players` contains some automatic players that play against Lib
 Run Libre Blackjack with no arguments to play Blackjack interactively in ASCII mode.
 
 ```{=html}
-<asciinema-player src="doc/libreblackjack2.cast" cols="89" rows="28" preload="true" poster="npt:0:20"></asciinema-player>
+<asciinema-player src="doc/interactive2.cast" cols="89" rows="28" preload="true" poster="npt:0:20"></asciinema-player>
 ```
 
 Edit the file [`blackjack.conf`](https://github.com/seamplex/libreblackjack/blob/master/blackjack.conf) in the same directory where the executable is run to set up rules, arranged shoes and other options. See the `doc` directory for detailed documentation. Type `help` at the prompt to get it.
