@@ -102,9 +102,9 @@ Edit the file [`blackjack.conf`](https://github.com/seamplex/libreblackjack/blob
 
 The differential value of Libre Blackjack is that players can be programmed to play employing different strategies, card-counting techniques or even state-of-the-art AI algorithms.
 
-See the directory [`players`](players) for examples of how to write players in
+See the directory [players](players) of the [Git repository](https://github.com/seamplex/blackjack) for examples of how to write players in
 
- * [a pure UNIX way using the `yes` tool](players/02-always-stand)
+ * [a pure UNIX-way player using the `yes` tool](players/02-always-stand)
  * [Perl](players/05-no-bust)
  * [Awk](players/08-mimic-the-dealer)
  * [Bash](players/20-basic-strategy)
