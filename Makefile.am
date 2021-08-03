@@ -1,10 +1,9 @@
-# Copyright (C) 2020 jeremy theler
+# Copyright (C) 2020-2021 jeremy theler
 # This file is part of libreblackjack.
 # This file is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
 # SUBDIRS = doc po
-SUBDIRS = doc
 AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README doc/blackjack.texi
 
