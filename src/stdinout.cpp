@@ -277,8 +277,10 @@ int StdInOut::play(void) {
       switch (actionRequired) {
 
         case Libreblackjack::PlayerActionRequired::Bet:
-          currentBet = std::stoi(command);
-          actionTaken = Libreblackjack::PlayerActionTaken::Bet;
+          if (isdigit(command[0])) {
+            currentBet = std::stoi(command);
+            actionTaken = Libreblackjack::PlayerActionTaken::Bet;
+          }
         break;
 
         case Libreblackjack::PlayerActionRequired::Insurance:
