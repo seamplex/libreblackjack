@@ -4,13 +4,13 @@
 # There is NO WARRANTY, to the extent permitted by law.
 
 # SUBDIRS = doc po
+SUBDIRS = doc
 AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README doc/blackjack.texi
 
 TESTS = check-internal.sh check-stand.sh
 EXTRA_DIST = ChangeLog  players $(TESTS)
 
-ACLOCAL_AMFLAGS = -I m4
 bin_PROGRAMS = blackjack
 blackjack_INCLUDES = $(all_includes)
 blackjack_LDADD = $(all_libraries) 
