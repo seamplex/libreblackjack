@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - base classes
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020,2023 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -202,7 +202,7 @@ class Player {
     Player(const Player &&) = delete;
 
     virtual int play(void) = 0;
-    virtual void info(Libreblackjack::Info = Libreblackjack::Info::None, int = 0, int = 0) = 0;
+    virtual void info(Libreblackjack::Info = Libreblackjack::Info::None, int p1 = 0, int p2 = 0) { return; }
     
     Libreblackjack::PlayerActionRequired actionRequired = Libreblackjack::PlayerActionRequired::None;
     Libreblackjack::PlayerActionTaken    actionTaken    = Libreblackjack::PlayerActionTaken::None;
@@ -217,7 +217,7 @@ class Player {
     bool no_insurance = false;
     bool always_insure = false;
     
-    unsigned int currentBet;
+    unsigned int currentBet = 0;
     
   protected:
     std::list<PlayerHand> hands;

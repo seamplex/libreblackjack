@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - tty interactive player
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020, 2023 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -29,8 +29,8 @@
 #include <readline/history.h>
 #endif
 
-#include "conf.h"
-#include "blackjack.h"
+#include "../conf.h"
+#include "../blackjack.h"
 #include "tty.h"
 
 // TODO: make class static

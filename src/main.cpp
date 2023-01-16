@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - main function
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020,2023 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -25,9 +25,10 @@
 #include "conf.h"
 #include "base.h"
 #include "blackjack.h"
-#include "tty.h"
-#include "stdinout.h"
-#include "internal.h"
+#include "players/tty.h"
+#include "players/stdinout.h"
+#include "players/basic.h"
+#include "players/informed.h"
 
 int main(int argc, char **argv) {
   
@@ -52,18 +53,21 @@ int main(int argc, char **argv) {
   if (conf.getDealerName() == "blackjack") {
     dealer = new Blackjack(conf);
   } else {
-    std::cerr << "Unknown dealer for '" << conf.getDealerName() <<"' game." << std::endl;
+    std::cerr << "Unknown dealer for '" << conf.getDealerName() <<"' game" << std::endl;
     return -1;
   }
 
+  // TODO: factory pattern
   if (conf.getPlayerName() == "tty") {
     player = new Tty(conf);
   } else if (conf.getPlayerName() == "stdinout" || conf.getPlayerName() == "stdio") {
     player = new StdInOut(conf);
-  } else if (conf.getPlayerName() == "internal") {
-    player = new Internal(conf);
+  } else if (conf.getPlayerName() == "basic") {
+    player = new Basic(conf);
+  } else if (conf.getPlayerName() == "informed") {
+    player = new Informed(conf);
   } else {
-    std::cerr << "Unknown player '" << conf.getPlayerName() <<".'" << std::endl;
+    std::cerr << "Unknown player '" << conf.getPlayerName() <<"'" << std::endl;
     return -1;
   }
   

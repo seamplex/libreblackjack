@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  Libre Blackjack - stdio player
+ *  Libre Blackjack - tty interactive player
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020, 2023 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -20,30 +20,62 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 
-#ifndef STDINOUT_H
-#define STDINOUT_H
-#include "blackjack.h"
-
+#ifndef TTY_H
+#define TTY_H
 #include <algorithm> 
 #include <functional> 
 #include <cctype>
 #include <locale>
 
+#include "../blackjack.h"
 
-class StdInOut : public Player {
+extern std::vector<std::string> commands;
+
+class Tty : public Player {
   public:  
-    StdInOut(Configuration &);
-    ~StdInOut() { };
+    Tty(Configuration &);
+    ~Tty() { };
     
     int play(void) override;
     void info(Libreblackjack::Info = Libreblackjack::Info::None, int = 0, int = 0) override;
+
+    // for readline's autocompletion
+    static char *rl_command_generator(const char *, int);
+    static char **rl_completion(const char *, int, int);
+    static int list_index;
+    static int len;  
     
   private:
-    std::string input_buffer;
-    
+
+    void renderHand(Hand *, bool = false);
+    void renderTable(void);
+      
+#ifdef HAVE_LIBREADLINE
+  char *input_buffer;
+#else
+  std::string input_buffer;
+#endif
+
     std::size_t handToSplit;
     unsigned int cardToSplit;
+  
+    std::string arrow;
+    std::string prompt;
     
+    int delay = 200;
+    
+    bool color = true;
+    std::string black;
+    std::string red;
+    std::string green;
+    std::string yellow;
+    std::string blue;
+    std::string magenta;
+    std::string cyan;
+    std::string white;
+    std::string reset;
+    
+
     inline void ltrim(std::string &s) {
       s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
     };
@@ -55,4 +87,5 @@ class StdInOut : public Player {
     inline void trim(std::string &s) { ltrim(s); rtrim(s); };    
       
 };
+
 #endif

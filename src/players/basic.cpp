@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  Libre Blackjack - tty interactive player
+ *  Libre Blackjack - internal basic strategy automatic player
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020,2023 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -23,23 +23,14 @@
 #include <fstream>
 #include <sstream>
 
-#include "conf.h"
-#include "blackjack.h"
-#include "internal.h"
+#include "../conf.h"
+#include "../blackjack.h"
+#include "basic.h"
 
 
-Internal::Internal(Configuration &conf) {
+Basic::Basic(Configuration &conf) {
 
-  // fill everything with "none"
-  hard.resize(21);
-  soft.resize(21);
-  pair.resize(21);
-  
   for (int value = 0; value < 21; value++) {
-    hard[value].resize(12);
-    soft[value].resize(12);
-    pair[value].resize(12);
-
     for (int upcard = 0; upcard < 12; upcard++) {
       hard[value][upcard] = Libreblackjack::PlayerActionTaken::None;
       soft[value][upcard] = Libreblackjack::PlayerActionTaken::None;
@@ -148,7 +139,7 @@ Internal::Internal(Configuration &conf) {
       stream >> token;
       
       int value = 0;
-      std::vector<std::vector<Libreblackjack::PlayerActionTaken>> *strategy = nullptr;
+      Libreblackjack::PlayerActionTaken (*strategy)[21][12] = nullptr;
       switch (token[0]) {
         case 'h':
           strategy = &hard;
@@ -204,11 +195,7 @@ Internal::Internal(Configuration &conf) {
   return;
 }
 
-void Internal::info(Libreblackjack::Info msg, int p1, int p2) {
-  return;
-}
-
-int Internal::play() {
+int Basic::play() {
 
   std::size_t value;
   std::size_t upcard;

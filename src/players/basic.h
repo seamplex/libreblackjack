@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  Libre Blackjack - internal automatic player
+ *  Libre Blackjack - internal basic strategy automatic player
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020,2023 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -22,22 +22,21 @@
 
 #ifndef INTERNAL_H
 #define INTERNAL_H
-#include "blackjack.h"
+#include "../blackjack.h"
 
-class Internal : public Player {
+class Basic : public Player {
   public:  
-    Internal(Configuration &);
-    ~Internal() { };
+    Basic(Configuration &);
+    ~Basic() { };
     
     int play(void) override;
-    void info(Libreblackjack::Info = Libreblackjack::Info::None, int = 0, int = 0) override;
 
   private:
     
     std::string strategy_file_path{"bs.txt"};
-    std::vector<std::vector<Libreblackjack::PlayerActionTaken>> pair;
-    std::vector<std::vector<Libreblackjack::PlayerActionTaken>> soft;
-    std::vector<std::vector<Libreblackjack::PlayerActionTaken>> hard;
+    Libreblackjack::PlayerActionTaken pair[21][12];
+    Libreblackjack::PlayerActionTaken soft[21][12];
+    Libreblackjack::PlayerActionTaken hard[21][12];
       
 };
 

@@ -1,3 +1,4 @@
+ * re-write docs in pandoc + filters instead of m4
  * cpu and wall time in report
  * check that the card distribution is uniform
  * initial bankroll
@@ -14,7 +15,7 @@
    * ENHC
    * blackjack switch
    * blackjack under?
-   * siete y medio
+   * siete y medio?
    * card war
    * between
  * players

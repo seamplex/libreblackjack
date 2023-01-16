@@ -92,7 +92,7 @@ EOF
      cp options.conf blackjack.conf
      cat << EOF >> blackjack.conf
 hands = ${n}
-player = internal
+player = basic
 arranged_cards = ${card1}, $((${upcard_n} + 13)), $((${card2} + 26))
 report = ${t}${hand}-${upcard}-${play}.yaml
 #log = ${t}${hand}-${upcard}-${play}.log
@@ -298,7 +298,7 @@ for hand in A T $(seq 9 -1 2); do
     cp options.conf blackjack.conf
     cat << EOF >> blackjack.conf
 hands = ${n}
-player = internal
+player = basic
 arranged_cards = ${pair}, $((${upcard_n} + 13)), $((${pair} + 26))
 report = ${t}${hand}-${upcard}-${play}.yaml
 # log = ${t}${hand}-${upcard}-${play}.log

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - stdio player
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020, 2023 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -22,8 +22,8 @@
 
 #include <iostream>
 
-#include "conf.h"
-#include "blackjack.h"
+#include "../conf.h"
+#include "../blackjack.h"
 #include "stdinout.h"
 
 StdInOut::StdInOut(Configuration &conf) {

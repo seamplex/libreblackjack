@@ -22,16 +22,19 @@ blackjack_SOURCES = \
  src/version.cpp \
  src/blackjack.cpp \
  src/cards.cpp \
- src/stdinout.cpp \
- src/tty.cpp \
- src/internal.cpp
+ src/players/stdinout.cpp \
+ src/players/tty.cpp \
+ src/players/basic.cpp \
+ src/players/informed.cpp
 
 noinst_HEADERS = \
  src/base.h \
  src/blackjack.h \
  src/conf.h \
- src/internal.h \
- src/stdinout.h \
- src/tty.h \
  src/version-conf.h \
- src/version-vcs.h
+ src/version-vcs.h \
+ src/players/stdinout.h \
+ src/players/tty.h \
+ src/players/basic.h \
+ src/players/informed.h
+ 
