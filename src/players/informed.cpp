@@ -54,6 +54,8 @@
 
 
 Informed::Informed(Configuration &conf) {
+  // TODO: read conf
+  verbose = true;
   return;
 }
 
@@ -64,7 +66,7 @@ int Informed::play() {
   
   switch (actionRequired) {
     case Libreblackjack::PlayerActionRequired::Bet:
-      // TODO: compte expected value and change bet
+      // TODO: compute expected value and change bet
       currentBet = 1;
       actionTaken = Libreblackjack::PlayerActionTaken::Bet;
     break;
@@ -113,12 +115,15 @@ int Informed::play() {
       // -------------------------------------------------------      
       
       
+      actionTaken = Libreblackjack::PlayerActionTaken::Stand;
       if (canSplit) {
         pairs();
         if ((playerValue == -12 && pair_action(11)) || pair_action(value/2)) {
           actionTaken = Libreblackjack::PlayerActionTaken::Split;
         }
-      } else {
+      }
+      
+      if (canSplit == false || actionTaken != Libreblackjack::PlayerActionTaken::Split) {
         actionTaken = (playerValue < 0) ? soft_hsd_action(value) : hard_hsd_action(value);
         
         if (canDouble == false && actionTaken == Libreblackjack::PlayerActionTaken::Double) {

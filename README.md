@@ -8,11 +8,17 @@ lang: en-US
 
 > A [free](https://www.gnu.org/philosophy/free-sw.html) [Blackjack](https://en.wikipedia.org/wiki/Blackjack) back end inspired by [GNU Chess](https://www.gnu.org/software/chess/).
 
-[Libre Blackjack](https://www.seamplex.com/blackjack) is a blackjack engine that emulates a dealer, deals (digital) cards and understands plain-text commands such as `hit` or `stand`. The basic idea is that one or more players can talk to Libre Blackjack either in an interactive or in an automated way through
- 
- * the standard input and/or output (optionally using named pipes or TCP (web)sockets with `netcat` or `gwsocket`), or
- * C++ methods (optionally loaded at runtime from shared objects TBD).
-  
+[Libre Blackjack](https://www.seamplex.com/blackjack) is a blackjack engine that
+
+ 1. emulates a dealer,
+ 2. deals (digital) cards and
+ 3. understands plain-text commands such as `hit` or `stand`.
+
+The basic idea is that one or more players can “talk” to Libre Blackjack either in an interactive or in an automated way through
+
+ a. the standard input and/or output (optionally using named pipes or TCP (web)sockets with `netcat` or `gwsocket`), or
+ b C++ methods (optionally loaded at runtime from shared objects TBD).
+
 These players can be actual human players playing in real-time through a front end (a GUI application, a web-based interface, a mobile app, etc.) or robots that implement a certain betting and playing strategy playing (i.e. card counting) as fast as possible to study and analyze game statistics. There is an internal player that reads the strategy from a text file and plays accordingly. It can also be used to play interactive [ASCII blackjack](#play):
 
 ```{=html}

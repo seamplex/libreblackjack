@@ -43,6 +43,12 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
 
   conf.set(&max_bet, {"max_bet", "maxbet"});
   conf.set(&hit_soft_17, {"h17", "hit_soft_17"});
+  // TODO:
+  // * s17 = opposite of h17
+  // * das
+  // * doa
+  // * rsa
+  // * enhc
   conf.set(&double_after_split, {"das", "double_after_split"});
   conf.set(&blackjack_pays, {"blackjack_pays"});
   

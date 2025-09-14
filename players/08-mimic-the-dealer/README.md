@@ -53,7 +53,6 @@ wins: 0.41149
 pushes: 0.09727
 losses: 0.49124
 ...
-
 ```
 
 > **Exercise:** modify the player and the configuration file so both the dealer and the player may stand on soft seventeen. Analyze the four combinations (player h17 - dealer h17, player h17 - dealer s17, player s17 - dealer h17, player s17 - dealer s17)

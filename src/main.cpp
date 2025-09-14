@@ -50,6 +50,7 @@ int main(int argc, char **argv) {
     return 0;
   }  
   
+  // TODO: think of a better way
   if (conf.getDealerName() == "blackjack") {
     dealer = new Blackjack(conf);
   } else {
@@ -57,18 +58,19 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  // TODO: factory pattern
-  if (conf.getPlayerName() == "tty") {
+  // TODO: think of a better way
+  std::string player_name = conf.getPlayerName();
+  if (player_name == "tty") {
     player = new Tty(conf);
-  } else if (conf.getPlayerName() == "stdinout" || conf.getPlayerName() == "stdio") {
+  } else if (player_name == "stdinout" || player_name == "stdio") {
     player = new StdInOut(conf);
-  } else if (conf.getPlayerName() == "basic") {
+  } else if (player_name == "basic" || player_name == "internal") {
     player = new Basic(conf);
-  } else if (conf.getPlayerName() == "informed") {
+  } else if (player_name == "informed") {
     player = new Informed(conf);
   } else {
-    std::cerr << "Unknown player '" << conf.getPlayerName() <<"'" << std::endl;
-    return -1;
+    std::cerr << "Unknown player '" << player_name <<"'" << std::endl;
+    return 1;
   }
   
   // assign player to dealer
@@ -84,7 +86,7 @@ int main(int argc, char **argv) {
       do {
         if (unknownCommands++ > conf.max_incorrect_commands) {
           std::cerr << "Too many unknown commands." << std::endl;
-          return -2;
+          return 2;
         }
         player->play();
       } while (dealer->process() <= 0);
@@ -92,7 +94,8 @@ int main(int argc, char **argv) {
   }
   
   player->info(Libreblackjack::Info::Bye);
-  dealer->reportPrepare();
+  
+  dealer->prepareReport();
   dealer->writeReportYAML();
   
   delete player;
