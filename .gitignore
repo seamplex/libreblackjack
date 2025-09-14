@@ -65,6 +65,7 @@ src/version.h
 src/.dirstamp
 blackjack
 *.tar.gz
+binary*
 
 doc/version.texi
 doc/mdate-sh

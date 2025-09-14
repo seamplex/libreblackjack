@@ -1,3 +1,11 @@
+# new
+
+ * ENCH S17 DAS DOA RSA
+ * 100k cards
+ * multiple players
+ 
+# old
+
  * re-write docs in pandoc + filters instead of m4
  * cpu and wall time in report
  * check that the card distribution is uniform
