@@ -18,17 +18,31 @@ AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CANONICAL_HOST
 AC_PROG_CXX
 
+AC_ARG_ENABLE([debug],
+  [AS_HELP_STRING([--enable-debug], [Compile with debugging symbols])],
+  [enable_debug=$enableval], [enable_debug=no])
+
+######################
+# default optimization flags
+AS_IF([test "x$CXXFLAGS" = "x-g -O2"],
+  AS_IF([test "x$with_debug" = "xyes" -o "x$enable_debug" = "xyes"] , [
+    CXXFLAGS="-g -O0"
+    AC_DEFINE([DEBUG], [1], [Define to 1 if debugging is enabled])
+  ],[
+    CXXFLAGS="-O3 -flto=auto -no-pie"
+  ])
+)
+
 AC_CHECK_HEADER([readline/readline.h])
 AC_CHECK_LIB([readline], [readline])
 
-# default is optimized without debugging symbols
-AS_IF([test "$CXXFLAGS" = "-g -O2"], [CXXFLAGS="-O3"])
+
 
 AC_MSG_NOTICE([creating version-conf.h])
 cat << EOF > src/version-conf.h
 #define COMPILATION_ARCH     "${host_os} ${host_cpu}"
 #define COMPILER_VERSION     "`$CXX --version | head -n1`"
-#define COMPILER_CFLAGS      "$CFLAGS"
+#define COMPILER_CXXFLAGS    "$CXXFLAGS"
 EOF
 
 #AC_CONFIG_FILES([Makefile doc/Makefile po/Makefile.in])

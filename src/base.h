@@ -272,7 +272,7 @@ class Dealer {
     
     Libreblackjack::DealerAction nextAction = Libreblackjack::DealerAction::None;
     
-    void reportPrepare(void);
+    void prepareReport(void);
     int writeReportYAML(void);
     
   protected:

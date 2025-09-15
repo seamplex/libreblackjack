@@ -43,6 +43,7 @@ Basic::Basic(Configuration &conf) {
   std::vector<std::string> default_soft(21);
   std::vector<std::string> default_pair(21);
   
+  // TODO: read from file
   default_hard[20] = "  ssssssssss";  
   default_hard[19] = "  ssssssssss";  
   default_hard[18] = "  ssssssssss";  

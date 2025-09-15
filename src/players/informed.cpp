@@ -54,7 +54,8 @@
 
 
 Informed::Informed(Configuration &conf) {
-    
+  // TODO: read conf
+  verbose = true;
   return;
 }
 
@@ -65,7 +66,7 @@ int Informed::play() {
   
   switch (actionRequired) {
     case Libreblackjack::PlayerActionRequired::Bet:
-      // TODO: compte expected value and change bet
+      // TODO: compute expected value and change bet
       currentBet = 1;
       actionTaken = Libreblackjack::PlayerActionTaken::Bet;
     break;
@@ -77,13 +78,15 @@ int Informed::play() {
     
     case Libreblackjack::PlayerActionRequired::Play:
 
+#ifdef BJDEBUG
+      std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
+#endif      
       value = std::abs(playerValue);
       upcard = std::abs(dealerValue);
       
       // -------------------------------------------------------
       // compute the expected values
       // -------------------------------------------------------
-
       for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
           dealer_hard[i][j] = 0;
@@ -232,6 +235,7 @@ void Informed::dealer_european_to_american(void) {
 
 void Informed::hit_iteration() {
   
+  // do not go below 3 if not needed by value  
   for (int player = 20; player > 3; player--) {
     hard_hit[player] = 1.0/13.0*(max(hard_stand[player+2], hard_hit[player+2]) +
                                  max(hard_stand[player+3], hard_hit[player+3]) +

@@ -28,18 +28,30 @@ void Dealer::updateMeanAndVariance(void) {
 }
 
 
-void Dealer::reportPrepare(void) {
+void Dealer::prepareReport(void) {
+  
+//  if (n_hand != n_hands) {
+//    n_hand--;
+//  }
+
+  if (n_hand <= 1) {
+    return;
+  }
 
   // we need to update these statistics after the last played hand
   updateMeanAndVariance();  
     
   double error = error_standard_deviations * sqrt (playerStats.variance / (double) n_hand);
 
-  int precision = (int) (std::ceil(-std::log10(error))) - 2;
-  if (precision < 0) {
-    precision = 0;
+  int precision = 0;
+  if (error > 0) {
+    precision = (int) (std::ceil(-std::log10(error))) - 2;
+    if (precision < 0) {
+      precision = 0;
+    }
   }
   std::string format = "\"(%+." + std::to_string(precision) + "f ± %." + std::to_string(precision) + "f) %%%%\"";
+  
   report.push_back(reportItem(1, "result", string_format(format, 100*playerStats.mean, 100*error), 0.0));
   
   report.push_back(reportItem(2, "mean",      "%g", playerStats.mean));
@@ -64,11 +76,13 @@ void Dealer::reportPrepare(void) {
 
 int Dealer::writeReportYAML(void) {
     
-  FILE *out;  
+  if (n_hand <= 1) {
+    return 0;
+  }  
+
+  FILE *out = stderr;  
   if (report_file_path != "") {
     out = fopen(report_file_path.c_str(), "w");
-  } else {
-    out = stderr;  
   }
     
   // TODO: choose if comments with explanations are to be added

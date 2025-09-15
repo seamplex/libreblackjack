@@ -8,11 +8,17 @@ lang: en-US
 
 > A [free](https://www.gnu.org/philosophy/free-sw.html) [Blackjack](https://en.wikipedia.org/wiki/Blackjack) back end inspired by [GNU Chess](https://www.gnu.org/software/chess/).
 
-[Libre Blackjack](https://www.seamplex.com/blackjack) is a blackjack engine that emulates a dealer, deals (digital) cards and understands plain-text commands such as `hit` or `stand`. The basic idea is that one or more players can talk to Libre Blackjack either in an interactive or in an automated way through
- 
- * the standard input and/or output (optionally using named pipes or TCP (web)sockets with `netcat` or `gwsocket`), or
- * C++ methods (optionally loaded at runtime from shared objects TBD).
-  
+[Libre Blackjack](https://www.seamplex.com/blackjack) is a blackjack engine that
+
+ 1. emulates a dealer,
+ 2. deals (digital) cards and
+ 3. understands plain-text commands such as `hit` or `stand`.
+
+The basic idea is that one or more players can “talk” to Libre Blackjack either in an interactive or in an automated way through
+
+ a. the standard input and/or output (optionally using named pipes or TCP (web)sockets with `netcat` or `gwsocket`), or
+ b C++ methods (optionally loaded at runtime from shared objects TBD).
+
 These players can be actual human players playing in real-time through a front end (a GUI application, a web-based interface, a mobile app, etc.) or robots that implement a certain betting and playing strategy playing (i.e. card counting) as fast as possible to study and analyze game statistics. There is an internal player that reads the strategy from a text file and plays accordingly. It can also be used to play interactive [ASCII blackjack](#play):
 
 ```{=html}
@@ -57,8 +63,29 @@ These automatic players can range from simple no-bust or mimic-the-dealer hitter
 
 # Quick start
 
+Quickest way to start is to download [pre-compiled binaries](https://seamplex.com/blackjack/dist/) for your architecture:
 
-```
+ * [GNU/Linux](https://seamplex.com/blackjack/dist/linux)
+ 
+   ```terminal
+   wget https://seamplex.com/blackjack/dist/macos/blackjack-v0.2.8-ga974467-macos-arm64.tar.gz
+   sudo tar -xzf blackjack-v0.2.8-ga974467-macos-arm64.tar.gz -C /
+   ```
+ 
+ * [MacOS](https://seamplex.com/blackjack/dist/macos)
+ 
+   ```terminal
+   wget https://seamplex.com/blackjack/dist/macos/blackjack-v0.2.8-ga974467-macos-arm64.tar.gz
+   sudo tar -xzf blackjack-v0.2.8-ga974467-macos-arm64.tar.gz -C /
+   ```
+ 
+ 
+
+## Compile from source
+
+Feel free to compile latest version from Github:
+
+```terminal
 sudo apt-get install git autoconf make g++
 git clone https://github.com/seamplex/libreblackjack.git
 cd libreblackjack
@@ -75,7 +102,7 @@ If you wan tab completion of commands and browseable history, make sure you also
 
 Run as test suite to check the code work as expected.
 
-```
+```terminal
 $ make check
 ```
 
@@ -114,14 +141,14 @@ See the directory [players](players) of the [Git repository](https://github.com/
 
 To play through a TCP socket, call `blackjack` within `netcat`. On one host, do
 
-```
+```terminal
 rm -f /tmp/f; mkfifo /tmp/f
 cat /tmp/f | blackjack  | nc -l 127.0.0.1 1234 > /tmp/f
 ```
 
 On the other one, connect to the first host on port 1234:
 
-```
+```terminal
 nc host 1234
 ```
 
