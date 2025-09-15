@@ -101,7 +101,7 @@ sudo make install
    ```terminal
    xcode-select --install
    ```
-   This installs the C/C++ compiler (`clang`, `clang++`) and `make`.
+   This installs the C/C++ compiler (`clang`, `clang++`), `make`, and `git`.
 
 2. **Install autoconf and automake with Homebrew**  
    If you don't already have Homebrew, install it:
@@ -126,6 +126,7 @@ sudo make install
 **Notes:**
 - The default macOS compiler (`clang++`) works fine for most users.
 - You do **not** need to install `gcc/g++` or `make` via Homebrew unless you have special requirements.
+- The `git` command is installed as part of the Xcode Command Line Tools. If you have followed step 1, you do not need to install git separately.
 - If you encounter build issues, please report them [here](https://github.com/seamplex/libreblackjack/issues).
 
 
