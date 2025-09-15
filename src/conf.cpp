@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - configuration handling
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020, 2025 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -51,7 +51,8 @@ Configuration::Configuration(int argc, char **argv) {
 
 ///op+general+option `--`configuration_variable`[=`*value*`]`
 ///op+general+desc Any configuration variable from the [configuration file] can be set from the command line.
-///op+general+desc For example, passing `--no_insurance` is like setting `no_insurance = 1` in the configuration file. Command-line options override configuration options.
+///op+general+desc For example, passing `--no_insurance` is like setting `no_insurance = 1` in the configuration file.
+///op+general+desc Command-line options override setting in the configuration file.
     
 ///op+internal+option `-i` or `--internal`
 ///op+internal+desc Use the internal player to play against itself. See [internal player] for details.
@@ -79,24 +80,20 @@ Configuration::Configuration(int argc, char **argv) {
         show_version = true;
       break;
       case 'c':
-        configFilePath = std::move(std::string(optarg));
-        explicitConfigFile = true;
+        config_file_path = optarg;
+        explicit_config_file = true;
       break;
       case 'd':
-        data["decks"] = std::move(std::string(optarg));
+        conf["decks"] = optarg;
       break;
       case 'n':
-        data["hands"] = std::move(std::string(optarg));
+        conf["hands"] = optarg;
       break;
       case 'i':
-        data["player"] = "internal";
+        conf["player"] = "internal";
       break;
       case 'f':
-        if (optarg != NULL) {
-          data["flat_bet"] = optarg;    
-        } else {
-          data["flat_bet"] = "yes";
-        }
+        conf["flat_bet"] = (optarg != NULL) ? optarg : "yes";
       break;
       case '?':
         {  
@@ -111,10 +108,11 @@ Configuration::Configuration(int argc, char **argv) {
             }
             auto name = line.substr(offset, delimiterPos-offset);
             auto value = line.substr(delimiterPos + 1);
-            data[name] = value;
+            conf[name] = value;
           } else {
-            data[line] = "true";
+            conf[line] = "true";
           }
+          
         }  
       break;
       default:
@@ -123,9 +121,11 @@ Configuration::Configuration(int argc, char **argv) {
   }
   
   
-  std::ifstream default_file(configFilePath);
+  std::ifstream default_file(config_file_path);
   if (default_file.good()) {
-    readConfigFile(configFilePath, explicitConfigFile);
+    if (readConfigFile(config_file_path, explicit_config_file) != 0) {
+      exit(1);
+    }
   }
   
   
@@ -152,35 +152,34 @@ Configuration::Configuration(int argc, char **argv) {
 
 // source https://www.walletfox.com/course/parseconfigfile.php
 
-int Configuration::readConfigFile(std::string filePath, bool mandatory) {
+int Configuration::readConfigFile(std::string file_path, bool mandatory) {
   
   // std::ifstream is RAII, i.e. no need to call close
-  std::ifstream fileStream(filePath);
-    
-  std::size_t delimiterPos;
-  std::string name;
-  std::string value;
+  std::ifstream fileStream(file_path);
   
   if (fileStream.is_open()) {
+    int line_num = 0; 
     std::string line;
     while(getline(fileStream, line)) {
+      line_num++;
       line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
       if (line[0] == '#' || line[0] == ';' || line.empty()) {
         continue;
       }
                 
       // TODO: comments on the same line
-      delimiterPos = line.find("=");
-      if (delimiterPos != std::string::npos) {
-        name = line.substr(0, delimiterPos);
-        value = line.substr(delimiterPos + 1);
+      std::size_t delimiter_pos = line.find("=");
+      if (delimiter_pos != std::string::npos) {
+        std::string name = line.substr(0, delimiter_pos);
+        std::string value = line.substr(delimiter_pos + 1);
         if (!exists(name)) {
-          data[name] = value;
+          conf[name] = value;
+          used[name] = false;
         }  
-        // TODO: add another map of string to bools to mark wheter the option was used or not
       } else {
-        // TODO: warning?
-      }
+        std::cerr << "error: cannot find '=' in " << file_path << ":" << line_num << std::endl;
+        return -1;
+      } 
     }
   } else {
     return -1;
@@ -191,9 +190,9 @@ int Configuration::readConfigFile(std::string filePath, bool mandatory) {
 }
 
 bool Configuration::set(bool *value, std::list<std::string> key) {
-  for (auto it : key) {
-    if (exists(*(&it))) {
-      auto s = data[*(&it)];
+  for (auto &it : key) {
+    if (exists(it)) {
+      auto s = conf[it];
       if (s == "true" || s == "yes" || s == "y" || s == "") {
         *value = true;  
       } else if (s == "false" || s == "no" || s == "n") {
@@ -201,6 +200,8 @@ bool Configuration::set(bool *value, std::list<std::string> key) {
       } else {
         *value = std::stoi(s);
       }
+      used[it] = true;
+//      std::cout << "set bool " << it << "=" << *value << std::endl;
       return true;
     }
   }
@@ -208,9 +209,11 @@ bool Configuration::set(bool *value, std::list<std::string> key) {
 }
 
 bool Configuration::set(int *value, std::list<std::string> key) {
-  for (auto it : key) {
-    if (exists(*(&it))) {
-      *value = std::stoi(data[*(&it)]);
+  for (auto &it : key) {
+    if (exists(it)) {
+      *value = std::stoi(conf[it]);
+      used[it] = true;
+//      std::cout << "set int " << it << "=" << *value << std::endl;
       return true;
     }
   }
@@ -219,26 +222,30 @@ bool Configuration::set(int *value, std::list<std::string> key) {
 
 bool Configuration::set(unsigned int *value, std::list<std::string> key) {
   // check for negative values
-  for (auto it : key) {
-    if (exists(*(&it))) {
+  for (auto &it : key) {
+    if (exists(it)) {
       
-      int tmp = std::stoi(data[*(&it)]);
+      int tmp = std::stoi(conf[it]);
       if (tmp < 0) {
-        std::cerr << "key " << *(&it) << " cannot be negative" << std::endl;
+        std::cerr << "error: key " << it << " cannot be negative" << std::endl;
         exit(-1);
       }
       
-      *value = std::stoi(data[*(&it)]);
+      *value = std::stoi(conf[it]);
+      used[it] = true;      
+//      std::cout << "set uint " << it << "=" << *value << std::endl;
       return true;
     }
   }
   return false;
 }
 
-bool Configuration::set(unsigned long int *value, std::list<std::string> key) {
-  for (auto it : key) {
-    if (exists(*(&it))) {
-      *value = (unsigned long int)std::stod(data[*(&it)]);
+bool Configuration::set(size_t *value, std::list<std::string> key) {
+  for (auto &it : key) {
+    if (exists(it)) {
+      *value = (size_t)std::stod(conf[it]);
+      used[it] = true;      
+//      std::cout << "set size_t " << it << "=" << *value << std::endl;
       return true;
     }
   }
@@ -246,9 +253,12 @@ bool Configuration::set(unsigned long int *value, std::list<std::string> key) {
 }
 
 bool Configuration::set(std::string &value, std::list<std::string> key) {
-  for (auto it : key) {
-    if (exists(*(&it))) {
-      value = data[*(&it)];
+  for (auto &it : key) {
+    if (exists(it)) {
+      value = conf[it];
+      used[it] = true;      
+//      std::cout << "set string " << it << "=" << value << std::endl;
+      
       return true;
     }
   }
@@ -258,31 +268,42 @@ bool Configuration::set(std::string &value, std::list<std::string> key) {
 bool Configuration::set(double *value, std::list<std::string> key) {
   for (auto it : key) {
     if (exists(*(&it))) {
-      *value = std::stof(data[*(&it)]);
+      *value = std::stof(conf[*(&it)]);
       return true;
     }
   }
   return false;
 }
 
+int Configuration::checkUsed(void) {
+    
+  for (auto &it : used) {
+    if (it.second == false) {
+      std::cerr << "error: unknown setting " << it.first << std::endl;
+      return 1;
+    }
+  }
+  return 0;
+}
+
 void Configuration::show(void) {
     
-  for (auto &it : data) {
+  for (auto &it : conf) {
     std::cout << it.first << " = " << it.second << std::endl;
   }
     
 }
 
 int Configuration::getInt(std::string key) {
-  auto it = data.find(key);
-  return (it != data.end()) ? std::stoi(it->second) : 0;
+  auto it = conf.find(key);
+  return (it != conf.end()) ? std::stoi(it->second) : 0;
 }
 
 std::string Configuration::getString(std::string key) {
-  auto it = data.find(key);
-  return (it != data.end()) ? it->second : "";
+  auto it = conf.find(key);
+  return (it != conf.end()) ? it->second : "";
 }
 
 Configuration::~Configuration() {
-  data.clear();
+  conf.clear();
 }

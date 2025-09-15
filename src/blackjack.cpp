@@ -42,14 +42,23 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   conf.set(&n_decks, {"decks", "n_decks"});
 
   conf.set(&max_bet, {"max_bet", "maxbet"});
-  conf.set(&hit_soft_17, {"h17", "hit_soft_17"});
+  conf.set(&h17, {"h17", "hit_soft_17"});
+  conf.set(&s17, {"s17", "stand_soft_17"});
+  
+  if (h17 == true && s17 == true) {
+    // TODO: error handler
+    std::cerr << "error: both h17 and s17 set to true" << std::endl;
+  }
+  if (h17 == false && s17 == false) {
+    std::cerr << "error: both h17 and s17 set to false" << std::endl;
+  }
+  
+  conf.set(&das, {"das", "double_after_split"});
+  conf.set(&doa, {"doa", "double_on_any"});
+  conf.set(&enhc, {"enhc", "european_no_hole_card"});
   // TODO:
-  // * s17 = opposite of h17
-  // * das
-  // * doa
   // * rsa
   // * enhc
-  conf.set(&double_after_split, {"das", "double_after_split"});
   conf.set(&blackjack_pays, {"blackjack_pays"});
   
   conf.set(&playerStats.bankroll, {"bankroll", "initial_bankroll"});
@@ -62,14 +71,61 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   conf.set(&number_of_burnt_cards, {"number_of_burnt_cards", "n_burnt_cards", "burnt_cards"});
   conf.set(&penetration, {"penetration"});
   conf.set(&penetration_sigma, {"penetration_sigma", "penetration_dispersion"});
-  conf.set(&shuffle_every_hand, {"shuffle_every_hand"});
+  conf.set(&shuffle_every_hand, {"shuffle", "shuffle_every_hand"});
   
-  if (conf.exists("arranged_cards")) {
-    std::istringstream stream(conf.getString("arranged_cards"));
+  // TODO: test
+  if (conf.exists("cards_as_ints")) {
+    std::istringstream stream(conf.getString("cards_as_ints"));
     std::string token;
     while(std::getline(stream, token, ',')) {
-      arranged_cards.push_back(std::stoi(token));
+      int n = std::stoi(token);
+      if (n <= 0 || n > 52) {
+        std::cerr << "error: invalid integer card " << token << std::endl;
+        exit(1);
+      }
+      arranged_cards.push_back(n);
     }
+  } else if (conf.exists("cards")) {
+    std::istringstream stream(conf.getString("cards"));
+    std::string token;
+    while(std::getline(stream, token, ',')) {
+      char number = token[0];
+      char suit = token[1];
+      int n = 0;
+      if (number == 'A') {
+        n = 1;    
+      } else if (number == 'T') {
+        n = 10;    
+      } else if (number == 'J') {
+        n = 10;    
+      } else if (number == 'Q') {
+        n = 12;    
+      } else if (number == 'K') {
+        n = 13;    
+      } else {
+        n = number - '0';
+      }
+      if (n < 1 || n > 13) {
+        std::cerr << "error: invalid card " << token << std::endl;
+        exit(1);
+      }
+      
+      if (suit == 'C') {
+        n += static_cast<int>(Libreblackjack::Suit::Clubs) * 13;
+      } else if (suit == 'D') {
+        n += static_cast<int>(Libreblackjack::Suit::Diamonds) * 13;
+      } else if (suit == 'H') {
+        n += static_cast<int>(Libreblackjack::Suit::Hearts) * 13;
+      } else if (suit == 'S') {
+        n += static_cast<int>(Libreblackjack::Suit::Spades) * 13;
+      } else {
+        std::cerr << "error: invalid card " << token << std::endl;
+        exit(1);
+      }
+      
+      arranged_cards.push_back(n);
+    }
+      
   }
   
   n_arranged_cards = arranged_cards.size();
@@ -89,7 +145,7 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
       }
     }
     shuffle();
-    cutCardPos = static_cast<int>(penetration * 52 * n_decks);
+    cut_card_position = static_cast<int>(penetration * 52 * n_decks);
   }
 }
 
@@ -135,7 +191,7 @@ void Blackjack::deal(void) {
       // state that the player did not win anything nor split nor doubled down
       playerStats.splits = 0;
       
-      if (lastPass) {
+      if (last_pass) {
         info(Libreblackjack::Info::Shuffle);
           
         // shuffle the shoe
@@ -143,7 +199,7 @@ void Blackjack::deal(void) {
           
         // burn as many cards as asked
         pos += number_of_burnt_cards;
-        lastPass = false;
+        last_pass = false;
       }
 
       info(Libreblackjack::Info::NewHand, n_hand, 1e3*playerStats.bankroll);
@@ -201,30 +257,32 @@ void Blackjack::deal(void) {
       std::cout << "second card " << card[playerSecondCard].utf8() << std::endl;
 #endif
       
-      // step 6. deal the dealer's hole card 
-      holeCard = drawCard(&hand);
-      info(Libreblackjack::Info::CardDealer);
+      if (enhc == false) {
+        // step 6. deal the dealer's hole card 
+        holeCard = drawCard(&hand);
+        info(Libreblackjack::Info::CardDealer);
 
-      // step 7.a. if the upcard is an ace ask for insurance
-      if (card[upCard].value == 11) {
-        if (player->no_insurance == false && player->always_insure == false) {
-          player->actionRequired = Libreblackjack::PlayerActionRequired::Insurance;
-          nextAction = Libreblackjack::DealerAction::None;
-          return;
+        // step 7.a. if the upcard is an ace ask for insurance
+        if (card[upCard].value == 11) {
+          if (player->no_insurance == false && player->always_insure == false) {
+            player->actionRequired = Libreblackjack::PlayerActionRequired::Insurance;
+            nextAction = Libreblackjack::DealerAction::None;
+            return;
         
-        } else if (player->always_insure) {
-          playerStats.currentHand->insured = true;
-          // TODO: allow insurance for less than one half of the original bet
-          // if the guy (girl) wants to insure, we take his (her) money
-          playerStats.bankroll -= 0.5 * playerStats.currentHand->bet;
-          if (playerStats.bankroll < playerStats.worstBankroll) {
-            playerStats.worstBankroll = playerStats.bankroll;
-          }
-          playerStats.handsInsured++;
+          } else if (player->always_insure) {
+            playerStats.currentHand->insured = true;
+            // TODO: allow insurance for less than one half of the original bet
+            // if the guy (girl) wants to insure, we take his (her) money
+            playerStats.bankroll -= 0.5 * playerStats.currentHand->bet;
+            if (playerStats.bankroll < playerStats.worstBankroll) {
+              playerStats.worstBankroll = playerStats.bankroll;
+            }
+            playerStats.handsInsured++;
           
-          player->actionRequired = Libreblackjack::PlayerActionRequired::None;
-          nextAction = Libreblackjack::DealerAction::CheckforBlackjacks;
-          return;
+            player->actionRequired = Libreblackjack::PlayerActionRequired::None;
+            nextAction = Libreblackjack::DealerAction::CheckforBlackjacks;
+            return;
+          }
         }
       }
       
@@ -306,7 +364,7 @@ void Blackjack::deal(void) {
         
       } else {
         // only if the dealer had the chance to have a blackjack we say "No blackjacks"
-        if (card[upCard].value == 10 || card[upCard].value == 11) {
+        if (enhc == false && (card[upCard].value == 10 || card[upCard].value == 11)) {
           info(Libreblackjack::Info::NoBlackjacks);
         }
         
@@ -359,10 +417,12 @@ void Blackjack::deal(void) {
         }
 
         if (bustedAllHands) {
-          info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
+          if (enhc == false) {  
+            info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
 #ifdef BJDEBUG
-          std::cout << "hole " << card[holeCard].utf8() << std::endl;
+            std::cout << "hole " << card[holeCard].utf8() << std::endl;
 #endif
+          }
           
           player->actionRequired = Libreblackjack::PlayerActionRequired::None;
           nextAction = Libreblackjack::DealerAction::StartNewHand;
@@ -377,14 +437,16 @@ void Blackjack::deal(void) {
     
     case Libreblackjack::DealerAction::HitDealerHand:
         
-      info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
+      if (enhc == false) {  
+        info(Libreblackjack::Info::CardDealerRevealsHole, holeCard);
 #ifdef BJDEBUG
-      std::cout << "hole " << card[holeCard].utf8() << std::endl;
+        std::cout << "hole " << card[holeCard].utf8() << std::endl;
 #endif
+      }
 
       // hit while count is less than 17 (or equal to soft 17 if hit_soft_17 is true)
       player->dealerValue = hand.value();
-      while ((std::abs(player->dealerValue) < 17 || (hit_soft_17 && player->dealerValue == -17)) && hand.busted() == 0) {
+      while ((std::abs(player->dealerValue) < 17 || (h17 && player->dealerValue == -17)) && hand.busted() == 0) {
         unsigned int dealerCard = drawCard(&hand);
         info(Libreblackjack::Info::CardDealer, dealerCard);
 #ifdef BJDEBUG
@@ -783,7 +845,7 @@ unsigned int Blackjack::drawCard(Hand *hand) {
     
   } else {
       
-    lastPass = (pos >= cutCardPos) || shuffle_every_hand;
+    last_pass = (pos >= cut_card_position) || shuffle_every_hand;
     if (pos >= 52 * n_decks) {
       shuffle();
     }

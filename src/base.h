@@ -290,9 +290,8 @@ class Dealer {
     unsigned int n_decks = 0;
     unsigned int n_shuffles = 0;
     // default one million hands
-    unsigned long int n_hands = 1000000;
-    
-    unsigned long int n_hand = 0;
+    size_t n_hands = 1000000;
+    size_t n_hand = 0;
     
     struct {
       std::list<PlayerHand> hands;

@@ -46,16 +46,19 @@ class Blackjack : public Dealer {
     
     std::vector<unsigned int> shoe;
     size_t pos = 0;
-    size_t cutCardPos = 0;
-    bool lastPass = false;
+    size_t cut_card_position = 0;
+    bool last_pass = false;
     
     unsigned int upCard;
     unsigned int holeCard;
     unsigned int playerFirstCard;
     unsigned int playerSecondCard;
         
-    bool hit_soft_17 = true;
-    bool double_after_split = true;
+    bool h17 = true;
+    bool s17 = false;
+    bool das = true;
+    bool doa = true;
+    bool enhc = false;
     bool shuffle_every_hand = false;
     
     std::vector<unsigned int> arranged_cards;
@@ -74,6 +77,7 @@ class Blackjack : public Dealer {
     double penetration_sigma = 0;
     
     void canDoubleSplit(void) {
+      // TODO: doa
       player->canDouble = playerStats.currentHand->cards.size() == 2;
       player->canSplit = player->canDouble && (card[*(playerStats.currentHand->cards.begin())].value == card[*(++playerStats.currentHand->cards.begin())].value);
       return;

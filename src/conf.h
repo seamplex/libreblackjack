@@ -27,6 +27,8 @@
 #include <list>
 #include <map>
 
+// TODO: namespace fbj
+
 class Configuration {
   public:  
     Configuration(int, char **);  
@@ -34,7 +36,7 @@ class Configuration {
 
     int readConfigFile(std::string, bool = false);
     
-    bool exists(std::string key) { return (data.count(key) != 0); }
+    bool exists(std::string key) { return (conf.count(key) != 0); }
 
     bool set(bool *, std::list<std::string>);
     bool set(int *, std::list<std::string>);
@@ -44,6 +46,7 @@ class Configuration {
     bool set(std::string &, std::list<std::string>);
     
 
+    int checkUsed(void);
     void show(void);
     bool getBool(std::string);
     int getInt(std::string);
@@ -56,15 +59,16 @@ class Configuration {
     std::string report_file_path;
     // TODO: 
 
-    unsigned int hands_per_char = false;
+//    unsigned int hands_per_char = false;
     
     bool show_help = false;
     bool show_version = false;
     
   private:
-    std::map<std::string, std::string> data;
-    std::string configFilePath = "./blackjack.conf";
-    bool explicitConfigFile = false;
+    std::map<std::string, std::string> conf;
+    std::map<std::string, bool> used;
+    std::string config_file_path = "./blackjack.conf";
+    bool explicit_config_file = false;
     
     std::string dealer;
     std::string player;

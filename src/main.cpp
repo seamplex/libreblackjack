@@ -73,6 +73,11 @@ int main(int argc, char **argv) {
     return 1;
   }
   
+  if (conf.checkUsed() != 0) {
+    return 1;
+  }
+  
+  
   // assign player to dealer
   dealer->setPlayer(player);
 
