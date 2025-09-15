@@ -66,24 +66,23 @@ These automatic players can range from simple no-bust or mimic-the-dealer hitter
 Quickest way to start is to download [pre-compiled binaries](https://seamplex.com/blackjack/dist/) for your architecture:
 
  * [GNU/Linux](https://seamplex.com/blackjack/dist/linux)
- 
-   ```terminal
-   wget https://seamplex.com/blackjack/dist/macos/blackjack-v0.2.8-ga974467-macos-arm64.tar.gz
-   sudo tar -xzf blackjack-v0.2.8-ga974467-macos-arm64.tar.gz -C /
-   ```
- 
  * [MacOS](https://seamplex.com/blackjack/dist/macos)
+
  
-   ```terminal
-   wget https://seamplex.com/blackjack/dist/macos/blackjack-v0.2.8-ga974467-macos-arm64.tar.gz
-   sudo tar -xzf blackjack-v0.2.8-ga974467-macos-arm64.tar.gz -C /
-   ```
+```terminal
+wget https://seamplex.com/blackjack/dist/macos/blackjack-v0.2.8-ga974467-macos-arm64.tar.gz
+sudo tar -xzf blackjack-v0.2.8-ga974467-macos-arm64.tar.gz -C /
+```
  
  
 
 ## Compile from source
 
-Feel free to compile latest version from Github:
+Feel free to compile latest version from Github.
+
+If you want tab completion of commands and browseable history, make sure you also have [GNU Readline](http://tiswww.case.edu/php/chet/readline/rltop.html) available at compilation time.
+
+### GNU/Linux
 
 ```terminal
 sudo apt-get install git autoconf make g++
@@ -95,7 +94,39 @@ make
 sudo make install
 ```
 
-If you wan tab completion of commands and browseable history, make sure you also have [GNU Readline](http://tiswww.case.edu/php/chet/readline/rltop.html) available at compilation time.
+### MacOS
+
+1. **Install Xcode Command Line Tools**  
+   Open a terminal and run:
+   ```terminal
+   xcode-select --install
+   ```
+   This installs the C/C++ compiler (`clang`, `clang++`) and `make`.
+
+2. **Install autoconf and automake with Homebrew**  
+   If you don't already have Homebrew, install it:
+   ```terminal
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+   Then install the required tools:
+   ```terminal
+   brew install autoconf automake
+   ```
+
+3. **Clone and build libreblackjack**
+   ```terminal
+   git clone https://github.com/seamplex/libreblackjack.git
+   cd libreblackjack
+   ./autogen.sh
+   ./configure
+   make
+   sudo make install  # Optional: installs system-wide, may prompt for your password
+   ```
+
+**Notes:**
+- The default macOS compiler (`clang++`) works fine for most users.
+- You do **not** need to install `gcc/g++` or `make` via Homebrew unless you have special requirements.
+- If you encounter build issues, please report them [here](https://github.com/seamplex/libreblackjack/issues).
 
 
 ## Test suite
