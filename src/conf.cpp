@@ -275,6 +275,11 @@ bool Configuration::set(double *value, std::list<std::string> key) {
   return false;
 }
 
+void Configuration::markUsed(std::string key) {
+  used[key] = true;
+  return;
+}
+
 int Configuration::checkUsed(void) {
     
   for (auto &it : used) {

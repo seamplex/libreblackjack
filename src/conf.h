@@ -44,7 +44,7 @@ class Configuration {
     bool set(long unsigned int *, std::list<std::string>);
     bool set(double *, std::list<std::string>);
     bool set(std::string &, std::list<std::string>);
-    
+    void markUsed(std::string);
 
     int checkUsed(void);
     void show(void);

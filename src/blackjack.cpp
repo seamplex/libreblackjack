@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - standard blackjack dealer
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020, 2025 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -85,6 +85,7 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
       }
       arranged_cards.push_back(n);
     }
+    conf.markUsed("cards_as_ints");
   } else if (conf.exists("cards")) {
     std::istringstream stream(conf.getString("cards"));
     std::string token;
@@ -125,7 +126,7 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
       
       arranged_cards.push_back(n);
     }
-      
+    conf.markUsed("cards");
   }
   
   n_arranged_cards = arranged_cards.size();
