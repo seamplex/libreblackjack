@@ -247,7 +247,7 @@ class Dealer {
     // maybe this first one does not need to be deleted
     virtual void shuffle(void) = 0;
     virtual void deal(void) = 0;
-    virtual unsigned int drawCard(Hand * = nullptr) = 0;
+    virtual unsigned int draw(Hand * = nullptr) = 0;
     virtual int process(void) = 0;
     
     void setPlayer(Player *p) {

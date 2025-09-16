@@ -76,9 +76,9 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   
   // TODO: test
   if (conf.exists("cards_as_ints")) {
-    std::istringstream stream(conf.getString("cards_as_ints"));
+    std::istringstream iss(conf.getString("cards_as_ints"));
     std::string token;
-    while(std::getline(stream, token, ',')) {
+    while(iss >> token) {
       int n = std::stoi(token);
       if (n <= 0 || n > 52) {
         std::cerr << "error: invalid integer card " << token << std::endl;
@@ -88,9 +88,9 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
     }
     conf.markUsed("cards_as_ints");
   } else if (conf.exists("cards")) {
-    std::istringstream stream(conf.getString("cards"));
+    std::istringstream iss(conf.getString("cards"));
     std::string token;
-    while(std::getline(stream, token, ',')) {
+    while(iss >> token) {
       char number = token[0];
       char suit = token[1];
       int n = 0;
@@ -238,13 +238,13 @@ void Blackjack::deal(void) {
     case lbj::DealerAction::DealPlayerFirstCard:
       // where's step 2? <- probably that's the player's bet
       // step 3. deal the first card to each player
-      playerFirstCard = drawCard(&(*playerStats.currentHand));
+      playerFirstCard = draw(&(*playerStats.currentHand));
       info(lbj::Info::CardPlayer, playerFirstCard);
 #ifdef BJDEBUG
       std::cout << "first card " << card[playerFirstCard].utf8() << std::endl;
 #endif
       // step 4. show dealer's upcard
-      upCard = drawCard(&hand);
+      upCard = draw(&hand);
       info(lbj::Info::CardDealer, upCard);
 #ifdef BJDEBUG
       std::cout << "up card " << card[upCard].utf8() << std::endl;
@@ -252,7 +252,7 @@ void Blackjack::deal(void) {
       player->dealerValue = hand.value();
 
       // step 5. deal the second card to each player
-      playerSecondCard = drawCard(&(*playerStats.currentHand));
+      playerSecondCard = draw(&(*playerStats.currentHand));
       info(lbj::Info::CardPlayer, playerSecondCard);
       player->playerValue = playerStats.currentHand->value();
 #ifdef BJDEBUG
@@ -261,7 +261,7 @@ void Blackjack::deal(void) {
       
       if (enhc == false) {
         // step 6. deal the dealer's hole card 
-        holeCard = drawCard(&hand);
+        holeCard = draw(&hand);
         info(lbj::Info::CardDealer);
 
         // step 7.a. if the upcard is an ace ask for insurance
@@ -390,7 +390,7 @@ void Blackjack::deal(void) {
     case lbj::DealerAction::MoveOnToNextHand:
       // see if we finished all the player's hands
       if (++playerStats.currentHand != playerStats.hands.end()) {
-        unsigned int playerCard = drawCard(&(*playerStats.currentHand));
+        unsigned int playerCard = draw(&(*playerStats.currentHand));
         player->playerValue = playerStats.currentHand->value();
         info(lbj::Info::CardPlayer, playerCard, playerStats.currentHand->id);
 #ifdef BJDEBUG
@@ -449,7 +449,7 @@ void Blackjack::deal(void) {
       // hit while count is less than 17 (or equal to soft 17 if hit_soft_17 is true)
       player->dealerValue = hand.value();
       while ((std::abs(player->dealerValue) < 17 || (h17 && player->dealerValue == -17)) && hand.busted() == 0) {
-        unsigned int dealerCard = drawCard(&hand);
+        unsigned int dealerCard = draw(&hand);
         info(lbj::Info::CardDealer, dealerCard);
 #ifdef BJDEBUG
         std::cout << "dealer " << card[dealerCard].utf8() << std::endl;
@@ -650,7 +650,7 @@ int Blackjack::process(void) {
         playerStats.currentHand->doubled = true;
         playerStats.handsDoubled++;
 
-        playerCard = drawCard(&(*playerStats.currentHand));
+        playerCard = draw(&(*playerStats.currentHand));
         player->playerValue = playerStats.currentHand->value();
         info(lbj::Info::CardPlayer, playerCard, playerStats.currentHand->id);
         
@@ -725,7 +725,7 @@ int Blackjack::process(void) {
         info(lbj::Info::PlayerSplitIds, playerStats.currentHand->id, newHand.id);
         
         // deal a card to the first hand
-        playerCard = drawCard(&(*playerStats.currentHand));
+        playerCard = draw(&(*playerStats.currentHand));
         player->playerValue = playerStats.currentHand->value();
         info(lbj::Info::CardPlayer, playerCard, playerStats.currentHand->id);
 
@@ -734,7 +734,7 @@ int Blackjack::process(void) {
         if (card[*playerStats.currentHand->cards.begin()].value == 11 || std::abs(playerStats.currentHand->value()) == 21) {
           if (++playerStats.currentHand != playerStats.hands.end()) {
             info(lbj::Info::PlayerNextHand, (*playerStats.currentHand).id);
-            playerCard = drawCard(&(*playerStats.currentHand));
+            playerCard = draw(&(*playerStats.currentHand));
             player->playerValue = playerStats.currentHand->value();
             info(lbj::Info::CardPlayer, playerCard, playerStats.currentHand->id);
 
@@ -773,7 +773,7 @@ int Blackjack::process(void) {
 ///ip+hit+desc Hit on the current hand
 ///ip+hit+detail 
 ///ip+hit+detail This command can be abbreviated as `h`.
-      playerCard = drawCard(&(*playerStats.currentHand));        
+      playerCard = draw(&(*playerStats.currentHand));        
       player->playerValue = playerStats.currentHand->value();
       info(lbj::Info::CardPlayer, playerCard, playerStats.currentHand->id);
 
@@ -830,7 +830,7 @@ void Blackjack::shuffle() {
 }
 
 
-unsigned int Blackjack::drawCard(Hand *hand) {
+unsigned int Blackjack::draw(Hand *hand) {
     
   unsigned int tag = 0; 
 

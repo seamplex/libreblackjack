@@ -153,6 +153,16 @@ Configuration::Configuration(int argc, char **argv) {
 
 // source https://www.walletfox.com/course/parseconfigfile.php
 
+std::string trim(const std::string& str) {
+  size_t first = str.find_first_not_of(" \t\n\r\f\v");
+  if (first == std::string::npos) {
+    return ""; // String is all whitespace
+  }
+    
+  size_t last = str.find_last_not_of(" \t\n\r\f\v");
+  return str.substr(first, (last - first + 1));
+}
+
 int Configuration::readConfigFile(std::string file_path, bool mandatory) {
   
   // std::ifstream is RAII, i.e. no need to call close
@@ -163,7 +173,7 @@ int Configuration::readConfigFile(std::string file_path, bool mandatory) {
     std::string line;
     while(getline(fileStream, line)) {
       line_num++;
-      line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+      line = trim(line);
       if (line[0] == '#' || line[0] == ';' || line.empty()) {
         continue;
       }
@@ -171,8 +181,8 @@ int Configuration::readConfigFile(std::string file_path, bool mandatory) {
       // TODO: comments on the same line
       std::size_t delimiter_pos = line.find("=");
       if (delimiter_pos != std::string::npos) {
-        std::string name = line.substr(0, delimiter_pos);
-        std::string value = line.substr(delimiter_pos + 1);
+        std::string name = trim(line.substr(0, delimiter_pos));
+        std::string value = trim(line.substr(delimiter_pos + 1));
         if (!exists(name)) {
           conf[name] = value;
           used[name] = false;

@@ -34,7 +34,7 @@ class Blackjack : public Dealer {
     ~Blackjack();
     
     void shuffle() override;
-    unsigned int drawCard(Hand * = nullptr) override;
+    unsigned int draw(Hand * = nullptr) override;
     void deal(void) override;
     int process(void) override;
     

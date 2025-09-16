@@ -1,7 +1,8 @@
 # new
 
- * ENCH S17 DAS DOA RSA
- * 100k cards
+ * H17 S17 DAS DOA RSA
+ * 100k cards in a text file
+ * read strategy from file
  * multiple players
  
 # old
@@ -11,31 +12,35 @@
  * check that the card distribution is uniform
  * initial bankroll
  * report
-   * format (yaml, json, markdown table)
+   * add yaml filters to get JSON (`jq`), markdown table (`awk`), etc.
    * verbosity (extra small, small, medium, large, extra large)
- * flag to see if a conf string was used or not
  * progress bar
  * max_splits through conf (default 3)
- * double after split
  * name of the game the dealer deals
  * name of the games the player can play
  * dealers
-   * ENHC
    * blackjack switch
    * blackjack under?
    * siete y medio?
    * card war
    * between
  * players
+   * random hit/stand
    * internal reko
    * runtime-linked in a shared object
+ * conf
+    - bankroll_history_file_path
+    - removed_cards
  
- * multithreading
+ * multithreading (not sure)
  * optimize using const and restrict 
 
  * questions
     1. how to play?
     2. what is the expected value? page 41 griffin
+
+# Stuff    
+    
  * mimic the dealer -5.5% single s17
  * referencess in griffin chapter 2 to blackjack history
  * definition of bs p42
@@ -54,9 +59,6 @@
  * basic strategy vs horrible player at the same time
  * websockets ux (sini?)
  * tournaments
- * conf
-    - bankroll_history_file_path
-    - removed_cards
  * dbus?
 
 
