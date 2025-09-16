@@ -1,9 +1,11 @@
 # new
 
- * H17 S17 DAS DOA RSA
+ * RSA
+ * ES10
  * 100k cards in a text file
  * read strategy from file
  * multiple players
+ * rules in report
  
 # old
 

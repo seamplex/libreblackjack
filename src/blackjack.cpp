@@ -100,54 +100,62 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   conf.set(&shuffle_every_hand, {"shuffle", "shuffle_every_hand"});
   
   // TODO: read cards from file
-  if (conf.exists("cards_as_ints")) {
-    std::istringstream iss(conf.getString("cards_as_ints"));
-    std::string token;
-    while(iss >> token) {
-      int n = std::stoi(token);
-      if (n <= 0 || n > 52) {
-        std::cerr << "error: invalid integer card " << token << std::endl;
-        exit(1);
-      }
-      arranged_cards.push_back(n);
-    }
-    conf.markUsed("cards_as_ints");
-  } else if (conf.exists("cards")) {
+  if (conf.exists("cards")) {
     std::istringstream iss(conf.getString("cards"));
     std::string token;
     while(iss >> token) {
-      char number = token[0];
-      char suit = token[1];
-      int n = 0;
-      if (number == 'A') {
-        n = 1;    
-      } else if (number == 'T') {
-        n = 10;    
-      } else if (number == 'J') {
-        n = 10;    
-      } else if (number == 'Q') {
-        n = 12;    
-      } else if (number == 'K') {
-        n = 13;    
-      } else {
-        n = number - '0';
-      }
-      if (n < 1 || n > 13) {
-        std::cerr << "error: invalid card " << token << std::endl;
-        exit(1);
+      
+      bool number = true;
+      for (char c : token) {
+        number &= std::isdigit(c);
       }
       
-      if (suit == 'C') {
-        n += static_cast<int>(lbj::Suit::Clubs) * 13;
-      } else if (suit == 'D') {
-        n += static_cast<int>(lbj::Suit::Diamonds) * 13;
-      } else if (suit == 'H') {
-        n += static_cast<int>(lbj::Suit::Hearts) * 13;
-      } else if (suit == 'S') {
-        n += static_cast<int>(lbj::Suit::Spades) * 13;
+      int n = 0;
+      if (number) {
+        n = std::stoi(token);
+        if (n <= 0 || n > 52) {
+          std::cerr << "error: invalid integer card " << token << std::endl;
+          exit(1);
+        }
       } else {
+        char rank = token[0];
+        char suit = token[1];
+        if (rank == 'A') {
+          n = 1;    
+        } else if (rank == 'T') {
+          n = 10;    
+        } else if (rank == 'J') {
+          n = 11;    
+        } else if (rank == 'Q') {
+          n = 12;    
+        } else if (rank == 'K') {
+          n = 13;    
+        } else {
+          n = rank - '0';
+        }
+        if (n < 1 || n > 13) {
+          std::cerr << "error: invalid ASCII rank " << token << std::endl;
+          exit(1);
+        }
+        
+        if (suit != '\0') {
+          if (suit == 'C') {
+            n += static_cast<int>(lbj::Suit::Clubs) * 13;
+          } else if (suit == 'D') {
+            n += static_cast<int>(lbj::Suit::Diamonds) * 13;
+          } else if (suit == 'H') {
+            n += static_cast<int>(lbj::Suit::Hearts) * 13;
+          } else if (suit == 'S') {
+            n += static_cast<int>(lbj::Suit::Spades) * 13;
+          } else {
+            std::cerr << "error: invalid ASCII suit " << token << std::endl;
+            exit(1);
+          }
+        }
+      }
+      
+      if (n == 0) {
         std::cerr << "error: invalid card " << token << std::endl;
-        exit(1);
       }
       
       arranged_cards.push_back(n);
