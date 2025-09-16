@@ -43,19 +43,44 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   conf.set(&n_decks, {"decks", "n_decks"});
 
   conf.set(&max_bet, {"max_bet", "maxbet"});
+  
+  
+  // rules are base, particular options take precedence
+  if (conf.exists("rules")) {
+    std::istringstream iss(conf.getString("rules"));
+    std::string token;
+    while(iss >> token) {
+      // I cannot believe there is no case-insensitive string comparison in C++
+      if (token == "enhc" || token == "ENHC") {
+        enhc = true;
+      } else if (token == "h17" || token == "H17") {
+        h17 = true;
+      } else if (token == "s17" || token == "S17") {
+        h17 = false;
+      } else if (token == "das" || token == "DAS") {
+        das = true;
+      } else if (token == "ndas" || token == "NDAS") {
+        das = false;
+      } else if (token == "doa" || token == "DOA") {
+        doa = true;
+      } else if (token == "ndoa" || token == "NDOA") {
+        doa = false;
+      } else if (token == "rsa" || token == "RSA") {
+        rsa = true;
+      } else if (token == "nrsa" || token == "NRSA") {
+        rsa = false;
+      } else {
+        std::cerr << "error: unknown rule " << token << std::endl;
+        exit(1);
+      }
+    }
+    conf.markUsed("rules");
+  }
+  
   conf.set(&h17, {"h17", "hit_soft_17"});
-  conf.set(&s17, {"s17", "stand_soft_17"});
-  
-  if (h17 == true && s17 == true) {
-    // TODO: error handler
-    std::cerr << "error: both h17 and s17 set to true" << std::endl;
-  }
-  if (h17 == false && s17 == false) {
-    std::cerr << "error: both h17 and s17 set to false" << std::endl;
-  }
-  
   conf.set(&das, {"das", "double_after_split"});
   conf.set(&doa, {"doa", "double_on_any"});
+  conf.set(&rsa, {"rsa", "resplit_aces"});
   conf.set(&enhc, {"enhc", "european_no_hole_card"});
   // TODO:
   // * rsa
@@ -74,7 +99,7 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   conf.set(&penetration_sigma, {"penetration_sigma", "penetration_dispersion"});
   conf.set(&shuffle_every_hand, {"shuffle", "shuffle_every_hand"});
   
-  // TODO: test
+  // TODO: read cards from file
   if (conf.exists("cards_as_ints")) {
     std::istringstream iss(conf.getString("cards_as_ints"));
     std::string token;
@@ -154,6 +179,22 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
 Blackjack::~Blackjack() {
   return;    
 }
+
+void Blackjack::can_double_split(void) {
+  int n_cards = playerStats.currentHand->cards.size();
+  player->canDouble = (n_cards == 2);
+  if (das == false) {
+    player->canDouble &= (playerStats.splits == 0);
+  }
+  if (doa == false) {
+    int value = playerStats.currentHand->value();
+    player->canDouble &= (value == 9 || value == 10 || value == 11);
+  }
+      
+  player->canSplit = n_cards == 2 && (card[*(playerStats.currentHand->cards.begin())].value == card[*(++playerStats.currentHand->cards.begin())].value);
+  return;
+}  
+
 
 void Blackjack::deal(void) {
   
@@ -296,8 +337,7 @@ void Blackjack::deal(void) {
       }
 
       // step 7.c. ask the player to play
-      player->canDouble = true;
-      player->canSplit = card[playerFirstCard].value == card[playerSecondCard].value;
+      can_double_split();
       player->actionRequired = lbj::PlayerActionRequired::Play;
       nextAction = lbj::DealerAction::AskForPlay;
       return;
@@ -370,7 +410,7 @@ void Blackjack::deal(void) {
           info(lbj::Info::NoBlackjacks);
         }
         
-        canDoubleSplit();
+        can_double_split();
         nextAction = lbj::DealerAction::AskForPlay;
         player->actionRequired = lbj::PlayerActionRequired::Play;
         return;
@@ -381,7 +421,7 @@ void Blackjack::deal(void) {
 #ifdef BJDEBUG
       std::cout << "pistola" << std::endl;
 #endif
-      canDoubleSplit();
+      can_double_split();
       player->actionRequired = lbj::PlayerActionRequired::Play;
       nextAction = lbj::DealerAction::AskForPlay;
       return;
@@ -402,7 +442,7 @@ void Blackjack::deal(void) {
           nextAction = lbj::DealerAction::MoveOnToNextHand;
           return;
         } else {
-          canDoubleSplit();
+          can_double_split();
           player->actionRequired = lbj::PlayerActionRequired::Play;
           nextAction = lbj::DealerAction::AskForPlay;
           return;
@@ -635,8 +675,8 @@ int Blackjack::process(void) {
 ///ip+double+detail two cards.
 ///ip+double+detail This command can be abbreviated as `d`.
     case lbj::PlayerActionTaken::Double:
-      // TODO: rule to allow doubling only for 9, 10 or 11
-      if (playerStats.currentHand->cards.size() == 2) {
+      can_double_split();
+      if (player->canDouble == true) {
 
         // TODO: check bankroll
         // take his (her) money
@@ -744,7 +784,7 @@ int Blackjack::process(void) {
               nextAction = lbj::DealerAction::MoveOnToNextHand;
               return 1;
             } else {
-              canDoubleSplit();
+              can_double_split();
               player->actionRequired = lbj::PlayerActionRequired::Play;
               nextAction = lbj::DealerAction::AskForPlay;
               return 1;
@@ -755,7 +795,7 @@ int Blackjack::process(void) {
             return 1;
           }  
         } else {
-          canDoubleSplit();
+          can_double_split();
           player->actionRequired = lbj::PlayerActionRequired::Play;
           nextAction = lbj::DealerAction::AskForPlay;
           return 1;
@@ -796,7 +836,7 @@ int Blackjack::process(void) {
         
       } else {
           
-        canDoubleSplit();
+        can_double_split();
         player->actionRequired = lbj::PlayerActionRequired::Play;
         nextAction = lbj::DealerAction::AskForPlay;
         return 1;

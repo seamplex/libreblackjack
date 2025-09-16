@@ -54,12 +54,13 @@ class Blackjack : public Dealer {
     unsigned int holeCard;
     unsigned int playerFirstCard;
     unsigned int playerSecondCard;
-        
-    bool h17 = true;
-    bool s17 = false;
-    bool das = true;
-    bool doa = true;
-    bool enhc = false;
+
+    // TODO: check these!
+    bool h17 = true;   // checked
+    bool das = true;   // checked
+    bool doa = true;   // checked
+    bool enhc = false; // checked
+    bool rsa = false;
     bool shuffle_every_hand = false;
     
     std::vector<unsigned int> arranged_cards;
@@ -77,12 +78,7 @@ class Blackjack : public Dealer {
     double penetration = 0.75;
     double penetration_sigma = 0;
     
-    void canDoubleSplit(void) {
-      // TODO: doa
-      player->canDouble = playerStats.currentHand->cards.size() == 2;
-      player->canSplit = player->canDouble && (card[*(playerStats.currentHand->cards.begin())].value == card[*(++playerStats.currentHand->cards.begin())].value);
-      return;
-    }  
+    void can_double_split(void);
       
 };
 };
