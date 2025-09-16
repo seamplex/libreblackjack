@@ -27,14 +27,15 @@
 #include "../blackjack.h"
 #include "basic.h"
 
+namespace lbj {
 
 Basic::Basic(Configuration &conf) {
 
   for (int value = 0; value < 21; value++) {
     for (int upcard = 0; upcard < 12; upcard++) {
-      hard[value][upcard] = Libreblackjack::PlayerActionTaken::None;
-      soft[value][upcard] = Libreblackjack::PlayerActionTaken::None;
-      pair[value][upcard] = Libreblackjack::PlayerActionTaken::None;
+      hard[value][upcard] = lbj::PlayerActionTaken::None;
+      soft[value][upcard] = lbj::PlayerActionTaken::None;
+      pair[value][upcard] = lbj::PlayerActionTaken::None;
     }
   }
   
@@ -89,13 +90,13 @@ Basic::Basic(Configuration &conf) {
       if (default_hard[value] != "") {
         switch (default_hard[value][upcard]) {
           case 'h':
-            hard[value][upcard] = Libreblackjack::PlayerActionTaken::Hit;  
+            hard[value][upcard] = lbj::PlayerActionTaken::Hit;  
           break;
           case 's':
-            hard[value][upcard] = Libreblackjack::PlayerActionTaken::Stand;  
+            hard[value][upcard] = lbj::PlayerActionTaken::Stand;  
           break;
           case 'd':
-            hard[value][upcard] = Libreblackjack::PlayerActionTaken::Double;  
+            hard[value][upcard] = lbj::PlayerActionTaken::Double;  
           break;  
         }
       }
@@ -103,19 +104,19 @@ Basic::Basic(Configuration &conf) {
       if (default_soft[value] != "") {
         switch (default_soft[value][upcard]) {
           case 'h':
-            soft[value][upcard] = Libreblackjack::PlayerActionTaken::Hit;  
+            soft[value][upcard] = lbj::PlayerActionTaken::Hit;  
           break;
           case 's':
-            soft[value][upcard] = Libreblackjack::PlayerActionTaken::Stand;  
+            soft[value][upcard] = lbj::PlayerActionTaken::Stand;  
           break;
           case 'd':
-            soft[value][upcard] = Libreblackjack::PlayerActionTaken::Double;  
+            soft[value][upcard] = lbj::PlayerActionTaken::Double;  
           break;  
         }
       }
       
       if (default_pair[value] != "" && default_pair[value][upcard] == 'y') {
-        pair[value][upcard] = Libreblackjack::PlayerActionTaken::Split;  
+        pair[value][upcard] = lbj::PlayerActionTaken::Split;  
       }
     }
   }  
@@ -140,7 +141,7 @@ Basic::Basic(Configuration &conf) {
       stream >> token;
       
       int value = 0;
-      Libreblackjack::PlayerActionTaken (*strategy)[21][12] = nullptr;
+      lbj::PlayerActionTaken (*strategy)[21][12] = nullptr;
       switch (token[0]) {
         case 'h':
           strategy = &hard;
@@ -167,26 +168,26 @@ Basic::Basic(Configuration &conf) {
       // TODO: check error
         stream >> token;
         if (token == "h") {
-          (*strategy)[value][upcard] = Libreblackjack::PlayerActionTaken::Hit;  
+          (*strategy)[value][upcard] = lbj::PlayerActionTaken::Hit;  
         } else if (token == "s") {
-          (*strategy)[value][upcard] = Libreblackjack::PlayerActionTaken::Stand;  
+          (*strategy)[value][upcard] = lbj::PlayerActionTaken::Stand;  
         } else if (token == "d") {
-          (*strategy)[value][upcard] = Libreblackjack::PlayerActionTaken::Double;  
+          (*strategy)[value][upcard] = lbj::PlayerActionTaken::Double;  
         } else if (token == "y") {
           // the pair data is different as it is not written as a function of the value
           // but of the value of the individual cards,
           // i.e. p8 means split a pair of eights and not a hand with two fours
           // to avoid clashing a pair of aces with a pair of sixes, we treat the former differently
           if (value != 11) {
-            (*strategy)[2*value][upcard] = Libreblackjack::PlayerActionTaken::Split;  
+            (*strategy)[2*value][upcard] = lbj::PlayerActionTaken::Split;  
           } else {
-            (*strategy)[11][upcard] = Libreblackjack::PlayerActionTaken::Split;  
+            (*strategy)[11][upcard] = lbj::PlayerActionTaken::Split;  
           }
         } else if (token == "n") {
           if (value != 11) {
-            (*strategy)[2*value][upcard] = Libreblackjack::PlayerActionTaken::None;  
+            (*strategy)[2*value][upcard] = lbj::PlayerActionTaken::None;  
           } else {
-            (*strategy)[11][upcard] = Libreblackjack::PlayerActionTaken::None;  
+            (*strategy)[11][upcard] = lbj::PlayerActionTaken::None;  
           }
         }
       }
@@ -202,16 +203,16 @@ int Basic::play() {
   std::size_t upcard;
   
   switch (actionRequired) {
-    case Libreblackjack::PlayerActionRequired::Bet:
+    case lbj::PlayerActionRequired::Bet:
       currentBet = 1;
-      actionTaken = Libreblackjack::PlayerActionTaken::Bet;
+      actionTaken = lbj::PlayerActionTaken::Bet;
     break;
 
-    case Libreblackjack::PlayerActionRequired::Insurance:
-      actionTaken = Libreblackjack::PlayerActionTaken::DontInsure;
+    case lbj::PlayerActionRequired::Insurance:
+      actionTaken = lbj::PlayerActionTaken::DontInsure;
     break;
     
-    case Libreblackjack::PlayerActionRequired::Play:
+    case lbj::PlayerActionRequired::Play:
 
 #ifdef BJDEBUG
       std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
@@ -221,27 +222,27 @@ int Basic::play() {
       
       // first, we see if we can and shold split
       if (canSplit &&
-           ((playerValue == -12 &&    pair[11][upcard] == Libreblackjack::PlayerActionTaken::Split) ||
-                                   pair[value][upcard] == Libreblackjack::PlayerActionTaken::Split)) {
-          actionTaken = Libreblackjack::PlayerActionTaken::Split;
+           ((playerValue == -12 &&    pair[11][upcard] == lbj::PlayerActionTaken::Split) ||
+                                   pair[value][upcard] == lbj::PlayerActionTaken::Split)) {
+          actionTaken = lbj::PlayerActionTaken::Split;
 
       } else {
       
         actionTaken = (playerValue < 0) ? soft[value][upcard] : hard[value][upcard];
         
         if (canDouble == false) {
-          if (actionTaken == Libreblackjack::PlayerActionTaken::Double) {
-            actionTaken = Libreblackjack::PlayerActionTaken::Hit;
+          if (actionTaken == lbj::PlayerActionTaken::Double) {
+            actionTaken = lbj::PlayerActionTaken::Hit;
           }
         }
       }
       
 #ifdef BJDEBUG
-      if (actionTaken == Libreblackjack::PlayerActionTaken::Hit) {
+      if (actionTaken == lbj::PlayerActionTaken::Hit) {
         std::cout << "hit" << std::endl;
-      } else if (actionTaken == Libreblackjack::PlayerActionTaken::Stand) {
+      } else if (actionTaken == lbj::PlayerActionTaken::Stand) {
         std::cout << "stand" << std::endl;
-      } else if (actionTaken == Libreblackjack::PlayerActionTaken::Split) {
+      } else if (actionTaken == lbj::PlayerActionTaken::Split) {
         std::cout << "split" << std::endl;
       } else {
         std::cout << "none" << std::endl;
@@ -251,10 +252,11 @@ int Basic::play() {
       
     break;  
     
-    case Libreblackjack::PlayerActionRequired::None:
+    case lbj::PlayerActionRequired::None:
     break;  
     
   }
   
   return 0;
+}
 }

@@ -25,7 +25,7 @@
 
 #define ENGINE  "a free & open blackjack engine\n"
 
-namespace Libreblackjack {
+namespace lbj {
 
 void shortversion(void) {
 

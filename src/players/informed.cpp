@@ -27,6 +27,7 @@
 #include "../blackjack.h"
 #include "informed.h"
 
+namespace lbj {
 
 // max of 2 and 3
 #define max(a,b) (((a)>(b))?(a):(b))
@@ -48,8 +49,8 @@
 #define pair_ascii(player,dealer)     (player < 12) ? ((split[player] > hard_hsd_ev(2*player,dealer)) ? 'Y' : 'N') : ((split[player] > soft_hsd_ev(12,dealer)) ? 'Y' : 'N')
 
 
-#define hard_hsd_action(player) (hard_double[player] > hard_hit[player] && hard_double[player] > hard_stand[player]) ? Libreblackjack::PlayerActionTaken::Double : (hard_hit[player] > hard_stand[player]) ? Libreblackjack::PlayerActionTaken::Hit : Libreblackjack::PlayerActionTaken::Stand
-#define soft_hsd_action(player) (soft_double[player] > soft_hit[player] && soft_double[player] > soft_stand[player]) ? Libreblackjack::PlayerActionTaken::Double : (soft_hit[player] > soft_stand[player]) ? Libreblackjack::PlayerActionTaken::Hit : Libreblackjack::PlayerActionTaken::Stand
+#define hard_hsd_action(player) (hard_double[player] > hard_hit[player] && hard_double[player] > hard_stand[player]) ? lbj::PlayerActionTaken::Double : (hard_hit[player] > hard_stand[player]) ? lbj::PlayerActionTaken::Hit : lbj::PlayerActionTaken::Stand
+#define soft_hsd_action(player) (soft_double[player] > soft_hit[player] && soft_double[player] > soft_stand[player]) ? lbj::PlayerActionTaken::Double : (soft_hit[player] > soft_stand[player]) ? lbj::PlayerActionTaken::Hit : lbj::PlayerActionTaken::Stand
 #define pair_action(player)     (player < 12) ? ((split[player] > hard_hsd_ev(2*player)) ? true : false) : ((split[player] > soft_hsd_ev(12)) ? true : false)
 
 
@@ -65,18 +66,18 @@ int Informed::play() {
   std::size_t upcard = 0;
   
   switch (actionRequired) {
-    case Libreblackjack::PlayerActionRequired::Bet:
+    case lbj::PlayerActionRequired::Bet:
       // TODO: compute expected value and change bet
       currentBet = 1;
-      actionTaken = Libreblackjack::PlayerActionTaken::Bet;
+      actionTaken = lbj::PlayerActionTaken::Bet;
     break;
 
-    case Libreblackjack::PlayerActionRequired::Insurance:
+    case lbj::PlayerActionRequired::Insurance:
       // TODO: compute  
-      actionTaken = Libreblackjack::PlayerActionTaken::DontInsure;
+      actionTaken = lbj::PlayerActionTaken::DontInsure;
     break;
     
-    case Libreblackjack::PlayerActionRequired::Play:
+    case lbj::PlayerActionRequired::Play:
 
 #ifdef BJDEBUG
       std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
@@ -120,25 +121,25 @@ int Informed::play() {
       double_down();
       // -------------------------------------------------------      
       
-      actionTaken = Libreblackjack::PlayerActionTaken::None;
+      actionTaken = lbj::PlayerActionTaken::None;
       if (canSplit) {
         pairs();
         if ((playerValue == -12 && pair_action(11)) || pair_action(value/2)) {
-          actionTaken = Libreblackjack::PlayerActionTaken::Split;
+          actionTaken = lbj::PlayerActionTaken::Split;
         }
       }
       
-      if (actionTaken == Libreblackjack::PlayerActionTaken::None) {
+      if (actionTaken == lbj::PlayerActionTaken::None) {
         actionTaken = (playerValue < 0) ? soft_hsd_action(value) : hard_hsd_action(value);
         
-        if (canDouble == false && actionTaken == Libreblackjack::PlayerActionTaken::Double) {
-          actionTaken = Libreblackjack::PlayerActionTaken::Hit;
+        if (canDouble == false && actionTaken == lbj::PlayerActionTaken::Double) {
+          actionTaken = lbj::PlayerActionTaken::Hit;
         }
       }
       
     break;  
     
-    case Libreblackjack::PlayerActionRequired::None:
+    case lbj::PlayerActionRequired::None:
         // TODO: count cards!
     break;  
     
@@ -378,4 +379,5 @@ void Informed::pairs() {
   }
 
   return;
+}
 }

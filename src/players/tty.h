@@ -29,6 +29,8 @@
 
 #include "../blackjack.h"
 
+namespace lbj {
+
 extern std::vector<std::string> commands;
 
 class Tty : public Player {
@@ -37,7 +39,7 @@ class Tty : public Player {
     ~Tty() { };
     
     int play(void) override;
-    void info(Libreblackjack::Info = Libreblackjack::Info::None, int = 0, int = 0) override;
+    void info(lbj::Info = lbj::Info::None, int = 0, int = 0) override;
 
     // for readline's autocompletion
     static char *rl_command_generator(const char *, int);
@@ -87,5 +89,5 @@ class Tty : public Player {
     inline void trim(std::string &s) { ltrim(s); rtrim(s); };    
       
 };
-
+};
 #endif

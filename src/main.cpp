@@ -32,18 +32,18 @@
 
 int main(int argc, char **argv) {
   
-  Dealer *dealer = nullptr;
-  Player *player = nullptr;
+  lbj::Dealer *dealer = nullptr;
+  lbj::Player *player = nullptr;
   
-  Configuration conf(argc, argv);
+  lbj::Configuration conf(argc, argv);
 
 
   if (conf.show_version) {
-    Libreblackjack::shortversion();
-    Libreblackjack::copyright();
+    lbj::shortversion();
+    lbj::copyright();
   }
   if (conf.show_help) {
-    Libreblackjack::help(argv[0]);
+    lbj::help(argv[0]);
   }
 
   if (conf.show_version || conf.show_help) {
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
   
   // TODO: think of a better way
   if (conf.getDealerName() == "blackjack") {
-    dealer = new Blackjack(conf);
+    dealer = new lbj::Blackjack(conf);
   } else {
     std::cerr << "Unknown dealer for '" << conf.getDealerName() <<"' game" << std::endl;
     return -1;
@@ -61,13 +61,13 @@ int main(int argc, char **argv) {
   // TODO: think of a better way
   std::string player_name = conf.getPlayerName();
   if (player_name == "tty") {
-    player = new Tty(conf);
+    player = new lbj::Tty(conf);
   } else if (player_name == "stdinout" || player_name == "stdio") {
-    player = new StdInOut(conf);
+    player = new lbj::StdInOut(conf);
   } else if (player_name == "basic" || player_name == "internal") {
-    player = new Basic(conf);
+    player = new lbj::Basic(conf);
   } else if (player_name == "informed") {
-    player = new Informed(conf);
+    player = new lbj::Informed(conf);
   } else {
     std::cerr << "Unknown player '" << player_name <<"'" << std::endl;
     return 1;
@@ -83,10 +83,10 @@ int main(int argc, char **argv) {
 
   // let the action begin!
   unsigned int unknownCommands = 0;
-  dealer->nextAction = Libreblackjack::DealerAction::StartNewHand;
+  dealer->nextAction = lbj::DealerAction::StartNewHand;
   while (!dealer->finished()) {
     dealer->deal();
-    if (player->actionRequired != Libreblackjack::PlayerActionRequired::None) {
+    if (player->actionRequired != lbj::PlayerActionRequired::None) {
       unknownCommands = 0;
       do {
         if (unknownCommands++ > conf.max_incorrect_commands) {
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
     }
   }
   
-  player->info(Libreblackjack::Info::Bye);
+  player->info(lbj::Info::Bye);
   
   dealer->prepareReport();
   dealer->writeReportYAML();

@@ -24,6 +24,8 @@
 #define INTERNAL_H
 #include "../blackjack.h"
 
+namespace lbj {
+
 class Basic : public Player {
   public:  
     Basic(Configuration &);
@@ -34,10 +36,10 @@ class Basic : public Player {
   private:
     
     std::string strategy_file_path{"bs.txt"};
-    Libreblackjack::PlayerActionTaken pair[21][12];
-    Libreblackjack::PlayerActionTaken soft[21][12];
-    Libreblackjack::PlayerActionTaken hard[21][12];
+    lbj::PlayerActionTaken pair[21][12];
+    lbj::PlayerActionTaken soft[21][12];
+    lbj::PlayerActionTaken hard[21][12];
       
 };
-
+}
 #endif

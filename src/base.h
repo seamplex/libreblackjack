@@ -31,7 +31,7 @@
 
 #include "conf.h"
 
-namespace Libreblackjack {
+namespace lbj {
   void shortversion(void);
   void help(const char *);
   void copyright(void);
@@ -112,21 +112,20 @@ namespace Libreblackjack {
     Black,
     Red
   };
-};
 
 class Card {
   public:
     Card(unsigned int);
     ~Card() { };
     
-    Libreblackjack::Suit getSuit() { return suit; };
+    Suit getSuit() { return suit; };
     unsigned int getNumber()       { return number; };
     unsigned int getValue()        { return value; };
 
     std::string getNumberASCII()   { return numberASCII; };
     std::string getSuitUTF8()      { return suitUTF8;    };
     
-    Libreblackjack::Suit suit;
+    Suit suit;
     unsigned int number;
     unsigned int value;
     
@@ -202,10 +201,10 @@ class Player {
     Player(const Player &&) = delete;
 
     virtual int play(void) = 0;
-    virtual void info(Libreblackjack::Info = Libreblackjack::Info::None, int p1 = 0, int p2 = 0) { return; }
+    virtual void info(lbj::Info = lbj::Info::None, int p1 = 0, int p2 = 0) { return; }
     
-    Libreblackjack::PlayerActionRequired actionRequired = Libreblackjack::PlayerActionRequired::None;
-    Libreblackjack::PlayerActionTaken    actionTaken    = Libreblackjack::PlayerActionTaken::None;
+    lbj::PlayerActionRequired actionRequired = lbj::PlayerActionRequired::None;
+    lbj::PlayerActionTaken    actionTaken    = lbj::PlayerActionTaken::None;
 
     int dealerValue = 0;
     int playerValue = 0;
@@ -255,7 +254,7 @@ class Dealer {
       player = p;
     }
     
-    void info(Libreblackjack::Info msg, int p1 = 0, int p2 = 0) {
+    void info(lbj::Info msg, int p1 = 0, int p2 = 0) {
       if (player->verbose) {
         player->info(msg, p1, p2);
       }
@@ -270,7 +269,7 @@ class Dealer {
       return (done = d);
     }
     
-    Libreblackjack::DealerAction nextAction = Libreblackjack::DealerAction::None;
+    lbj::DealerAction nextAction = lbj::DealerAction::None;
     
     void prepareReport(void);
     int writeReportYAML(void);
@@ -343,5 +342,6 @@ class Dealer {
 
 template <typename ... Args> std::string string_format( const std::string& format, Args ... args);
 template <typename ... Args> std::string string_format2( const std::string& format, Args ... args);
+}
 
 #endif

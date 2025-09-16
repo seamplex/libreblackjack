@@ -26,6 +26,7 @@
 #include "base.h"
 #include "conf.h"
 
+namespace lbj {
 
 class Blackjack : public Dealer {
   public:  
@@ -83,5 +84,6 @@ class Blackjack : public Dealer {
       return;
     }  
       
+};
 };
 #endif

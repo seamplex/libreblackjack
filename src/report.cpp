@@ -5,6 +5,7 @@
 
 #include "base.h"
 
+namespace lbj {
 
 // https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
 template<typename ... Args>
@@ -101,4 +102,5 @@ int Dealer::writeReportYAML(void) {
   }
 
   return 0;
+}
 }

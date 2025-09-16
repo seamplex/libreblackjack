@@ -33,7 +33,9 @@
 #include "../blackjack.h"
 #include "tty.h"
 
-// TODO: make class static
+namespace lbj {
+
+    // TODO: make class static
 std::vector<std::string> commands;
 
 // https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
@@ -51,8 +53,8 @@ std::string string_format2( const std::string& format, Args ... args)
 
 Tty::Tty(Configuration &conf) {
     
-  Libreblackjack::shortversion();
-//   Libreblackjack::copyright();
+  shortversion();
+//   lbj::copyright();
 
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
   conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});  
@@ -98,7 +100,7 @@ Tty::Tty(Configuration &conf) {
   return;
 }
 
-void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
+void Tty::info(lbj::Info msg, int p1, int p2) {
   std::string s;
   bool render = false;
   
@@ -106,7 +108,7 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
   
   switch (msg) {
 
-    case Libreblackjack::Info::BetInvalid:
+    case lbj::Info::BetInvalid:
       if (p1 < 0) {
         s = "Your bet is negative (" + std::to_string(p1) + ")";
       } else if (p1 > 0) {
@@ -116,7 +118,7 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
       }
     break;
 
-    case Libreblackjack::Info::NewHand:
+    case lbj::Info::NewHand:
       std::cout << std::endl;
       s = "Starting new hand #" + std::to_string(p1) + " with bankroll " + string_format2("%g", 1e-3*p2);
       
@@ -136,12 +138,12 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
       currentHandId = 0;
     break;
     
-    case Libreblackjack::Info::Shuffle:
+    case lbj::Info::Shuffle:
       // TODO: ask the user to cut  
       s = "Deck needs to be shuffled.";
     break;
     
-    case Libreblackjack::Info::CardPlayer:
+    case lbj::Info::CardPlayer:
       if (p2 != static_cast<int>(currentHandId)) {
         for (currentHand = hands.begin(); currentHand != hands.end(); ++currentHand) {
           if (static_cast<int>(currentHand->id) == p2) {
@@ -155,7 +157,7 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
       break;
     break;
     
-    case Libreblackjack::Info::CardDealer:
+    case lbj::Info::CardDealer:
       if (p1 > 0) {
         switch (dealerHand.cards.size()) {
           case 0:
@@ -172,35 +174,35 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
       currentHandId = 0;
     break;
     
-    case Libreblackjack::Info::CardDealerRevealsHole:
+    case lbj::Info::CardDealerRevealsHole:
       s = "Dealer's hole card was " + card[p1].utf8();
       *(++(dealerHand.cards.begin())) = p1;
       currentHandId = 0;
     break;
     
-    case Libreblackjack::Info::DealerBlackjack:
+    case lbj::Info::DealerBlackjack:
       s = "Dealer has Blackjack";
     break;
     
-    case Libreblackjack::Info::PlayerWinsInsurance:
+    case lbj::Info::PlayerWinsInsurance:
       s = "Player wins insurance";
     break;
     
-    case Libreblackjack::Info::PlayerBlackjackAlso:
+    case lbj::Info::PlayerBlackjackAlso:
       s = "Player also has Blackjack";
       render = true;
     break;
 
-    case Libreblackjack::Info::PlayerSplitInvalid:
+    case lbj::Info::PlayerSplitInvalid:
       s = "Cannot split";
     break;
 
-    case Libreblackjack::Info::PlayerSplitOk:
+    case lbj::Info::PlayerSplitOk:
       s = "Splitting hand" + ((p1 != 0)?(" #" + std::to_string(p1)):"");
       handToSplit = p1;
     break;
 
-    case Libreblackjack::Info::PlayerSplitIds:
+    case lbj::Info::PlayerSplitIds:
 
       {
         bool found = false;
@@ -228,59 +230,59 @@ void Tty::info(Libreblackjack::Info msg, int p1, int p2) {
       currentHandId = p1;  
     break;
 
-    case Libreblackjack::Info::PlayerDoubleInvalid:
+    case lbj::Info::PlayerDoubleInvalid:
       s = "Cannot double down";
     break;
     
-    case Libreblackjack::Info::PlayerNextHand:
+    case lbj::Info::PlayerNextHand:
       s = "Playing next hand #" + std::to_string(p1);
       render = true;
     break;
     
-    case Libreblackjack::Info::PlayerPushes:
+    case lbj::Info::PlayerPushes:
       s = "Player pushes " + string_format2("%g", 1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
       render = true;
     break;
     
-    case Libreblackjack::Info::PlayerLosses:
+    case lbj::Info::PlayerLosses:
       s = "Player losses " + string_format2("%g", 1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
       render = true;
     break;
-    case Libreblackjack::Info::PlayerBlackjack:
+    case lbj::Info::PlayerBlackjack:
       s = "Player has Blackjack";
       render = true;
     break;
-    case Libreblackjack::Info::PlayerWins:
+    case lbj::Info::PlayerWins:
       s = "Player wins " + string_format2("%g", 1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
       render = true;
     break;
     
-    case Libreblackjack::Info::NoBlackjacks:
+    case lbj::Info::NoBlackjacks:
       s = "No blackjacks";
     break;
 
-    case Libreblackjack::Info::DealerBusts:
+    case lbj::Info::DealerBusts:
       s = "Dealer busts with " + std::to_string(p1);
     break;  
     
-    case Libreblackjack::Info::Help:
+    case lbj::Info::Help:
       std::cout << "help yourself" << std::endl;        
     break;
 
-    case Libreblackjack::Info::Bankroll:
+    case lbj::Info::Bankroll:
       std::cout << "Your bankroll is " << string_format2("%g", 1e-3*p1) << std::endl;        
     break;
     
     
-    case Libreblackjack::Info::CommandInvalid:
+    case lbj::Info::CommandInvalid:
       s = "Invalid command";
     break;
     
-    case Libreblackjack::Info::Bye:
+    case lbj::Info::Bye:
       s = "Bye bye! We'll play Blackjack again next time";
     break;
     
-    case Libreblackjack::Info::None:
+    case lbj::Info::None:
     break;
     
   }
@@ -301,21 +303,21 @@ int Tty::play() {
 
   std::string s;  
   switch (actionRequired) {
-    case Libreblackjack::PlayerActionRequired::Bet:
+    case lbj::PlayerActionRequired::Bet:
       s = "Bet?";  
     break;
 
-    case Libreblackjack::PlayerActionRequired::Insurance:
+    case lbj::PlayerActionRequired::Insurance:
       renderTable();  
       s = "Insurance?";  
     break;
     
-    case Libreblackjack::PlayerActionRequired::Play:
+    case lbj::PlayerActionRequired::Play:
       renderTable();  
       s = "Play? " + std::to_string(playerValue) + " " + std::to_string(dealerValue);
     break;  
     
-    case Libreblackjack::PlayerActionRequired::None:
+    case lbj::PlayerActionRequired::None:
     break;
     
   }
@@ -332,7 +334,7 @@ int Tty::play() {
   if ((input_buffer = readline(prompt.c_str())) == nullptr) {
       
     // EOF means "quit"
-    actionTaken = Libreblackjack::PlayerActionTaken::Quit;
+    actionTaken = lbj::PlayerActionTaken::Quit;
     std::cout << std::endl;
     return 0;
   }
@@ -349,60 +351,60 @@ int Tty::play() {
     
 #endif  
   
-  actionTaken = Libreblackjack::PlayerActionTaken::None;
+  actionTaken = lbj::PlayerActionTaken::None;
 
   // check common commands first
          if (command == "quit" || command == "q") {
-    actionTaken = Libreblackjack::PlayerActionTaken::Quit;
+    actionTaken = lbj::PlayerActionTaken::Quit;
   } else if (command == "help") {
-    actionTaken = Libreblackjack::PlayerActionTaken::Help;
+    actionTaken = lbj::PlayerActionTaken::Help;
   //    } else if (command == "count" || command == "c") {
-  //      actionTaken = Libreblackjack::PlayerActionTaken::Count;
+  //      actionTaken = lbj::PlayerActionTaken::Count;
   } else if (command == "upcard" || command == "u") {
-    actionTaken = Libreblackjack::PlayerActionTaken::UpcardValue;
+    actionTaken = lbj::PlayerActionTaken::UpcardValue;
   } else if (command == "bankroll" || command == "b") {
-    actionTaken = Libreblackjack::PlayerActionTaken::Bankroll;
+    actionTaken = lbj::PlayerActionTaken::Bankroll;
   } else if (command == "hands") {
-    actionTaken = Libreblackjack::PlayerActionTaken::Hands;
+    actionTaken = lbj::PlayerActionTaken::Hands;
   }
 
-  if (actionTaken == Libreblackjack::PlayerActionTaken::None) {
+  if (actionTaken == lbj::PlayerActionTaken::None) {
     switch (actionRequired) {
 
-      case Libreblackjack::PlayerActionRequired::Bet:
+      case lbj::PlayerActionRequired::Bet:
         if (isdigit(command[0])) {
           currentBet = std::stoi(command);
-          actionTaken = Libreblackjack::PlayerActionTaken::Bet;
+          actionTaken = lbj::PlayerActionTaken::Bet;
         }
       break;
 
-      case Libreblackjack::PlayerActionRequired::Insurance:
+      case lbj::PlayerActionRequired::Insurance:
         if (command == "y" || command == "yes") {
-          actionTaken = Libreblackjack::PlayerActionTaken::Insure;
+          actionTaken = lbj::PlayerActionTaken::Insure;
         } else if (command == "n" || command == "no") {
-          actionTaken = Libreblackjack::PlayerActionTaken::DontInsure;
+          actionTaken = lbj::PlayerActionTaken::DontInsure;
         } else {
           // TODO: chosse if we allow not(yes) == no
-          actionTaken = Libreblackjack::PlayerActionTaken::None;  
+          actionTaken = lbj::PlayerActionTaken::None;  
         }
       break;
 
-      case Libreblackjack::PlayerActionRequired::Play:
+      case lbj::PlayerActionRequired::Play:
         // TODO: sort by higher-expected response first
                if (command == "h" || command =="hit") {
-          actionTaken = Libreblackjack::PlayerActionTaken::Hit;
+          actionTaken = lbj::PlayerActionTaken::Hit;
         } else if (command == "s" || command == "stand") {
-          actionTaken = Libreblackjack::PlayerActionTaken::Stand;
+          actionTaken = lbj::PlayerActionTaken::Stand;
         } else if (command == "d" || command == "double") {
-          actionTaken = Libreblackjack::PlayerActionTaken::Double;
+          actionTaken = lbj::PlayerActionTaken::Double;
         } else if (command == "p" || command == "split" || command == "pair") {
-          actionTaken = Libreblackjack::PlayerActionTaken::Split;
+          actionTaken = lbj::PlayerActionTaken::Split;
         } else {
-          actionTaken = Libreblackjack::PlayerActionTaken::None;
+          actionTaken = lbj::PlayerActionTaken::None;
         }
       break;
 
-      case Libreblackjack::PlayerActionRequired::None:
+      case lbj::PlayerActionRequired::None:
       break;
 
     }
@@ -437,7 +439,7 @@ void Tty::renderHand(Hand *hand, bool current) {
   std::cout << std::endl;
     
   for (auto c : hand->cards) {
-    if (color && (card[c].suit == Libreblackjack::Suit::Diamonds || card[c].suit == Libreblackjack::Suit::Hearts)) {
+    if (color && (card[c].suit == lbj::Suit::Diamonds || card[c].suit == lbj::Suit::Hearts)) {
       ansiColor = red;
       ansiReset = reset;
     } else {
@@ -463,7 +465,7 @@ void Tty::renderHand(Hand *hand, bool current) {
   std::cout << std::endl;
   
   for (auto c : hand->cards) {
-    if (color && (card[c].suit == Libreblackjack::Suit::Diamonds || card[c].suit == Libreblackjack::Suit::Hearts)) {
+    if (color && (card[c].suit == lbj::Suit::Diamonds || card[c].suit == lbj::Suit::Hearts)) {
       ansiColor = red;
       ansiReset = reset;
     } else {
@@ -492,7 +494,7 @@ void Tty::renderHand(Hand *hand, bool current) {
   std::cout << std::endl;
 
   for (auto c : hand->cards) {
-    if (color && (card[c].suit == Libreblackjack::Suit::Diamonds || card[c].suit == Libreblackjack::Suit::Hearts)) {
+    if (color && (card[c].suit == lbj::Suit::Diamonds || card[c].suit == lbj::Suit::Hearts)) {
       ansiColor = red;
       ansiReset = reset;
     } else {
@@ -539,4 +541,5 @@ char **Tty::rl_completion(const char *text, int start, int end) {
   matches = rl_completion_matches(text, rl_command_generator);
 #endif
   return matches;
+}
 }

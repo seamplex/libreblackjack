@@ -28,6 +28,8 @@
 // all arrays are fixed in size so the compiler can do its magic
 #define SIZE 1+32
 
+namespace lbj {
+
 class Informed : public Player {
   public:  
     Informed(Configuration &);
@@ -59,5 +61,5 @@ class Informed : public Player {
     void double_down();
     void pairs();
 };
-
+}
 #endif

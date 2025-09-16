@@ -26,6 +26,8 @@
 #include "../blackjack.h"
 #include "stdinout.h"
 
+namespace lbj {
+
 StdInOut::StdInOut(Configuration &conf) {
     
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
@@ -40,13 +42,13 @@ StdInOut::StdInOut(Configuration &conf) {
   return;
 }
 
-void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
+void StdInOut::info(lbj::Info msg, int p1, int p2) {
     
   std::string s;
   
   switch (msg) {
 
-    case Libreblackjack::Info::BetInvalid:
+    case lbj::Info::BetInvalid:
       if (p1 < 0) {
         s = "bet_negative" + std::to_string(p1);  
       } else if (p1 > 0) {
@@ -56,7 +58,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
       }
     break;
 
-    case Libreblackjack::Info::NewHand:
+    case lbj::Info::NewHand:
       s = "new_hand " + std::to_string(p1) + " " + std::to_string(1e-3*p2);  
       
       // clear dealer's hand
@@ -75,12 +77,12 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
       currentHandId = 0;
     break;
     
-    case Libreblackjack::Info::Shuffle:
+    case lbj::Info::Shuffle:
       // TODO: ask the user to cut  
       s = "shuffling";  
     break;
     
-    case Libreblackjack::Info::CardPlayer:
+    case lbj::Info::CardPlayer:
       s = "card_player " + card[p1].ascii() + " " + ((p2 != 0)?(std::to_string(p2)+ " "):"") ;
       if (p2 != static_cast<int>(currentHandId)) {
         for (currentHand = hands.begin(); currentHand != hands.end(); ++currentHand) {
@@ -94,7 +96,7 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
       break;
     break;
     
-    case Libreblackjack::Info::CardDealer:
+    case lbj::Info::CardDealer:
       if (p1 > 0) {
         switch (dealerHand.cards.size()) {
           case 0:
@@ -111,34 +113,34 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
       currentHandId = 0;
     break;
     
-    case Libreblackjack::Info::CardDealerRevealsHole:
+    case lbj::Info::CardDealerRevealsHole:
       s = "card_dealer_hole " + card[p1].ascii();;
       *(++(dealerHand.cards.begin())) = p1;
       currentHandId = 0;
     break;
     
-    case Libreblackjack::Info::DealerBlackjack:
+    case lbj::Info::DealerBlackjack:
       s = "dealer_blackjack";
     break;
     
-    case Libreblackjack::Info::PlayerWinsInsurance:
+    case lbj::Info::PlayerWinsInsurance:
       s = "player_wins_insurance";
     break;
     
-    case Libreblackjack::Info::PlayerBlackjackAlso:
+    case lbj::Info::PlayerBlackjackAlso:
       s = "player_blackjack_also";
     break;
 
-    case Libreblackjack::Info::PlayerSplitInvalid:
+    case lbj::Info::PlayerSplitInvalid:
       s = "player_split_invalid";
     break;
 
-    case Libreblackjack::Info::PlayerSplitOk:
+    case lbj::Info::PlayerSplitOk:
       s = "player_split_ok" + ((p1 != 0)?std::to_string(p1):"");
       handToSplit = p1;
     break;
 
-    case Libreblackjack::Info::PlayerSplitIds:
+    case lbj::Info::PlayerSplitIds:
 
       {
         bool found = false;
@@ -166,54 +168,54 @@ void StdInOut::info(Libreblackjack::Info msg, int p1, int p2) {
       s = "new_split_hand " + std::to_string(p2) + " " + card[cardToSplit].ascii();
     break;
 
-    case Libreblackjack::Info::PlayerDoubleInvalid:
+    case lbj::Info::PlayerDoubleInvalid:
       s = "player_double_invalid";
     break;
     
-    case Libreblackjack::Info::PlayerNextHand:
+    case lbj::Info::PlayerNextHand:
       s = "player_next_hand";
     break;
     
-    case Libreblackjack::Info::PlayerPushes:
+    case lbj::Info::PlayerPushes:
       s = "player_pushes " + std::to_string(playerValue) + " " + std::to_string(dealerValue);;
     break;
     
-    case Libreblackjack::Info::PlayerLosses:
+    case lbj::Info::PlayerLosses:
       s = "player_losses " + std::to_string(playerValue) + " " + std::to_string(dealerValue);
     break;
-    case Libreblackjack::Info::PlayerBlackjack:
+    case lbj::Info::PlayerBlackjack:
       s = "blackjack_player";
     break;
-    case Libreblackjack::Info::PlayerWins:
+    case lbj::Info::PlayerWins:
       s = "player_wins " + std::to_string(playerValue) + " " + std::to_string(dealerValue);;
     break;
     
-    case Libreblackjack::Info::NoBlackjacks:
+    case lbj::Info::NoBlackjacks:
       s = "no_blackjacks";
     break;
 
-    case Libreblackjack::Info::DealerBusts:
+    case lbj::Info::DealerBusts:
       s = "dealer_busts " + std::to_string(playerValue) + " " + std::to_string(dealerValue);;
     break;  
     
-    case Libreblackjack::Info::Help:
+    case lbj::Info::Help:
       std::cout << "help yourself" << std::endl;        
     break;
 
-    case Libreblackjack::Info::Bankroll:
+    case lbj::Info::Bankroll:
       std::cout << "bankroll " << std::to_string(1e-3*p1) << std::endl;        
     break;
     
     
-    case Libreblackjack::Info::CommandInvalid:
+    case lbj::Info::CommandInvalid:
       s = "command_invalid";
     break;
     
-    case Libreblackjack::Info::Bye:
+    case lbj::Info::Bye:
       s = "bye";  
     break;
     
-    case Libreblackjack::Info::None:
+    case lbj::Info::None:
     break;
     
   }
@@ -228,19 +230,19 @@ int StdInOut::play(void) {
   std::string s;
   
   switch (actionRequired) {
-    case Libreblackjack::PlayerActionRequired::Bet:
+    case lbj::PlayerActionRequired::Bet:
       s = "bet?";  
     break;
 
-    case Libreblackjack::PlayerActionRequired::Insurance:
+    case lbj::PlayerActionRequired::Insurance:
       s = "insurance?";  
     break;
     
-    case Libreblackjack::PlayerActionRequired::Play:
+    case lbj::PlayerActionRequired::Play:
       s = "play? " + std::to_string(playerValue) + " " + std::to_string(dealerValue);
     break;  
     
-    case Libreblackjack::PlayerActionRequired::None:
+    case lbj::PlayerActionRequired::None:
     break;
     
   }
@@ -251,65 +253,65 @@ int StdInOut::play(void) {
   std::cin >> command;
 
   if (std::cin.eof()) {
-    actionTaken = Libreblackjack::PlayerActionTaken::Quit;
+    actionTaken = lbj::PlayerActionTaken::Quit;
     return 0;
   }
 
   trim(command);
-  actionTaken = Libreblackjack::PlayerActionTaken::None;
+  actionTaken = lbj::PlayerActionTaken::None;
     
     // check common commands first
            if (command == "quit" || command == "q") {
-      actionTaken = Libreblackjack::PlayerActionTaken::Quit;
+      actionTaken = lbj::PlayerActionTaken::Quit;
     } else if (command == "help") {
-      actionTaken = Libreblackjack::PlayerActionTaken::Help;
+      actionTaken = lbj::PlayerActionTaken::Help;
 //    } else if (command == "count" || command == "c") {
-//      actionTaken = Libreblackjack::PlayerActionTaken::Count;
+//      actionTaken = lbj::PlayerActionTaken::Count;
     } else if (command == "upcard" || command == "u") {
-      actionTaken = Libreblackjack::PlayerActionTaken::UpcardValue;
+      actionTaken = lbj::PlayerActionTaken::UpcardValue;
     } else if (command == "bankroll" || command == "b") {
-      actionTaken = Libreblackjack::PlayerActionTaken::Bankroll;
+      actionTaken = lbj::PlayerActionTaken::Bankroll;
     } else if (command == "hands") {
-      actionTaken = Libreblackjack::PlayerActionTaken::Hands;
+      actionTaken = lbj::PlayerActionTaken::Hands;
     }
     
-    if (actionTaken == Libreblackjack::PlayerActionTaken::None) {
+    if (actionTaken == lbj::PlayerActionTaken::None) {
       switch (actionRequired) {
 
-        case Libreblackjack::PlayerActionRequired::Bet:
+        case lbj::PlayerActionRequired::Bet:
           if (isdigit(command[0])) {
             currentBet = std::stoi(command);
-            actionTaken = Libreblackjack::PlayerActionTaken::Bet;
+            actionTaken = lbj::PlayerActionTaken::Bet;
           }
         break;
 
-        case Libreblackjack::PlayerActionRequired::Insurance:
+        case lbj::PlayerActionRequired::Insurance:
           if (command == "y" || command == "yes") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Insure;
+            actionTaken = lbj::PlayerActionTaken::Insure;
           } else if (command == "n" || command == "no") {
-            actionTaken = Libreblackjack::PlayerActionTaken::DontInsure;
+            actionTaken = lbj::PlayerActionTaken::DontInsure;
           } else {
             // TODO: chosse if we allow not(yes) == no
-            actionTaken = Libreblackjack::PlayerActionTaken::None;  
+            actionTaken = lbj::PlayerActionTaken::None;  
           }
         break;
 
-        case Libreblackjack::PlayerActionRequired::Play:
+        case lbj::PlayerActionRequired::Play:
           // TODO: sort by higher-expected response first
                  if (command == "h" || command =="hit") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Hit;
+            actionTaken = lbj::PlayerActionTaken::Hit;
           } else if (command == "s" || command == "stand") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Stand;
+            actionTaken = lbj::PlayerActionTaken::Stand;
           } else if (command == "d" || command == "double") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Double;
+            actionTaken = lbj::PlayerActionTaken::Double;
           } else if (command == "p" || command == "split" || command == "pair") {
-            actionTaken = Libreblackjack::PlayerActionTaken::Split;
+            actionTaken = lbj::PlayerActionTaken::Split;
           } else {
-            actionTaken = Libreblackjack::PlayerActionTaken::None;
+            actionTaken = lbj::PlayerActionTaken::None;
           }
         break;
         
-        case Libreblackjack::PlayerActionRequired::None:
+        case lbj::PlayerActionRequired::None:
         break;
         
       }
@@ -318,4 +320,5 @@ int StdInOut::play(void) {
   
   return 0;
 
+}
 }

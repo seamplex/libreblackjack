@@ -27,8 +27,8 @@
 #include <list>
 #include <map>
 
-// TODO: namespace fbj
-
+namespace lbj {
+  
 class Configuration {
   public:  
     Configuration(int, char **);  
@@ -77,4 +77,5 @@ class Configuration {
 //    bool bar_already_alloced = false;
     
 };
+}
 #endif

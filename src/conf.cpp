@@ -30,6 +30,7 @@
 #include <getopt.h>
 #include <unistd.h>
 
+namespace lbj {
 Configuration::Configuration(int argc, char **argv) {
   
   const struct option longopts[] = {
@@ -71,7 +72,7 @@ Configuration::Configuration(int argc, char **argv) {
   int optc = 0;
   int option_index = 0;
   opterr = 0;
-  while ((optc = getopt_long_only(argc, argv, "c:hvd:n:if:", longopts, &option_index)) != -1) {
+  while ((optc = getopt_long_only(argc, argv, "c:hvd:n:if", longopts, &option_index)) != -1) {
     switch (optc) {
       case 'h':
         show_help = true;
@@ -311,4 +312,5 @@ std::string Configuration::getString(std::string key) {
 
 Configuration::~Configuration() {
   conf.clear();
+}
 }

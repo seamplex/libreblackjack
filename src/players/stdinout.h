@@ -29,6 +29,7 @@
 #include <cctype>
 #include <locale>
 
+namespace lbj {
 
 class StdInOut : public Player {
   public:  
@@ -36,7 +37,7 @@ class StdInOut : public Player {
     ~StdInOut() { };
     
     int play(void) override;
-    void info(Libreblackjack::Info = Libreblackjack::Info::None, int = 0, int = 0) override;
+    void info(lbj::Info = lbj::Info::None, int = 0, int = 0) override;
     
   private:
     std::string input_buffer;
@@ -55,4 +56,5 @@ class StdInOut : public Player {
     inline void trim(std::string &s) { ltrim(s); rtrim(s); };    
       
 };
+}
 #endif
