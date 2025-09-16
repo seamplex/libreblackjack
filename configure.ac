@@ -8,7 +8,11 @@ dnl This program is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-m4_include([version.m4])
+m4_ifndef([_VERSION_M4_INCLUDED], [
+  m4_define([_VERSION_M4_INCLUDED], 1)
+  m4_include([version.m4])
+])
+
 AC_INIT([blackjack],[libreblackjackversion],[jeremy@seamplex.com])
 AM_INIT_AUTOMAKE
 # AM_GNU_GETTEXT([external])
@@ -27,7 +31,7 @@ AC_ARG_ENABLE([debug],
 AS_IF([test "x$CXXFLAGS" = "x-g -O2"],
   AS_IF([test "x$with_debug" = "xyes" -o "x$enable_debug" = "xyes"] , [
     CXXFLAGS="-g -O0"
-    AC_DEFINE([DEBUG], [1], [Define to 1 if debugging is enabled])
+    AC_DEFINE([BJDEBUG], [1], [Define to 1 if debugging is enabled])
   ],[
     CXXFLAGS="-O3 -flto=auto -no-pie"
   ])

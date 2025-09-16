@@ -50,27 +50,26 @@ class Blackjack : public Dealer {
     size_t cut_card_position = 0;
     bool last_pass = false;
     
-    unsigned int upCard;
-    unsigned int holeCard;
-    unsigned int playerFirstCard;
-    unsigned int playerSecondCard;
+    unsigned int dealer_up_card;
+    unsigned int dealer_hole_card;
+    unsigned int player_first_card;
+    unsigned int player_second_card;
 
-    // TODO: check these!
-    bool h17 = true;   // checked
-    bool das = true;   // checked
-    bool doa = true;   // checked
-    bool enhc = false; // checked
-    bool rsa = false;
+    // TODO: make tests
+    bool h17 = true;
+    bool das = true;
+    bool doa = true;
+    bool enhc = false;
+    bool rsa = false;  // TODO
     bool shuffle_every_hand = false;
+    bool quit_when_arranged_cards_run_out = false;
     
-    std::vector<unsigned int> arranged_cards;
-    unsigned int n_arranged_cards = 0; // just to prevent calling size() each time we draw a card
-    unsigned int i_arranged_cards = 0;
+    std::vector<int> arranged_cards;
+    size_t n_arranged_cards = 0; // just to prevent calling size() each time we draw a card
+    size_t i_arranged_cards = 0;
 
     unsigned int max_bet = 0;
     unsigned int number_of_burnt_cards = 0;
-    
-    
     
     double insurance = 0;
     double blackjack_pays = 1.5;
@@ -78,8 +77,8 @@ class Blackjack : public Dealer {
     double penetration = 0.75;
     double penetration_sigma = 0;
     
+    int read_arranged_cards(std::istringstream iss); // maybe this should go into the parent class?
     void can_double_split(void);
-      
 };
 };
 #endif

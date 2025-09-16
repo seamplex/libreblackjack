@@ -30,6 +30,7 @@
 
 
 #include <sstream>
+#include <fstream>
 #include <algorithm>
 #include <iterator>
 #include <list>
@@ -53,6 +54,8 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
       // I cannot believe there is no case-insensitive string comparison in C++
       if (token == "enhc" || token == "ENHC") {
         enhc = true;
+      } else if (token == "ahc" || token == "AHC") {
+        enhc = false;
       } else if (token == "h17" || token == "H17") {
         h17 = true;
       } else if (token == "s17" || token == "S17") {
@@ -63,7 +66,7 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
         das = false;
       } else if (token == "doa" || token == "DOA") {
         doa = true;
-      } else if (token == "ndoa" || token == "NDOA") {
+      } else if (token == "da9" || token == "DA9") {
         doa = false;
       } else if (token == "rsa" || token == "RSA") {
         rsa = true;
@@ -82,9 +85,6 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   conf.set(&doa, {"doa", "double_on_any"});
   conf.set(&rsa, {"rsa", "resplit_aces"});
   conf.set(&enhc, {"enhc", "european_no_hole_card"});
-  // TODO:
-  // * rsa
-  // * enhc
   conf.set(&blackjack_pays, {"blackjack_pays"});
   
   conf.set(&playerStats.bankroll, {"bankroll", "initial_bankroll"});
@@ -98,75 +98,46 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   conf.set(&penetration, {"penetration"});
   conf.set(&penetration_sigma, {"penetration_sigma", "penetration_dispersion"});
   conf.set(&shuffle_every_hand, {"shuffle", "shuffle_every_hand"});
+  conf.set(&quit_when_arranged_cards_run_out, {"quit_when_arranged_cards_run_out"});
   
-  // TODO: read cards from file
+  
+  // read arranged cards
   if (conf.exists("cards")) {
+    if (conf.exists("cards_file")) {
+      std::cerr << "error: cannot have both cards and cards_file" << std::endl;
+      exit(1);
+    }
     std::istringstream iss(conf.getString("cards"));
-    std::string token;
-    while(iss >> token) {
-      
-      bool number = true;
-      for (char c : token) {
-        number &= std::isdigit(c);
-      }
-      
-      int n = 0;
-      if (number) {
-        n = std::stoi(token);
-        if (n <= 0 || n > 52) {
-          std::cerr << "error: invalid integer card " << token << std::endl;
-          exit(1);
-        }
-      } else {
-        char rank = token[0];
-        char suit = token[1];
-        if (rank == 'A') {
-          n = 1;    
-        } else if (rank == 'T') {
-          n = 10;    
-        } else if (rank == 'J') {
-          n = 11;    
-        } else if (rank == 'Q') {
-          n = 12;    
-        } else if (rank == 'K') {
-          n = 13;    
-        } else {
-          n = rank - '0';
-        }
-        if (n < 1 || n > 13) {
-          std::cerr << "error: invalid ASCII rank " << token << std::endl;
-          exit(1);
-        }
-        
-        if (suit != '\0') {
-          if (suit == 'C') {
-            n += static_cast<int>(lbj::Suit::Clubs) * 13;
-          } else if (suit == 'D') {
-            n += static_cast<int>(lbj::Suit::Diamonds) * 13;
-          } else if (suit == 'H') {
-            n += static_cast<int>(lbj::Suit::Hearts) * 13;
-          } else if (suit == 'S') {
-            n += static_cast<int>(lbj::Suit::Spades) * 13;
-          } else {
-            std::cerr << "error: invalid ASCII suit " << token << std::endl;
-            exit(1);
-          }
-        }
-      }
-      
-      if (n == 0) {
-        std::cerr << "error: invalid card " << token << std::endl;
-      }
-      
-      arranged_cards.push_back(n);
+    if (read_arranged_cards(std::move(iss)) != 0) {
+      exit(1);
     }
     conf.markUsed("cards");
+  }
+  
+  if (conf.exists("cards_file")) {
+    if (conf.exists("cards")) {
+      std::cerr << "error: cannot have both cards and cards_file" << std::endl;
+      exit(1);
+    }
+    
+    std::ifstream file(conf.getString("cards_file"));
+    if (!file.is_open()) {
+      std::cerr << "error: opening file " << conf.getString("rules") << std::endl;
+      exit(1);
+    }
+    std::string file_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    file.close();
+    
+    std::istringstream iss(file_content);
+    if (read_arranged_cards(std::move(iss)) != 0) {
+      exit(1);
+    }
+    conf.markUsed("cards_file");
   }
   
   n_arranged_cards = arranged_cards.size();
   
   bool explicit_seed = conf.set(&rng_seed, {"rng_seed", "seed"});
-  
   if (explicit_seed) {
     rng = std::mt19937(rng_seed);
   }
@@ -180,12 +151,76 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
       }
     }
     shuffle();
-    cut_card_position = static_cast<int>(penetration * 52 * n_decks);
+    cut_card_position = static_cast<size_t>(penetration * 52 * n_decks);
   }
 }
 
 Blackjack::~Blackjack() {
   return;    
+}
+
+int Blackjack::read_arranged_cards(std::istringstream iss) {
+  std::string token;
+  while(iss >> token) {
+      
+    // TODO: move to cards.cpp  
+    bool number = true;
+    for (char c : token) {
+      number &= std::isdigit(c);
+    }
+      
+    int n = 0;
+    if (number) {
+      n = std::stoi(token);
+      if (n <= 0 || n > 52) {
+        // TODO: negative values are placeholders for random cards
+        std::cerr << "error: invalid integer card " << token << std::endl;
+        return 1;
+      }
+    } else {
+      char rank = token[0];
+      char suit = token[1];
+      if (rank == 'A') {
+        n = 1;    
+      } else if (rank == 'T') {
+        n = 10;    
+      } else if (rank == 'J') {
+        n = 11;    
+      } else if (rank == 'Q') {
+        n = 12;    
+      } else if (rank == 'K') {
+        n = 13;    
+      } else {
+        n = rank - '0';
+      }
+      if (n < 1 || n > 13) {
+        std::cerr << "error: invalid ASCII card rank " << token << std::endl;
+        return 1;
+      }
+        
+      if (suit != '\0') {
+        if (suit == 'C') {
+          n += static_cast<int>(lbj::Suit::Clubs) * 13;
+        } else if (suit == 'D') {
+          n += static_cast<int>(lbj::Suit::Diamonds) * 13;
+        } else if (suit == 'H') {
+          n += static_cast<int>(lbj::Suit::Hearts) * 13;
+        } else if (suit == 'S') {
+          n += static_cast<int>(lbj::Suit::Spades) * 13;
+        } else {
+          std::cerr << "error: invalid ASCII card suit " << token << std::endl;
+          return 1;
+        }
+      }
+    }
+      
+    if (n == 0) {
+      std::cerr << "error: invalid card " << token << std::endl;
+    }
+      
+    arranged_cards.push_back(n);
+  }
+  return 0;
 }
 
 void Blackjack::can_double_split(void) {
@@ -206,7 +241,7 @@ void Blackjack::can_double_split(void) {
 
 void Blackjack::deal(void) {
   
-  bool playerBlackjack = false;
+  bool player_blackjack = false;
   // let's start by assuming the player does not need to do anything
   player->actionRequired = lbj::PlayerActionRequired::None;
   
@@ -287,34 +322,34 @@ void Blackjack::deal(void) {
     case lbj::DealerAction::DealPlayerFirstCard:
       // where's step 2? <- probably that's the player's bet
       // step 3. deal the first card to each player
-      playerFirstCard = draw(&(*playerStats.currentHand));
-      info(lbj::Info::CardPlayer, playerFirstCard);
+      player_first_card = draw(&(*playerStats.currentHand));
+      info(lbj::Info::CardPlayer, player_first_card);
 #ifdef BJDEBUG
-      std::cout << "first card " << card[playerFirstCard].utf8() << std::endl;
+      std::cout << "first card " << card[player_first_card].utf8() << std::endl;
 #endif
       // step 4. show dealer's upcard
-      upCard = draw(&hand);
-      info(lbj::Info::CardDealer, upCard);
+      dealer_up_card = draw(&hand);
+      info(lbj::Info::CardDealer, dealer_up_card);
 #ifdef BJDEBUG
-      std::cout << "up card " << card[upCard].utf8() << std::endl;
+      std::cout << "up card " << card[dealer_up_card].utf8() << std::endl;
 #endif
       player->dealerValue = hand.value();
 
       // step 5. deal the second card to each player
-      playerSecondCard = draw(&(*playerStats.currentHand));
-      info(lbj::Info::CardPlayer, playerSecondCard);
+      player_second_card = draw(&(*playerStats.currentHand));
+      info(lbj::Info::CardPlayer, player_second_card);
       player->playerValue = playerStats.currentHand->value();
 #ifdef BJDEBUG
-      std::cout << "second card " << card[playerSecondCard].utf8() << std::endl;
+      std::cout << "second card " << card[player_second_card].utf8() << std::endl;
 #endif
       
       if (enhc == false) {
         // step 6. deal the dealer's hole card 
-        holeCard = draw(&hand);
+        dealer_hole_card = draw(&hand);
         info(lbj::Info::CardDealer);
 
         // step 7.a. if the upcard is an ace ask for insurance
-        if (card[upCard].value == 11) {
+        if (card[dealer_up_card].value == 11) {
           if (player->no_insurance == false && player->always_insure == false) {
             player->actionRequired = lbj::PlayerActionRequired::Insurance;
             nextAction = lbj::DealerAction::None;
@@ -338,7 +373,7 @@ void Blackjack::deal(void) {
       }
       
       // step 7.b. if either the dealer or the player has a chance to have a blackjack, check
-      if ((card[upCard].value == 10 || card[upCard].value == 11) || std::abs(player->playerValue) == 21) {
+      if ((card[dealer_up_card].value == 10 || card[dealer_up_card].value == 11) || std::abs(player->playerValue) == 21) {
         player->actionRequired = lbj::PlayerActionRequired::None;
         nextAction = lbj::DealerAction::CheckforBlackjacks;
         return;
@@ -353,12 +388,12 @@ void Blackjack::deal(void) {
  
     case lbj::DealerAction::CheckforBlackjacks:
       // step 8. check if there are any blackjack
-      playerBlackjack = playerStats.currentHand->blackjack();
+      player_blackjack = playerStats.currentHand->blackjack();
       if (hand.blackjack()) {
-        info(lbj::Info::CardDealerRevealsHole, holeCard);
+        info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
         info(lbj::Info::DealerBlackjack);
 #ifdef BJDEBUG
-        std::cout << "dealer blakjack " << card[holeCard].utf8() << std::endl;
+        std::cout << "dealer blakjack " << card[dealer_hole_card].utf8() << std::endl;
 #endif
         playerStats.blackjacksDealer++;
 
@@ -372,10 +407,10 @@ void Blackjack::deal(void) {
           playerStats.winsInsured++;
         }
 
-        if (playerBlackjack) {
+        if (player_blackjack) {
           info(lbj::Info::PlayerBlackjackAlso);
 #ifdef BJDEBUG
-          std::cout << "both blackjack " << card[holeCard].utf8() << std::endl;
+          std::cout << "bdealer_hole_cardkjack " << card[dealer_hole_card].utf8() << std::endl;
 #endif
 
           // give him his (her her) money back
@@ -397,7 +432,7 @@ void Blackjack::deal(void) {
         player->actionRequired = lbj::PlayerActionRequired::None;
         return;
         
-      } else if (playerBlackjack) {
+      } else if (player_blackjack) {
 
         // pay him (her)
         playerStats.bankroll += (1.0 + blackjack_pays) * playerStats.currentHand->bet;
@@ -414,7 +449,7 @@ void Blackjack::deal(void) {
         
       } else {
         // only if the dealer had the chance to have a blackjack we say "No blackjacks"
-        if (enhc == false && (card[upCard].value == 10 || card[upCard].value == 11)) {
+        if (enhc == false && (card[dealer_up_card].value == 10 || card[dealer_up_card].value == 11)) {
           info(lbj::Info::NoBlackjacks);
         }
         
@@ -468,9 +503,9 @@ void Blackjack::deal(void) {
 
         if (bustedAllHands) {
           if (enhc == false) {  
-            info(lbj::Info::CardDealerRevealsHole, holeCard);
+            info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
 #ifdef BJDEBUG
-            std::cout << "hole " << card[holeCard].utf8() << std::endl;
+            std::cout << "hole " << card[dealer_hole_card].utf8() << std::endl;
 #endif
           }
           
@@ -487,10 +522,10 @@ void Blackjack::deal(void) {
     
     case lbj::DealerAction::HitDealerHand:
         
-      if (enhc == false) {  
-        info(lbj::Info::CardDealerRevealsHole, holeCard);
+      if (enhc == false) {
+        info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
 #ifdef BJDEBUG
-        std::cout << "hole " << card[holeCard].utf8() << std::endl;
+        std::cout << "hole " << card[dealer_hole_card].utf8() << std::endl;
 #endif
       }
 
@@ -889,6 +924,11 @@ unsigned int Blackjack::draw(Hand *hand) {
       if ((tag = arranged_cards[i_arranged_cards++]) <= 0 || tag > 52) {
         tag = fiftyTwoCards(rng);
       }
+      
+      if (quit_when_arranged_cards_run_out && i_arranged_cards == n_arranged_cards) {
+        finished(true);
+      }
+      
     } else {
       tag = fiftyTwoCards(rng);
     }  

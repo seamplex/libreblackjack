@@ -73,6 +73,7 @@ int main(int argc, char **argv) {
     return 1;
   }
   
+  // complain if there are configuration options which are not used
   if (conf.checkUsed() != 0) {
     return 1;
   }
@@ -82,14 +83,14 @@ int main(int argc, char **argv) {
   dealer->setPlayer(player);
 
   // let the action begin!
-  unsigned int unknownCommands = 0;
+  size_t n_incorrect_commands = 0;
   dealer->nextAction = lbj::DealerAction::StartNewHand;
   while (!dealer->finished()) {
     dealer->deal();
     if (player->actionRequired != lbj::PlayerActionRequired::None) {
-      unknownCommands = 0;
+      n_incorrect_commands = 0;
       do {
-        if (unknownCommands++ > conf.max_incorrect_commands) {
+        if (n_incorrect_commands++ > conf.max_incorrect_commands) {
           std::cerr << "Too many unknown commands." << std::endl;
           return 2;
         }

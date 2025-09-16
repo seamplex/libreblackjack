@@ -1,17 +1,22 @@
-# new
+# high importance
 
  * RSA
  * ES10
- * 100k cards in a text file
  * read strategy from file
  * multiple players
+ * clean up command line help, -c or no?
  * rules in report
  
+# medium
+
+ * error handler, explain what the valid choices are (i.e. unknown rules)
+ * update docs (like feenox)
+ * cpu and wall time in report
+
 # old
 
- * re-write docs in pandoc + filters instead of m4
- * cpu and wall time in report
  * check that the card distribution is uniform
+   - i.e. statistiscal tests
  * initial bankroll
  * report
    * add yaml filters to get JSON (`jq`), markdown table (`awk`), etc.
@@ -33,6 +38,7 @@
  * conf
     - bankroll_history_file_path
     - removed_cards
+    - chance of getting first cards
  
  * multithreading (not sure)
  * optimize using const and restrict 

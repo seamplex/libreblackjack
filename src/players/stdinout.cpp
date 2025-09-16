@@ -199,6 +199,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
     break;  
     
     case lbj::Info::Help:
+      // TODO: help
       std::cout << "help yourself" << std::endl;        
     break;
 
