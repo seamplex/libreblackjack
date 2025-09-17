@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - tty interactive player
  *
- *  Copyright (C) 2020, 2023 jeremy theler
+ *  Copyright (C) 2020, 2023, 2025 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -51,14 +51,11 @@ std::string string_format2( const std::string& format, Args ... args)
   return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
 
-Tty::Tty(Configuration &conf) {
+Tty::Tty(Configuration &conf) : Player(conf) {
     
   shortversion();
 //   lbj::copyright();
 
-  conf.set(&flat_bet, {"flat_bet", "flatbet"});  
-  conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});  
-  conf.set(&always_insure, {"always_insure"});  
   conf.set(&delay, {"delay"});  
 
   if (commands.size() == 0) {

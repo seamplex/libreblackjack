@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - base classes
  *
- *  Copyright (C) 2020,2023 jeremy theler
+ *  Copyright (C) 2020, 2023, 2025 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -192,7 +192,11 @@ class PlayerHand : public Hand {
 
 class Player {
   public:
-    Player() = default;
+    Player(Configuration &conf) {
+      conf.set(&flat_bet, {"flat_bet", "flatbet"});  
+      conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});  
+      conf.set(&always_insure, {"always_insure"});  
+    };
     virtual ~Player() = default;
     // delete copy and move constructors
     Player(Player&) = delete;

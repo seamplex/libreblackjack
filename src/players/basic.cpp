@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - internal basic strategy automatic player
  *
- *  Copyright (C) 2020,2023 jeremy theler
+ *  Copyright (C) 2020, 2023, 2025 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -29,7 +29,7 @@
 
 namespace lbj {
 
-Basic::Basic(Configuration &conf) {
+Basic::Basic(Configuration &conf) : Player(conf) {
 
   for (int value = 0; value < 21; value++) {
     for (int upcard = 0; upcard < 12; upcard++) {
@@ -44,7 +44,6 @@ Basic::Basic(Configuration &conf) {
   std::vector<std::string> default_soft(21);
   std::vector<std::string> default_pair(21);
   
-  // TODO: read from file
   default_hard[20] = "  ssssssssss";  
   default_hard[19] = "  ssssssssss";  
   default_hard[18] = "  ssssssssss";  
@@ -126,16 +125,19 @@ Basic::Basic(Configuration &conf) {
   conf.set(strategy_file_path, {"strategy_file_path", "strategy_file", "strategy"});  
   
   // std::ifstream is RAII, i.e. no need to call close
-  std::ifstream fileStream(strategy_file_path);
-  std::string line;  
-  std::string token;
+  std::ifstream file_stream(strategy_file_path);
   
-  if (fileStream.is_open()) {
-    while (getline(fileStream, line)) {
+  if (file_stream.is_open()) {
+    std::string line;
+    int line_num = 0;
+    while (getline(file_stream, line)) {
+      line_num++;
+      // TODO: trim?
       if (line[0] == '#' || line[0] == ';' || line.empty() || line.find_first_not_of(" \t\r\n") == line.npos) {
         continue;
       }
 
+      std::string token;
       auto stream = std::istringstream(line);
       // TODO: check error
       stream >> token;
@@ -144,36 +146,47 @@ Basic::Basic(Configuration &conf) {
       lbj::PlayerActionTaken (*strategy)[21][12] = nullptr;
       switch (token[0]) {
         case 'h':
+        case 'H':
           strategy = &hard;
         break;
         case 's':
+        case 'S':
           strategy = &soft;
         break;
         case 'p':
+        case 'P':
           strategy = &pair;
           // see below how we handle these two cases
-          if (token[1] == 'A') {
+          if (token[1] == 'A' || token[1] == 'a') {
             value = 11;  
-          } else if (token[1] == 'T') {
+          } else if (token[1] == 'T' || token[1] == 't') {
             value = 10;
           }
+        break;
+        default:
+          std::cerr << "error: either h (hard), s (soft) or p (pair) expected as the first character in " << strategy_file_path << ":" << line_num << std::endl;
+          exit(1);
         break;
       }
 
       if (value == 0) {
         value = std::stoi(token.substr(1));
       }
+      if (value == 0 || value > 20) {
+        std::cerr << "error: unknown value in " << strategy_file_path << ":" << line_num << std::endl;
+        exit(1);
+      }
       
       for (int upcard = 2; upcard < 12; upcard++) {
-      // TODO: check error
+        // TODO: check error
         stream >> token;
-        if (token == "h") {
+        if (token == "h" || token == "H") {
           (*strategy)[value][upcard] = lbj::PlayerActionTaken::Hit;  
-        } else if (token == "s") {
+        } else if (token == "s" || token == "S") {
           (*strategy)[value][upcard] = lbj::PlayerActionTaken::Stand;  
-        } else if (token == "d") {
+        } else if (token == "d" || token == "D") {
           (*strategy)[value][upcard] = lbj::PlayerActionTaken::Double;  
-        } else if (token == "y") {
+        } else if (token == "y" || token == "Y") {
           // the pair data is different as it is not written as a function of the value
           // but of the value of the individual cards,
           // i.e. p8 means split a pair of eights and not a hand with two fours
@@ -183,12 +196,15 @@ Basic::Basic(Configuration &conf) {
           } else {
             (*strategy)[11][upcard] = lbj::PlayerActionTaken::Split;  
           }
-        } else if (token == "n") {
+        } else if (token == "n" || token == "N") {
           if (value != 11) {
             (*strategy)[2*value][upcard] = lbj::PlayerActionTaken::None;  
           } else {
             (*strategy)[11][upcard] = lbj::PlayerActionTaken::None;  
           }
+        } else {
+          std::cerr << "error: unknown command '" << token << "' in " << strategy_file_path << ":" << line_num << std::endl;
+          exit(1);
         }
       }
     }

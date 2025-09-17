@@ -151,8 +151,6 @@ Configuration::Configuration(int argc, char **argv) {
     
 }
 
-// source https://www.walletfox.com/course/parseconfigfile.php
-
 std::string trim(const std::string& str) {
   size_t first = str.find_first_not_of(" \t\n\r\f\v");
   if (first == std::string::npos) {
@@ -212,7 +210,6 @@ bool Configuration::set(bool *value, std::list<std::string> key) {
         *value = std::stoi(s);
       }
       used[it] = true;
-//      std::cout << "set bool " << it << "=" << *value << std::endl;
       return true;
     }
   }
@@ -224,7 +221,6 @@ bool Configuration::set(int *value, std::list<std::string> key) {
     if (exists(it)) {
       *value = std::stoi(conf[it]);
       used[it] = true;
-//      std::cout << "set int " << it << "=" << *value << std::endl;
       return true;
     }
   }
@@ -244,7 +240,6 @@ bool Configuration::set(unsigned int *value, std::list<std::string> key) {
       
       *value = std::stoi(conf[it]);
       used[it] = true;      
-//      std::cout << "set uint " << it << "=" << *value << std::endl;
       return true;
     }
   }
@@ -256,7 +251,6 @@ bool Configuration::set(size_t *value, std::list<std::string> key) {
     if (exists(it)) {
       *value = (size_t)std::stod(conf[it]);
       used[it] = true;      
-//      std::cout << "set size_t " << it << "=" << *value << std::endl;
       return true;
     }
   }
@@ -268,8 +262,6 @@ bool Configuration::set(std::string &value, std::list<std::string> key) {
     if (exists(it)) {
       value = conf[it];
       used[it] = true;      
-//      std::cout << "set string " << it << "=" << value << std::endl;
-      
       return true;
     }
   }
@@ -280,6 +272,7 @@ bool Configuration::set(double *value, std::list<std::string> key) {
   for (auto it : key) {
     if (exists(*(&it))) {
       *value = std::stof(conf[*(&it)]);
+      used[it] = true;      
       return true;
     }
   }
