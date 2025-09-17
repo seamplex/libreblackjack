@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - stdio player
  *
- *  Copyright (C) 2020, 2023 jeremy theler
+ *  Copyright (C) 2020, 2023, 2025 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -28,7 +28,7 @@
 
 namespace lbj {
 
-StdInOut::StdInOut(Configuration &conf) {
+StdInOut::StdInOut(Configuration &conf) : Player(conf) {
     
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
   conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});  

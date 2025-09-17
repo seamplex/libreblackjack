@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
    n0=80000
 n_max=9000000
@@ -93,7 +93,7 @@ EOF
      cat << EOF >> blackjack.conf
 hands = ${n}
 player = basic
-arranged_cards = ${card1}, $((${upcard_n} + 13)), $((${card2} + 26))
+cards = ${card1} $((${upcard_n} + 13)) $((${card2} + 26))
 report = ${t}${hand}-${upcard}-${play}.yaml
 #log = ${t}${hand}-${upcard}-${play}.log
 EOF
@@ -299,7 +299,7 @@ for hand in A T $(seq 9 -1 2); do
     cat << EOF >> blackjack.conf
 hands = ${n}
 player = basic
-arranged_cards = ${pair}, $((${upcard_n} + 13)), $((${pair} + 26))
+cards = ${pair} $((${upcard_n} + 13)) $((${pair} + 26))
 report = ${t}${hand}-${upcard}-${play}.yaml
 # log = ${t}${hand}-${upcard}-${play}.log
 EOF

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - internal fully-informed automatic player
  *
- *  Copyright (C) 2023 jeremy theler
+ *  Copyright (C) 2023, 2025 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -54,9 +54,8 @@ namespace lbj {
 #define pair_action(player)     (player < 12) ? ((split[player] > hard_hsd_ev(2*player)) ? true : false) : ((split[player] > soft_hsd_ev(12)) ? true : false)
 
 
-Informed::Informed(Configuration &conf) {
+Informed::Informed(Configuration &conf) : Player(conf) {
   // TODO: read conf
-  verbose = true;
   return;
 }
 
