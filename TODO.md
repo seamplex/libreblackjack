@@ -1,14 +1,17 @@
 # high importance
 
+ * fix BJs vs. single ace in ENHC
  * RSA
  * ES10
- * read strategy from file
+ * write dealt cards in a txt file to check with utils
+ * arranged cards in shoes (i.e. decks != 0)
  * multiple players
  * clean up command line help, -c or no?
  * rules in report
  
 # medium
 
+ * tests
  * error handler, explain what the valid choices are (i.e. unknown rules)
  * update docs (like feenox)
  * cpu and wall time in report
@@ -16,7 +19,7 @@
 # old
 
  * check that the card distribution is uniform
-   - i.e. statistiscal tests
+   - i.e. statistical tests
  * initial bankroll
  * report
    * add yaml filters to get JSON (`jq`), markdown table (`awk`), etc.

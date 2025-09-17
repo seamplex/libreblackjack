@@ -161,6 +161,25 @@ std::string trim(const std::string& str) {
   return str.substr(first, (last - first + 1));
 }
 
+std::string strip_inline_comment(const std::string& line) {
+    size_t hash_pos = line.find('#');
+    size_t semicolon_pos = line.find(';');
+    size_t comment_pos = std::min(hash_pos, semicolon_pos);
+
+    // If both # and ; are present, pick the first one
+    if (hash_pos != std::string::npos && semicolon_pos != std::string::npos) {
+        comment_pos = std::min(hash_pos, semicolon_pos);
+    } else if (hash_pos != std::string::npos) {
+        comment_pos = hash_pos;
+    } else if (semicolon_pos != std::string::npos) {
+        comment_pos = semicolon_pos;
+    } else {
+        return line;
+    }
+
+    return line.substr(0, comment_pos);
+}
+
 int Configuration::readConfigFile(std::string file_path, bool mandatory) {
   
   // std::ifstream is RAII, i.e. no need to call close
@@ -171,12 +190,11 @@ int Configuration::readConfigFile(std::string file_path, bool mandatory) {
     std::string line;
     while(getline(fileStream, line)) {
       line_num++;
-      line = trim(line);
+      line = trim(strip_inline_comment(line));    
       if (line[0] == '#' || line[0] == ';' || line.empty()) {
         continue;
       }
                 
-      // TODO: comments on the same line
       std::size_t delimiter_pos = line.find("=");
       if (delimiter_pos != std::string::npos) {
         std::string name = trim(line.substr(0, delimiter_pos));
