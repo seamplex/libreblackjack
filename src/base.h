@@ -288,8 +288,8 @@ class Dealer {
     // default infinite number of decks (it's faster)
     unsigned int n_decks = 0;
     unsigned int n_shuffles = 0;
-    // default one hundred thousand hands
-    size_t n_hands = 100000;
+    // default one million hands
+    size_t n_hands = 1000000;
     size_t n_hand = 0;
     
     struct {

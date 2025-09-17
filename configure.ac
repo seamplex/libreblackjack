@@ -33,7 +33,7 @@ AS_IF([test "x$CXXFLAGS" = "x-g -O2"],
     CXXFLAGS="-g -O0"
     AC_DEFINE([BJDEBUG], [1], [Define to 1 if debugging is enabled])
   ],[
-    CXXFLAGS="-O3 -flto=auto -no-pie"
+    CXXFLAGS="-O3 -flto=auto"
   ])
 )
 
