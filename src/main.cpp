@@ -30,6 +30,20 @@
 #include "players/basic.h"
 #include "players/informed.h"
 
+void print_progress_bar(int n, int N, int bar_width=50) {
+    float progress = float(n) / N;
+    int pos = bar_width * progress;
+
+    std::cout << "\r[";
+    for (int i = 0; i < bar_width; ++i) {
+        if (i < pos) std::cout << "=";
+        else if (i == pos) std::cout << ">";
+        else std::cout << " ";
+    }
+    std::cout << "] " << int(progress * 100.0) << " %";
+    std::cout.flush();
+}
+
 int main(int argc, char **argv) {
   
   lbj::Dealer *dealer = nullptr;
@@ -96,6 +110,9 @@ int main(int argc, char **argv) {
         }
         player->play();
       } while (dealer->process() <= 0);
+    }
+    if (0) {
+      print_progress_bar(dealer->n_hand, dealer->n_hands);
     }
   }
   

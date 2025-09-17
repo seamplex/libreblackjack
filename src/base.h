@@ -273,10 +273,14 @@ class Dealer {
       return (done = d);
     }
     
-    lbj::DealerAction nextAction = lbj::DealerAction::None;
-    
     void prepareReport(void);
     int writeReportYAML(void);
+    
+    lbj::DealerAction nextAction = lbj::DealerAction::None;
+
+    // default one million hands
+    size_t n_hands = 1000000;
+    size_t n_hand = 0;
     
   protected:
     // TODO: multiple players
@@ -292,9 +296,6 @@ class Dealer {
     // default infinite number of decks (it's faster)
     unsigned int n_decks = 0;
     unsigned int n_shuffles = 0;
-    // default one million hands
-    size_t n_hands = 1000000;
-    size_t n_hand = 0;
     
     struct {
       std::list<PlayerHand> hands;

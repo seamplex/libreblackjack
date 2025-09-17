@@ -36,8 +36,8 @@ cp hard-stand.txt hard.txt
 cp soft-stand.txt soft.txt
 
 cat << EOF >> table.md
-|  Hand  |  \$n\$  |  Stand [%]  |  Double [%]  |  Hit [%] |   Play    |
-|:------:|:-----:|:-----------:|:------------:|:--------:|:---------:|
+|  Hand  |  \$n\$  |  Stand [%]   |    Hit [%]   |  Double [%]  |   Play    |
+|:------:|:-----:|:------------:|:------------:|:------------:|:---------:|
 EOF
 
 
