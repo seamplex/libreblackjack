@@ -370,13 +370,21 @@ void Blackjack::deal(void) {
             return;
           }
         }
-      }
       
-      // step 7.b. if either the dealer or the player has a chance to have a blackjack, check
-      if ((card[dealer_up_card].value == 10 || card[dealer_up_card].value == 11) || std::abs(player->playerValue) == 21) {
-        player->actionRequired = lbj::PlayerActionRequired::None;
-        nextAction = lbj::DealerAction::CheckforBlackjacks;
-        return;
+        // step 7.b. if either the dealer or the player has a chance to have a blackjack, check
+        if ((card[dealer_up_card].value == 10 || card[dealer_up_card].value == 11) || std::abs(player->playerValue) == 21) {
+          player->actionRequired = lbj::PlayerActionRequired::None;
+          nextAction = lbj::DealerAction::CheckforBlackjacks;
+          return;
+        }
+      } else {
+        // in ENHC if the player has blackjack, it's the dealer's turn
+        if (std::abs(player->playerValue) == 21) {
+          player->actionRequired = lbj::PlayerActionRequired::None;
+          nextAction = lbj::DealerAction::HitDealerHand;
+          return;
+        }
+          
       }
 
       // step 7.c. ask the player to play
