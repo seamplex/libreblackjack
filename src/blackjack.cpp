@@ -267,8 +267,8 @@ void Blackjack::deal(void) {
       hand.cards.clear();
 
       // erase all the player's hands, create one, add and make it the current one
-      for (auto playerHand = playerStats.hands.begin(); playerHand != playerStats.hands.end(); ++playerHand) {
-        playerHand->cards.clear();
+      for (auto &player_hand : playerStats.hands) {
+        player_hand.cards.clear();
       }
       playerStats.hands.clear();
       playerStats.hands.push_back(std::move(PlayerHand()));
@@ -378,10 +378,17 @@ void Blackjack::deal(void) {
           return;
         }
       } else {
-        // in ENHC if the player has blackjack, it's the dealer's turn
-        if (std::abs(player->playerValue) == 21) {
+        // in ENHC, if the player has 21.. 
+        if (player->playerValue == -21) {
+          if (card[dealer_up_card].value == 10 || card[dealer_up_card].value == 11) {
+            // and the dealer shows an ace or a face she has to draw
+            // (actually she should ask for insurance)
+            // but if the dealer does show an ace or a face the she has to hit
+            dealer_hole_card = draw(&hand);
+            info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
+          }
           player->actionRequired = lbj::PlayerActionRequired::None;
-          nextAction = lbj::DealerAction::HitDealerHand;
+          nextAction = lbj::DealerAction::CheckforBlackjacks;
           return;
         }
           
@@ -398,10 +405,12 @@ void Blackjack::deal(void) {
       // step 8. check if there are any blackjack
       player_blackjack = playerStats.currentHand->blackjack();
       if (hand.blackjack()) {
-        info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
+        if (enhc == false) {
+          info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
+        }
         info(lbj::Info::DealerBlackjack);
 #ifdef BJDEBUG
-        std::cout << "dealer blakjack " << card[dealer_hole_card].utf8() << std::endl;
+        std::cout << "dealer blackjack " << card[dealer_hole_card].utf8() << std::endl;
 #endif
         playerStats.blackjacksDealer++;
 
@@ -418,7 +427,7 @@ void Blackjack::deal(void) {
         if (player_blackjack) {
           info(lbj::Info::PlayerBlackjackAlso);
 #ifdef BJDEBUG
-          std::cout << "bdealer_hole_cardkjack " << card[dealer_hole_card].utf8() << std::endl;
+          std::cout << "dealer_hole_card " << card[dealer_hole_card].utf8() << std::endl;
 #endif
 
           // give him his (her her) money back
@@ -470,7 +479,7 @@ void Blackjack::deal(void) {
     
     case lbj::DealerAction::AskForPlay:
 #ifdef BJDEBUG
-      std::cout << "pistola" << std::endl;
+      std::cout << "please play" << std::endl;
 #endif
       can_double_split();
       player->actionRequired = lbj::PlayerActionRequired::Play;
@@ -546,6 +555,34 @@ void Blackjack::deal(void) {
         std::cout << "dealer " << card[dealerCard].utf8() << std::endl;
 #endif
         player->dealerValue = hand.value();
+      }
+      
+      if (enhc == true && hand.blackjack())  {
+        info(lbj::Info::DealerBlackjack);
+#ifdef BJDEBUG
+        std::cout << "dealer blackjack " << card[dealer_hole_card].utf8() << std::endl;
+#endif
+        playerStats.blackjacksDealer++;
+        
+        // the player loses all the hands
+
+        for (auto &player_hand : playerStats.hands) {
+          if (player_hand.insured) {
+            // pay him (her)
+            playerStats.bankroll += (1.0 + 0.5) * player_hand.bet;
+            playerStats.currentOutcome += player_hand.bet;
+            info(lbj::Info::PlayerWinsInsurance, 1e3*playerStats.currentHand->bet);
+            playerStats.winsInsured++;
+          }
+
+          playerStats.currentOutcome -= player_hand.bet;
+          info(lbj::Info::PlayerLosses, 1e3*player_hand.bet);
+          playerStats.losses++;
+        }
+
+        nextAction = lbj::DealerAction::StartNewHand;
+        player->actionRequired = lbj::PlayerActionRequired::None;
+        return;
       }
         
       if (hand.busted()) {

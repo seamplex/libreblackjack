@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - main function
  *
- *  Copyright (C) 2020,2023 jeremy theler
+ *  Copyright (C) 2020,2023,2025 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -30,18 +30,16 @@
 #include "players/basic.h"
 #include "players/informed.h"
 
-void print_progress_bar(int n, int N, int bar_width=50) {
-    float progress = float(n) / N;
-    int pos = bar_width * progress;
+void progress_bar(size_t n, size_t N, int bar_width) {
+  float progress = float(n) / N;
+  int pos = bar_width * progress;
 
-    std::cout << "\r[";
-    for (int i = 0; i < bar_width; ++i) {
-        if (i < pos) std::cout << "=";
-        else if (i == pos) std::cout << ">";
-        else std::cout << " ";
-    }
-    std::cout << "] " << int(progress * 100.0) << " %";
-    std::cout.flush();
+  std::cout << "\r[";
+  for (int i = 0; i < bar_width; ++i) {
+    std::cout << ((i < pos) ? "=" : ((i == pos) ? ">" : " "));
+  }
+  std::cout << "] " << int(progress * 100.0) << " %";
+  std::cout.flush();  
 }
 
 int main(int argc, char **argv) {
@@ -64,7 +62,8 @@ int main(int argc, char **argv) {
     return 0;
   }  
   
-  // TODO: think of a better way
+  // simple factory pattern
+  // for more dealers we might have a registration mechanism
   if (conf.getDealerName() == "blackjack") {
     dealer = new lbj::Blackjack(conf);
   } else {
@@ -72,7 +71,8 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  // TODO: think of a better way
+  // simple factory pattern
+  // for more players we might have a registration mechanism
   std::string player_name = conf.getPlayerName();
   if (player_name == "tty") {
     player = new lbj::Tty(conf);
@@ -92,11 +92,18 @@ int main(int argc, char **argv) {
     return 1;
   }
   
-  
   // assign player to dealer
   dealer->setPlayer(player);
 
-  // let the action begin!
+  // set up progress bar
+  int progress_bar_width = 50;
+  const size_t progress_step =  (progress_bar_width) ? dealer->n_hands / progress_bar_width : 0;
+  size_t progress_last = 0;
+  if (progress_bar_width > 0) {
+    progress_bar(0, dealer->n_hands, progress_bar_width);  
+  }  
+  
+  // --- let the action begin! -------------------------------------------------
   size_t n_incorrect_commands = 0;
   dealer->nextAction = lbj::DealerAction::StartNewHand;
   while (!dealer->finished()) {
@@ -111,9 +118,18 @@ int main(int argc, char **argv) {
         player->play();
       } while (dealer->process() <= 0);
     }
-    if (0) {
-      print_progress_bar(dealer->n_hand, dealer->n_hands);
+    if (progress_bar_width > 0) {
+      if ((dealer->n_hand - progress_last) > progress_step) {
+        progress_bar(dealer->n_hand, dealer->n_hands, progress_bar_width);
+        progress_last = dealer->n_hand;
+      }
     }
+  }
+  // ---------------------------------------------------------------------------
+  
+  if (progress_bar_width > 0) {
+    progress_bar(dealer->n_hands, dealer->n_hands, progress_bar_width);  
+    std::cout << std::endl;
   }
   
   player->info(lbj::Info::Bye);
