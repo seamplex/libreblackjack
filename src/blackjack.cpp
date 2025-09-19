@@ -254,7 +254,10 @@ void Blackjack::deal(void) {
         updateMeanAndVariance();
       }
 
-      i_arranged_cards = 0;
+      // TODO: think!
+      if (0) {
+        i_arranged_cards = 0;
+      }
       playerStats.currentOutcome = 0;
       n_hand++;
       

@@ -123,10 +123,8 @@ void Tty::info(lbj::Info msg, int p1, int p2) {
       dealerHand.cards.clear();
 
       // erase all of our hands
-      {
-        for (auto hand = hands.begin(); hand != hands.end(); ++hand) {
-          hand->cards.clear();
-        }
+      for (auto &hand : hands) {
+        hand.cards.clear();
       }
       // create one, add and make it the current one
       hands.clear();
@@ -430,12 +428,12 @@ void Tty::renderHand(Hand *hand, bool current) {
   std::string ansiColor;
   std::string ansiReset;
   
-  for (unsigned int i = 0; i < hand->cards.size(); i++) {
+  for (int i = 0; i < hand->cards.size(); i++) {
     std::cout << " _____   ";
   }
   std::cout << std::endl;
     
-  for (auto c : hand->cards) {
+  for (auto &c : hand->cards) {
     if (color && (card[c].suit == lbj::Suit::Diamonds || card[c].suit == lbj::Suit::Hearts)) {
       ansiColor = red;
       ansiReset = reset;
@@ -445,7 +443,7 @@ void Tty::renderHand(Hand *hand, bool current) {
     }
     
     if (c > 0) {
-      std::cout << "|" << ansiColor << card[c].getNumberASCII() << ((card[c].number != 10)?" ":"") << ansiReset << "   |  ";
+      std::cout << "|" << ansiColor << card[c].getNumberASCII() << " " << ansiReset << "   |  ";
     } else {
       std::cout << "|#####|  ";
     }
@@ -500,7 +498,7 @@ void Tty::renderHand(Hand *hand, bool current) {
     }
       
     if (c > 0) {
-      std::cout << "|___" << ansiColor << ((card[c].number != 10)?"_":"") << card[c].getNumberASCII() << ansiReset<< "|  ";
+      std::cout << "|___" << ansiColor << " " << card[c].getNumberASCII() << ansiReset<< "|  ";
     } else {
       std::cout << "|#####|  ";
     }

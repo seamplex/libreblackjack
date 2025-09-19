@@ -36,7 +36,7 @@ Card::Card(unsigned int tag) {
   number = 1 + ((tag-1) % 13);
   suit = static_cast<lbj::Suit>((tag-1)/13);
   value = (number == 1) ? 11 : ((number > 10) ? 10 : number);
-  numberASCII = (number == 1) ? "A" : ((number < 11) ? std::to_string(number) : TJQK[number-10]);
+  numberASCII = (number == 1) ? "A" : ((number < 10) ? std::to_string(number) : TJQK[number-10]);
       
   switch (suit){
     case lbj::Suit::Clubs:
