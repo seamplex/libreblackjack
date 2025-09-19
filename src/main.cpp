@@ -23,7 +23,7 @@
 #include <iostream>
 
 #include "conf.h"
-#include "base.h"
+#include "dealer.h"
 #include "blackjack.h"
 #include "players/tty.h"
 #include "players/stdinout.h"
@@ -44,11 +44,7 @@ void progress_bar(size_t n, size_t N, int bar_width) {
 
 int main(int argc, char **argv) {
   
-  lbj::Dealer *dealer = nullptr;
-  lbj::Player *player = nullptr;
-  
   lbj::Configuration conf(argc, argv);
-
 
   if (conf.show_version) {
     lbj::shortversion();
@@ -64,15 +60,18 @@ int main(int argc, char **argv) {
   
   // simple factory pattern
   // for more dealers we might have a registration mechanism
+  lbj::Dealer *dealer = nullptr;
   if (conf.getDealerName() == "blackjack") {
     dealer = new lbj::Blackjack(conf);
   } else {
-    std::cerr << "Unknown dealer for '" << conf.getDealerName() <<"' game" << std::endl;
+    std::cerr << "error: unknown dealer for '" << conf.getDealerName() <<"' game" << std::endl;
     return -1;
   }
 
   // simple factory pattern
   // for more players we might have a registration mechanism
+  int progress_bar_width = 0;
+  lbj::Player *player = nullptr;
   std::string player_name = conf.getPlayerName();
   if (player_name == "tty") {
     player = new lbj::Tty(conf);
@@ -80,10 +79,12 @@ int main(int argc, char **argv) {
     player = new lbj::StdInOut(conf);
   } else if (player_name == "basic" || player_name == "internal") {
     player = new lbj::Basic(conf);
+    progress_bar_width = 50;
   } else if (player_name == "informed") {
     player = new lbj::Informed(conf);
+    progress_bar_width = 50;
   } else {
-    std::cerr << "Unknown player '" << player_name <<"'" << std::endl;
+    std::cerr << "error: unknown player '" << player_name <<"'" << std::endl;
     return 1;
   }
   
@@ -96,7 +97,6 @@ int main(int argc, char **argv) {
   dealer->setPlayer(player);
 
   // set up progress bar
-  int progress_bar_width = 50;
   const size_t progress_step =  (progress_bar_width) ? dealer->n_hands / progress_bar_width : 0;
   size_t progress_last = 0;
   if (progress_bar_width > 0) {

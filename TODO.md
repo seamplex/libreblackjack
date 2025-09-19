@@ -1,13 +1,10 @@
 # high importance
 
- * fix BJs vs. single ace in ENHC
  * RSA
  * ES10
  * write dealt cards in a txt file to check with utils
  * arranged cards in shoes (i.e. decks != 0)
  * multiple players
- * clean up command line help, -c or no?
- * rules in report
  
 # medium
 

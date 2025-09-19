@@ -23,7 +23,7 @@
 #ifndef BLACKJACK_H
 #define BLACKJACK_H
 
-#include "base.h"
+#include "dealer.h"
 #include "conf.h"
 
 namespace lbj {
@@ -37,6 +37,8 @@ class Blackjack : public Dealer {
     unsigned int draw(Hand * = nullptr) override;
     void deal(void) override;
     int process(void) override;
+    std::string rules(void) override;
+    
     
   private:
     

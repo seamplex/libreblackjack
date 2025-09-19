@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  Libre Blackjack - version reporting
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020,2025 jeremy theler
  *
  *  This file is part of Libre Blackjack.
  *
@@ -42,7 +42,7 @@ void shortversion(void) {
 }
 
 void help(const char *program_name) {
-  std::cout << "Usage: " << program_name <<  "[options] [path_to_conf_file]" << std::endl;
+  std::cout << "usage: " << program_name <<  " [options] [-c path_to_conf_file]" << std::endl;
   std::cout << ENGINE << std::endl;
 
   std::cout << std::endl;
@@ -63,7 +63,7 @@ void help(const char *program_name) {
 
 
 void copyright(void) {
-  std::cout << "copyright (c) " << 2016 << "--" << 2020 << " jeremy theler." << std::endl;
+  std::cout << "copyright (c) " << 2016 << "--" << 2025 << " jeremy theler." << std::endl;
   std::cout << "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>" << std::endl;
   std::cout << "This is free software: you are free to change and redistribute it." << std::endl;
   std::cout << "There is NO WARRANTY, to the extent permitted by law." << std::endl << std::endl;

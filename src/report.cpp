@@ -1,10 +1,15 @@
 #include <iostream>
+#include <sstream>
+#include <fstream>
+#include <iomanip>
 #include <cmath>
 #include <memory>
 #include <string>
 
-#include "base.h"
+#include "dealer.h"
 
+
+// TODO: make a separate report class and construct with the dealer & player
 namespace lbj {
 
 // https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
@@ -31,10 +36,6 @@ void Dealer::updateMeanAndVariance(void) {
 
 void Dealer::prepareReport(void) {
   
-//  if (n_hand != n_hands) {
-//    n_hand--;
-//  }
-
   if (n_hand <= 1) {
     return;
   }
@@ -51,25 +52,38 @@ void Dealer::prepareReport(void) {
       precision = 0;
     }
   }
-  std::string format = "\"(%+." + std::to_string(precision) + "f ± %." + std::to_string(precision) + "f) %%%%\"";
   
-  report.push_back(reportItem(1, "result", string_format(format, 100*playerStats.mean, 100*error), 0.0));
+  std::ostringstream result;
+  result << "(" 
+      << std::showpos << std::fixed << std::setprecision(precision) << 100*playerStats.mean
+      << " ± " 
+      << std::noshowpos << std::fixed << std::setprecision(precision) << 100*error
+      << ")";
   
-  report.push_back(reportItem(2, "mean",      "%g", playerStats.mean));
-  report.push_back(reportItem(2, "error",     "%g", error));
-  report.push_back(reportItem(2, "hands",     "%g", n_hand));
-  report.push_back(reportItem(2, "bankroll",  "%g", playerStats.bankroll));
+  report.push_back(reportItem(1, "result", result.str()));
+  
+  std::string rules = this->rules();
+  if (rules != "") {
+    report.push_back(reportItem(1, "rules", rules));
+  }
+  
+  report.push_back(reportItem(2, "mean",      playerStats.mean));
+  report.push_back(reportItem(2, "error",     error));
+  report.push_back(reportItem(2, "hands",     n_hand));
+  report.push_back(reportItem(2, "bankroll",  playerStats.bankroll));
 
-  report.push_back(reportItem(3, "bustsPlayer", "%g", playerStats.bustsPlayer / (double) n_hand));
-  report.push_back(reportItem(3, "bustsDealer", "%g", playerStats.bustsDealer / (double) n_hand));
-  report.push_back(reportItem(3, "wins",        "%g", playerStats.wins / (double) n_hand));
-  report.push_back(reportItem(3, "pushes",      "%g", playerStats.pushes / (double) n_hand));
-  report.push_back(reportItem(3, "losses",      "%g", playerStats.losses / (double) n_hand));
+  report.push_back(reportItem(3, "busts_player", playerStats.bustsPlayer / (double) n_hand));
+  report.push_back(reportItem(3, "busts_dealer", playerStats.bustsDealer / (double) n_hand));
+  report.push_back(reportItem(3, "wins",         playerStats.wins / (double) n_hand));
+  report.push_back(reportItem(3, "pushes",       playerStats.pushes / (double) n_hand));
+  report.push_back(reportItem(3, "losses",       playerStats.losses / (double) n_hand));
 
-  report.push_back(reportItem(4, "total_money_waged", "%g", playerStats.totalMoneyWaged));
+  report.push_back(reportItem(4, "total_money_waged", playerStats.totalMoneyWaged));
+  report.push_back(reportItem(4, "blackjacks_player", playerStats.blackjacksPlayer / (double) n_hand));
+  report.push_back(reportItem(4, "blackjacks_dealer", playerStats.blackjacksDealer / (double) n_hand));
 
-  report.push_back(reportItem(5, "variance",  "%g", playerStats.variance));
-  report.push_back(reportItem(5, "deviation", "%g", sqrt(playerStats.variance)));
+  report.push_back(reportItem(5, "variance",  playerStats.variance));
+  report.push_back(reportItem(5, "deviation", sqrt(playerStats.variance)));
     
 
   return;
@@ -81,26 +95,36 @@ int Dealer::writeReportYAML(void) {
     return 0;
   }  
 
-  FILE *out = stderr;  
+
+  std::ostream* out = &std::cerr;
+  std::ofstream file_stream;
+
   if (report_file_path != "") {
-    out = fopen(report_file_path.c_str(), "w");
-  }
-    
-  // TODO: choose if comments with explanations are to be added
-  fprintf(out, "---\n");
-  for (auto item : report) {
-    if (item.level <= report_verbosity) {  
-      fprintf(out, "%s: ", item.key.c_str());
-      fprintf(out, item.format.c_str(), item.value);
-      fprintf(out, "\n");
-    }  
-  }
-  fprintf(out, "...\n");
-  
-  if (report_file_path != "") {
-    fclose(out);
+    if (!file_stream.is_open()) {
+      // Handle error - file couldn't be opened
+      std::cerr << "Error: Could not open file " << report_file_path << std::endl;
+      return -1;  // or throw exception, or handle error as appropriate
+    }
+    out = &file_stream;
   }
 
+  // TODO: choose if comments with explanations are to be added
+  *out << "---" << std::endl; 
+  for (auto &item : report) {
+    if (item.level <= report_verbosity) {
+      *out << item.key << ": ";
+        
+      if (item.string != "") {
+        *out << "\"" << item.string << "\"";  // This assumes item.value can be streamed directly
+      } else{
+        *out << item.value;  
+      }
+        
+      *out << std::endl;
+    }
+  }
+  *out << "..." << std::endl;
+  
   return 0;
 }
 }

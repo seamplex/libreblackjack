@@ -231,15 +231,17 @@ class Player {
 };
 
 struct reportItem {
-  reportItem(int l, std::string k, std::string f, double v) : key(k), format(f), value(v), level(l) {};
-  std::string key;
-  std::string format;
-  double value;
+  reportItem(int l, std::string k, std::string s) : level(l), key(k), string(s) {};
+  reportItem(int l, std::string k, double v) : level(l), key(k), value(v) {};
   int level;
+  std::string key;
+  double value;
+  std::string string;
 };
 
 class Dealer {
   public:
+    Dealer(Configuration &);
     Dealer() = default;
     virtual ~Dealer() = default;
     // delete copy and move constructors
@@ -253,6 +255,7 @@ class Dealer {
     virtual void deal(void) = 0;
     virtual unsigned int draw(Hand * = nullptr) = 0;
     virtual int process(void) = 0;
+    virtual std::string rules(void) { return ""; };
     
     void setPlayer(Player *p) {
       player = p;
@@ -335,7 +338,7 @@ class Dealer {
     } playerStats;
 
     std::string report_file_path;
-    int report_verbosity = 3;
+    int report_verbosity = 5;
     
     void updateMeanAndVariance(void);
     

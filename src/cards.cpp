@@ -20,7 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 
-#include "base.h"
+#include "dealer.h"
 
 namespace lbj {
 

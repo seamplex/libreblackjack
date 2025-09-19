@@ -38,7 +38,7 @@
 #include "blackjack.h"
 
 namespace lbj {
-Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 52) {
+Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fiftyTwoCards(1, 52) {
 
   conf.set(&n_hands, {"n_hands", "hands"});
   conf.set(&n_decks, {"decks", "n_decks"});
@@ -88,11 +88,6 @@ Blackjack::Blackjack(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 
   conf.set(&blackjack_pays, {"blackjack_pays"});
   
   conf.set(&playerStats.bankroll, {"bankroll", "initial_bankroll"});
-  
-  // TODO: these should be go in the parent dealer class
-  conf.set(&error_standard_deviations, {"error_standard_deviations"});
-  conf.set(report_file_path, {"report_file_path", "report"});
-  conf.set(&report_verbosity, {"report_verbosity", "report_level"});
   
   conf.set(&number_of_burnt_cards, {"number_of_burnt_cards", "n_burnt_cards", "burnt_cards"});
   conf.set(&penetration, {"penetration"});
@@ -993,5 +988,13 @@ unsigned int Blackjack::draw(Hand *hand) {
   }
   
   return tag;
+}
+
+std::string Blackjack::rules(void) {
+  return ((enhc) ? "ench" : "ahc")  + std::string(" ") +
+         ((h17)  ? "h17"  : "s17")  + std::string(" ") +
+         ((das)  ? "das"  : "ndas") + std::string(" ") +
+         ((doa)  ? "doa"  : "da9")  + std::string(" ") +
+         ((rsa)  ? "rsa"  : "nrsa");
 }
 }
