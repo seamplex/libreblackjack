@@ -31,7 +31,7 @@ AC_ARG_ENABLE([debug],
 AS_IF([test "x$CXXFLAGS" = "x-g -O2"],
   AS_IF([test "x$with_debug" = "xyes" -o "x$enable_debug" = "xyes"] , [
     CXXFLAGS="-g -O0"
-    AC_DEFINE([BJDEBUG], [1], [Define to 1 if debugging is enabled])
+    AC_DEFINE([DEBUG], [1], [Define to 1 if debugging is enabled])
   ],[
     CXXFLAGS="-O3 -flto=auto"
   ])

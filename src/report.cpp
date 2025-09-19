@@ -12,19 +12,6 @@
 // TODO: make a separate report class and construct with the dealer & player
 namespace lbj {
 
-// https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
-template<typename ... Args>
-std::string string_format( const std::string& format, Args ... args)
-{
-  size_t size = snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
-  if (size <= 0) {
-    return std::string("");
-  }
-  std::unique_ptr<char[]> buf(new char[size]); 
-  snprintf(buf.get(), size, format.c_str(), args ...);
-  return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
-}
-
 void Dealer::updateMeanAndVariance(void) {
   double delta = playerStats.currentOutcome - playerStats.mean;
   playerStats.mean += delta / (double)(n_hand);

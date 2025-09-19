@@ -17,6 +17,7 @@ blackjack_LDADD = $(all_libraries)
 
 blackjack_SOURCES = \
  src/main.cpp \
+ src/dealer.cpp \
  src/conf.cpp \
  src/report.cpp \
  src/version.cpp \
@@ -28,7 +29,7 @@ blackjack_SOURCES = \
  src/players/informed.cpp
 
 noinst_HEADERS = \
- src/base.h \
+ src/dealer.h \
  src/blackjack.h \
  src/conf.h \
  src/version-conf.h \
