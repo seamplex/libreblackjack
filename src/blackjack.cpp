@@ -19,16 +19,12 @@
  *  along with Libre Blackjack.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-
 #include <iostream>
 #include <utility>
 #include <random>
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
-
-
-
 #include <sstream>
 #include <fstream>
 #include <algorithm>
@@ -950,6 +946,7 @@ void Blackjack::shuffle() {
   if (n_decks > 0) {
     std::shuffle(shoe.begin(), shoe.end(), rng);
     pos = 0;
+    i_arranged_cards = 0;
     n_shuffles++;
   }
   
@@ -963,7 +960,7 @@ unsigned int Blackjack::draw(Hand *hand) {
 
   if (n_decks == 0) {
       
-    if (n_arranged_cards == 0 || i_arranged_cards > n_arranged_cards) {
+    if (n_arranged_cards == 0 || i_arranged_cards >= n_arranged_cards) {
       tag = fiftyTwoCards(rng);
     } else {
       // negative (or invalid) values are placeholder for random cards  
@@ -978,14 +975,35 @@ unsigned int Blackjack::draw(Hand *hand) {
     
   } else {
       
-    if (n_arranged_cards == 0 || i_arranged_cards > n_arranged_cards) {
+    if (n_arranged_cards == 0 || i_arranged_cards >= n_arranged_cards) {
       last_pass = (pos >= cut_card_position) || shuffle_every_hand;
       if (pos >= 52 * n_decks) {
         shuffle();
       }
     
-      tag = shoe[pos++];
+    } else {
+      if ((tag = arranged_cards[i_arranged_cards++]) > 0 && tag < 52) {
+
+        // find the original position of the card tag
+        auto it = std::find(shoe.begin() + pos, shoe.end(), tag);
+
+        // Check if 'tag' was found and pos is valid
+        if (it != shoe.end()) {
+          // Get the index of the first occurrence of 'tag'
+          size_t tag_index = std::distance(shoe.begin(), it);
+    
+          // Only swap if they're different positions
+          if (pos != tag_index) {
+            std::swap(shoe[pos], shoe[tag_index]);
+          }
+        } else {
+          std::cerr << "error: no more cards " << tag << " in the shoe" << std::endl;
+          exit(1);
+        }
+      }
     }
+    tag = shoe[pos++];
+    
   }
     
   if (hand != nullptr) {
