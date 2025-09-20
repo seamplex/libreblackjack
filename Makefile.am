@@ -8,7 +8,9 @@ SUBDIRS = doc
 AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README doc/blackjack.texi
 
-TESTS = check-internal.sh check-stand.sh
+TESTS = tests/internal.sh \
+        tests/variance.sh
+
 EXTRA_DIST = ChangeLog  players $(TESTS)
 
 bin_PROGRAMS = blackjack

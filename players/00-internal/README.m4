@@ -19,4 +19,8 @@ and you will get the following report with the results of playing one million ha
 include(report.yaml)
 ```
 
+ * rules can be changed in the conf
+ * the strategy can be read from a txt file
+ * the yaml goes to stderr by default but it can be written to a file or post-proccesed with `yq`
+
 case_nav

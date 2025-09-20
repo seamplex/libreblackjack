@@ -47,9 +47,9 @@ The script computes the expected value of each combination
  1. Player’s hand (hard, soft and pair)
  2. Dealer upcard
  3. Hit, double or stand (for hard and soft hands) and splitting or not (for pairs)
- 
+
 The results are given as the expected value in percentage with the uncertainty (one standard deviation) in the last significant digit.
- 
+
 define(table_head,
  <thead>
   <tr>

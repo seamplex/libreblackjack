@@ -119,7 +119,7 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
     
     std::ifstream file(conf.getString("cards_file"));
     if (!file.is_open()) {
-      std::cerr << "error: opening file " << conf.getString("rules") << std::endl;
+      std::cerr << "error: opening file " << conf.getString("cards_file") << std::endl;
       exit(1);
     }
     std::string file_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -963,7 +963,9 @@ unsigned int Blackjack::draw(Hand *hand) {
 
   if (n_decks == 0) {
       
-    if (n_arranged_cards != 0 && i_arranged_cards < n_arranged_cards) {
+    if (n_arranged_cards == 0 || i_arranged_cards > n_arranged_cards) {
+      tag = fiftyTwoCards(rng);
+    } else {
       // negative (or invalid) values are placeholder for random cards  
       if ((tag = arranged_cards[i_arranged_cards++]) <= 0 || tag > 52) {
         tag = fiftyTwoCards(rng);
@@ -972,19 +974,18 @@ unsigned int Blackjack::draw(Hand *hand) {
       if (quit_when_arranged_cards_run_out && i_arranged_cards == n_arranged_cards) {
         finished(true);
       }
-      
-    } else {
-      tag = fiftyTwoCards(rng);
     }  
     
   } else {
       
-    last_pass = (pos >= cut_card_position) || shuffle_every_hand;
-    if (pos >= 52 * n_decks) {
-      shuffle();
-    }
+    if (n_arranged_cards == 0 || i_arranged_cards > n_arranged_cards) {
+      last_pass = (pos >= cut_card_position) || shuffle_every_hand;
+      if (pos >= 52 * n_decks) {
+        shuffle();
+      }
     
-    tag = shoe[pos++];
+      tag = shoe[pos++];
+    }
   }
     
   if (hand != nullptr) {
@@ -999,6 +1000,7 @@ std::string Blackjack::rules(void) {
          ((h17)  ? "h17"  : "s17")  + std::string(" ") +
          ((das)  ? "das"  : "ndas") + std::string(" ") +
          ((doa)  ? "doa"  : "da9")  + std::string(" ") +
-         ((rsa)  ? "rsa"  : "nrsa");
+         ((rsa)  ? "rsa"  : "nrsa") + std::string(" ") +
+         std::to_string(n_decks) + "decks" ;
 }
 }

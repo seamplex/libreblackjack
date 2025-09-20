@@ -2,26 +2,25 @@
 
  * RSA
  * ES10
- * write dealt cards in a txt file to check with utils
  * arranged cards in shoes (i.e. decks != 0)
  * multiple players
- 
+
 # medium
 
  * tests
  * error handler, explain what the valid choices are (i.e. unknown rules)
- * update docs (like feenox)
+ * update docs, write a nice manual (m4 -> md -> texinfo -> pdf)
+   - command line invocation
+   - playing commands
+   - configuration options
  * cpu and wall time in report
 
-# old
+# low
 
- * check that the card distribution is uniform
-   - i.e. statistical tests
- * initial bankroll
+ * initial bankroll and risk of ruin
  * report
-   * add yaml filters to get JSON (`jq`), markdown table (`awk`), etc.
+   * show how to add yaml filters to get JSON (`jq`), markdown table (`awk`), etc.
    * verbosity (extra small, small, medium, large, extra large)
- * progress bar
  * max_splits through conf (default 3)
  * name of the game the dealer deals
  * name of the games the player can play
@@ -32,13 +31,12 @@
    * card war
    * between
  * players
-   * random hit/stand
    * internal reko
    * runtime-linked in a shared object
  * conf
-    - bankroll_history_file_path
-    - removed_cards
-    - chance of getting first cards
+   * bankroll_history_file_path
+   * removed_cards
+   * chance of getting first two cards
  
  * multithreading (not sure)
  * optimize using const and restrict 
