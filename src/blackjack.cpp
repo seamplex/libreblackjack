@@ -89,11 +89,13 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
   
   conf.set(&playerStats.bankroll, {"bankroll", "initial_bankroll"});
   
+  // parent class_
   conf.set(&number_of_burnt_cards, {"number_of_burnt_cards", "n_burnt_cards", "burnt_cards"});
   conf.set(&penetration, {"penetration"});
   conf.set(&penetration_sigma, {"penetration_sigma", "penetration_dispersion"});
   conf.set(&shuffle_every_hand, {"shuffle", "shuffle_every_hand"});
   conf.set(&quit_when_arranged_cards_run_out, {"quit_when_arranged_cards_run_out"});
+  conf.set(&new_hand_reset_cards, {"new_hand_reset_cards"});
   
   
   // read arranged cards
@@ -254,8 +256,7 @@ void Blackjack::deal(void) {
         updateMeanAndVariance();
       }
 
-      // TODO: think!
-      if (0) {
+      if (new_hand_reset_cards) {
         i_arranged_cards = 0;
       }
       playerStats.currentOutcome = 0;
@@ -994,7 +995,7 @@ unsigned int Blackjack::draw(Hand *hand) {
 }
 
 std::string Blackjack::rules(void) {
-  return ((enhc) ? "ench" : "ahc")  + std::string(" ") +
+  return ((enhc) ? "enhc" : "ahc")  + std::string(" ") +
          ((h17)  ? "h17"  : "s17")  + std::string(" ") +
          ((das)  ? "das"  : "ndas") + std::string(" ") +
          ((doa)  ? "doa"  : "da9")  + std::string(" ") +

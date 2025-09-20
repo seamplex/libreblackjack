@@ -57,7 +57,6 @@ class Blackjack : public Dealer {
     unsigned int player_first_card;
     unsigned int player_second_card;
 
-    // TODO: make tests
     bool h17 = true;
     bool das = true;
     bool doa = true;
@@ -65,6 +64,7 @@ class Blackjack : public Dealer {
     bool rsa = false;  // TODO
     bool shuffle_every_hand = false;
     bool quit_when_arranged_cards_run_out = false;
+    bool new_hand_reset_cards = true;
     
     std::vector<int> arranged_cards;
     size_t n_arranged_cards = 0; // just to prevent calling size() each time we draw a card

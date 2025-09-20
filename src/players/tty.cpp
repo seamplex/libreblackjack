@@ -443,7 +443,7 @@ void Tty::renderHand(Hand *hand, bool current) {
     }
     
     if (c > 0) {
-      std::cout << "|" << ansiColor << card[c].getNumberASCII() << " " << ansiReset << "   |  ";
+      std::cout << "|" << ansiColor << card[c].getNumberASCII() << ansiReset << "    |  ";
     } else {
       std::cout << "|#####|  ";
     }
@@ -498,7 +498,7 @@ void Tty::renderHand(Hand *hand, bool current) {
     }
       
     if (c > 0) {
-      std::cout << "|___" << ansiColor << " " << card[c].getNumberASCII() << ansiReset<< "|  ";
+      std::cout << "|____" << ansiColor << card[c].getNumberASCII() << ansiReset<< "|  ";
     } else {
       std::cout << "|#####|  ";
     }

@@ -16,7 +16,7 @@ void Dealer::updateMeanAndVariance(void) {
   double delta = playerStats.currentOutcome - playerStats.mean;
   playerStats.mean += delta / (double)(n_hand);
   playerStats.M2 += delta * (playerStats.currentOutcome - playerStats.mean);
-  playerStats.variance = playerStats.M2 / (double)(n_hand);
+  playerStats.variance = playerStats.M2 / (double)(n_hand-1);
   return;
 }
 
@@ -87,9 +87,10 @@ int Dealer::writeReportYAML(void) {
   std::ofstream file_stream;
 
   if (report_file_path != "") {
+    file_stream.open(report_file_path);
     if (!file_stream.is_open()) {
       // Handle error - file couldn't be opened
-      std::cerr << "Error: Could not open file " << report_file_path << std::endl;
+      std::cerr << "Error: could not open file " << report_file_path << std::endl;
       return -1;  // or throw exception, or handle error as appropriate
     }
     out = &file_stream;

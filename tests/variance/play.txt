@@ -1,0 +1,14 @@
+stand
+double
+double
+hit
+hit
+stand
+hit
+stand
+stand
+stand
+hit
+hit
+stand
+stand
