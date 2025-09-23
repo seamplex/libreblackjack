@@ -1,5 +1,10 @@
-\input texinfo @c -*-texinfo-*-
-@c %**start of header
+\input texinfo  @c -*-texinfo-*-
+$if(filename)$
+@setfilename $filename$
+$endif$
+$if(title)$
+@settitle $title$$if(version)$ $version$$endif$
+$endif$
 @documentencoding UTF-8
 $for(header-includes)$
 $header-includes$
@@ -13,7 +18,7 @@ $endfor$
 This manual is for LibreBlackjack (version @value{VERSION}, @value{UPDATED}),
 which is $desc$.
 
-Copyright @copyright{} 2016-2020 Jeremy Theler.
+Copyright @copyright{} 2016-2025 Jeremy Theler.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -36,7 +41,9 @@ $endif$
 $if(titlepage)$
 @titlepage
 @title $title$
-@subtitle $subtitle$, $version$
+$if(version)$
+@subtitle $version$
+$endif$
 $for(author)$
 @author $author$
 $endfor$

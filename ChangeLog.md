@@ -1,11 +1,20 @@
-# Current
+# Development (current)
 
+ * ...
+
+# v0.3 (2025)
+
+ * Test for variance
+ * Arranged cards in shoes
+ * European no-hole card (ENHC)
+ * Flexible card reader
+ * Nicer configuration parser
  * Support for both GNU/Linux and MacOS
+ * Internal “informed” player (he/she/it computes the best choice on the fly)
  
 
 # v0.2 (2020)
 
- * Internal “informed” player (he/she/it computes the best choice on the fly)
  * Monte-Carlo-based derivation of the basic strategy
  * Internal player that follows the basic strategy
  * TCP pipes (using netcat)

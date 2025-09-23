@@ -41,3 +41,10 @@ checkyq() {
  fi
 }
 
+checkgawk() {
+ if [ -z "$(which gawk)" ]; then
+  echo "gawk not found, skipping test"
+  exit 77
+ fi
+}
+

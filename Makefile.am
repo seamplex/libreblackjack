@@ -9,9 +9,12 @@ AUTOMAKE_OPTIONS = subdir-objects
 dist_doc_DATA = README doc/blackjack.texi
 
 TESTS = tests/internal.sh \
+        tests/stand.sh \
+        tests/no-bust.sh \
+        tests/mimic-the-dealer.sh \
         tests/variance.sh
 
-EXTRA_DIST = ChangeLog  players $(TESTS)
+EXTRA_DIST = ChangeLog  players tests utils
 
 bin_PROGRAMS = blackjack
 blackjack_INCLUDES = $(all_includes)
