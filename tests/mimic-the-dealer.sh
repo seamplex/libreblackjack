@@ -14,6 +14,7 @@ checkgawk   # this test does not work with mawk, it does not like the fifo
 
 if [ ! -e functions.sh ]; then
   cd tests
+  extra="../"
 fi
 if [ ! -e functions.sh ]; then
   exit 77
@@ -25,11 +26,11 @@ ref=-0.055
 
 rm -f fifo-mimic
 mkfifo fifo-mimic
-$blackjack -n1e5 --report=mimic.yaml < fifo-mimic | gawk -f ../players/08-mimic-the-dealer/mimic-the-dealer.awk > fifo-mimic
+${extra}${blackjack} -n1e5 --report=mimic.yaml < fifo-mimic | gawk -f ../players/08-mimic-the-dealer/mimic-the-dealer.awk > fifo-mimic
 
 actual=$(yq .mean mimic.yaml)
 tol=$(yq .error mimic.yaml)
-echo $actual $ref $error
+echo $actual $ref $tol
 awk -v a="$actual" -v r="$ref" -v t="$tol" 'BEGIN { exit !((a >= (r-t)) && (a <= (r+t))) }'
 exitifwrong $?
 echo "ok"

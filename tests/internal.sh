@@ -19,7 +19,7 @@ echo "6 decks h17 das nrsa 1e6"
 $blackjack -i --report=ahc.yaml --decks=6
 actual=$(yq .mean ahc.yaml)
 tol=$(yq .error ahc.yaml)
-echo $actual $ref $error
+echo $actual $ref $tol
 awk -v a="$actual" -v r="$ref" -v t="$tol" 'BEGIN { exit !((a >= (r-t)) && (a <= (r+t))) }'
 exitifwrong $?
 echo "ok"

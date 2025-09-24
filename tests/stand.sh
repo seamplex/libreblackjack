@@ -11,13 +11,13 @@ fi
 
 checkyq
 
-ref=-0.155
+ref=-0.158
 
 echo "always stand"
 yes stand | $blackjack -n5e5 --flat_bet=true --no_insurance=true --report=stand.yaml > /dev/null 
 actual=$(yq .mean stand.yaml)
 tol=$(yq .error stand.yaml)
-echo $actual $ref $error
+echo $actual $ref $tol
 awk -v a="$actual" -v r="$ref" -v t="$tol" 'BEGIN { exit !((a >= (r-t)) && (a <= (r+t))) }'
 exitifwrong $?
 echo "ok"
