@@ -14,9 +14,8 @@ def main():
             if len(parts) >= 2:
                 cards_file.write(parts[1] + "\n")
         if line.startswith("play?"):
-            # move = random.choice(["hit", "stand"])
-            # print(move, flush=True)
-            print("hit", flush=True)
+            move = random.choice(["hit", "stand"])
+            print(move, flush=True)
         elif line.endswith("bet?"):
             print("1", flush=True)
         elif line.endswith("?"):
