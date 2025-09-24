@@ -8,7 +8,10 @@ Makefile.in
 *.toc
 stamp-vti
 wwwtemp
+libreblackjack.t2p/
+libreblackjack.pdf
+libreblackjack.html
+libreblackjack.info
 blackjack.t2p/
 blackjack.pdf
 blackjack.html
-blackjack.info

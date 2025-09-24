@@ -217,6 +217,7 @@ pandoc hash.yaml ${in}.md \
     --standalone ${toc_option} \
     --metadata=rootdir:${rootdir} \
     --lua-filter=${rootdir}/doc/include-files.lua \
+    --lua-filter=${rootdir}/doc/code-style.lua \
     --filter pandoc-crossref \
     --number-sections --toc-depth=4 \
     ${template_args} ${format_args} -o ${out}

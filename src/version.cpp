@@ -46,17 +46,39 @@ void help(const char *program_name) {
   std::cout << ENGINE << std::endl;
 
   std::cout << std::endl;
+  
+  std::cout << "-c<path> or --conf=path    Specify the path to the configuration file." << std::endl;
+  std::cout << "                           Default is ./blackjack.conf." << std::endl;
+  std::cout << std::endl;
+  std::cout << "-n<n> or --hands=n         Specify the number of hands to play." << std::endl;
+  std::cout << "                           Corresponds to the hands variable in the configuration file." << std::endl;
+  std::cout << std::endl;
+  std::cout << "-d<n> or --decks=n         Specify the number of decks to use in the shoe." << std::endl;
+  std::cout << "                           Corresponds to the decks variable in the configuration file." << std::endl;
+  std::cout << std::endl;
+  std::cout << "-f or --flatbet            Do not ask for the amount to bet before starting" << std::endl;
+  std::cout << "                           a new hand and use a flat unit bet." << std::endl;
+  std::cout << "                           Corresponds to the flat_bet variable in the configuration file." << std::endl;
+  std::cout << std::endl;
+  std::cout << "-i or --internal           Use the internal player to play against the dealer." << std::endl;
+  std::cout << "                           See the manual for details and instructions to define the rules" << std::endl;
+  std::cout << "                           and optionally, the playing strategy and/or arranged shoes." << std::endl;
+  std::cout << std::endl;
+  std::cout << "-h or --help               Print this informative help message into standard output" << std::endl;
+  std::cout << "                           and exit successfully." << std::endl;
+  std::cout << std::endl;
+  std::cout << "-v or --version            Print the version number and licensing information into" << std::endl;
+  std::cout << "                           standard output and then exit successfully." << std::endl;
+  std::cout << std::endl;
+  std::cout << "--configuration_variable[=value]" << std::endl;
+  std::cout << "                           Any configuration variable from the configuration file can be" << std::endl;
+  std::cout << "                           set from the command line. For example, passing --no_insurance" << std::endl;
+  std::cout << "                           is like setting no_insurance = 1 in the configuration file." << std::endl;
+  std::cout << "                           Command-line options override setting in the configuration file." << std::endl;
+  std::cout << std::endl;
   std::cout << "If no configuration file is given, a file named blackjack.conf" << std::endl;
   std::cout << "in the current directory is used, provided it exists." << std::endl;
   std::cout << "See the full documentation for the available options and the default values." << std::endl;
-  std::cout << std::endl;
-  std::cout << "  -h, --hands=N    set the number of hands to play before quiting" << std::endl;
-  std::cout << "  -d, --decks=N    set the number of decks to use" << std::endl;
-  std::cout << "  -f, --flatbet    do not ask for the bet before each hand, use a unit flat bet" << std::endl;
-  std::cout << "  -i, --internal   use the internal player to play against the dealer (not interactive)" << std::endl;
-  std::cout << std::endl;
-  std::cout << "  -h, --help       display this help and exit" << std::endl;
-  std::cout << "  -v  --version    output version information and exit" << std::endl;
 
   return;
 }

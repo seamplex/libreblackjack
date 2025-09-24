@@ -2,7 +2,7 @@
 # 
 # Execute this script to generate a configure script
 #
-# Copyright (C) 2020-2021 jeremy theler
+# Copyright (C) 2020-2021,2025 jeremy theler
 # This file is part of libreblackjack.
 #
 # This file is free software: you are free to change and redistribute it.
@@ -48,17 +48,12 @@ echo "define(libreblackjackversion, [${version}])dnl" > version.m4
 
 
 if [ ! -z "$(which pandoc)" ]; then
-  pandoc README.md -t plain -o README
-#   cd doc
-#   ./md2texi.sh
-#   cd ..
+  pandoc README.md    -t plain -o README
+  pandoc ChangeLog.md -t plain -o ChangeLog
 else
-  fmt README.md > README
-  touch doc/libreblackjack.texi
+  fmt README.md    > README
+  fmt ChangeLog.md > ChangeLog
 fi
-
-# touch ChangeLog
-git log --oneline --decorate > ChangeLog
 
 autoreconf --install
 automake --add-missing

@@ -33,42 +33,52 @@
 namespace lbj {
 Configuration::Configuration(int argc, char **argv) {
   
+///help+usage+desc [-c path_to_conf_file] [options] 
+
+///help+extra+desc If no configuration file is given, a file named `blackjack.conf`
+///help+extra+desc in the current directory is used, provided it exists.
+///help+extra+desc @
+///help+extra+desc See the full documentation for the available options and the default values.
+  
   const struct option longopts[] = {
-///op+conf+option `-c`path  or `--conf=`path
-///op+conf+desc Specify the path to the [configuration file]. Default is `./blackjack.conf`
+///op+conf+option `-c<`*path*`>`  or `--conf=`*path*
+///op+conf+desc Specify the path to the configuration file. Default is `./blackjack.conf`.
     {"conf", required_argument, NULL, 'c'},
 
-    ///op+hands+option `-n`$n$  or `--hands=`$n$
-///op+hands+desc Specify the number of hands to play. Corresponds to the `hands` variable in the [configuration file].
+///op+hands+option `-n<`$n$`>`  or `--hands=`$n$
+///op+hands+desc Specify the number of hands to play. Corresponds to the `hands` variable in the configuration file.
     {"hands", required_argument, NULL, 'n'},
     
-///op+decks+option `-d`$n$ or `--decks=`$n$
-///op+decks+desc Specify the number of decks to use in the shoe. Corresponds to the `decks` variable in the [configuration file].
+///op+decks+option `-d<`$n$`>` or `--decks=`$n$
+///op+decks+desc Specify the number of decks to use in the shoe. Corresponds to the `decks` variable in the configuration file.
     {"decks", required_argument, NULL, 'd'},
     
 ///op+flatbet+option `-f` or `--flatbet`
-///op+flatbet+desc Do not ask for the amount to bet before starting a new hand and use a flat unit bet. Corresponds to the `flat_bet` variable in the [configuration file].
+///op+flatbet+desc Do not ask for the amount to bet before starting a new hand and use a flat unit bet.
+///op+flatbet+desc Corresponds to the `flat_bet` variable in the configuration file.
     {"flatbet", optional_argument, NULL, 'f'},
 
-///op+general+option `--`configuration_variable`[=`*value*`]`
-///op+general+desc Any configuration variable from the [configuration file] can be set from the command line.
-///op+general+desc For example, passing `--no_insurance` is like setting `no_insurance = 1` in the configuration file.
-///op+general+desc Command-line options override setting in the configuration file.
-    
 ///op+internal+option `-i` or `--internal`
-///op+internal+desc Use the internal player to play against itself. See [internal player] for details.
+///op+internal+desc Use the internal player to play against the dealer. See the manual for details
+///op+internal+desc and instructions to define the rules and optionally, the playing strategy and/or arranged shoes.
     {"internal", no_argument, NULL, 'i'},
     
 ///op+help+option `-h` or `--help`
-///op+help+desc Print this informative help message on standard output and exit successfully.
+///op+help+desc Print this informative help message into standard output and exit successfully.
     {"help", no_argument, NULL, 'h'},
     
 ///op+version+option `-v` or `--version`
-///op+version+desc Print the version number and licensing information of Hello on standard output and then exit successfully.
+///op+version+desc Print the version number and licensing information into standard output and then exit successfully.
     {"version", no_argument, NULL, 'v'},
     {NULL, 0, NULL, 0}
   };
+///op+general+option `--`*configuration_variable*`[=`*value*`]`
+///op+general+desc Any configuration variable from the configuration file can be set from the command line.
+///op+general+desc For example, passing `--no_insurance` is like setting `no_insurance = 1` in the configuration file.
+///op+general+desc Command-line options override setting in the configuration file.
+  
 
+  
   int optc = 0;
   int option_index = 0;
   opterr = 0;

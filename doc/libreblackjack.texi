@@ -1,0 +1,518 @@
+\input texinfo  @c -*-texinfo-*-
+@settitle Libre@ Blackjack
+@documentencoding UTF-8
+
+@setfilename blackjack.info
+@set UPDATED 2025-09-24
+@set VERSION 
+
+@copying
+This manual is for LibreBlackjack (version @value{VERSION}, @value{UPDATED}),
+which is a completely free-as-in-freedom blackjack engine designed to
+study and analyze the game statistics using different playing
+strategies, ranging from simple card counting up to other complex
+algorithms based on artificial-intelligence techniques.
+
+Copyright @copyright{} 2016-2025 Jeremy Theler.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+@end quotation
+@end copying
+
+@ifnottex
+@paragraphindent 0
+@end ifnottex
+@titlepage
+@title Libre@ Blackjack
+@author Jeremy Theler
+2025-09-24
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@node Top
+@top Libre@ Blackjack
+
+@menu
+* Overview::
+* Running @code{blackjack}::
+* Playing blackjack::
+* Configuration::
+* Internal players::
+* Examples::
+* Communication mechanisms::
+* Tests::
+* Statistical utilities::
+* Installation::
+@end menu
+
+@node Overview
+@chapter Overview
+@itemize
+@item
+Explain what the goal is.
+@item
+Show some examples.
+@item
+One directory (a.k.a. folder)
+@item
+1/2 Mhands/second
+@item
+Both free and open source so you get the four freedoms
+@enumerate 0
+@item
+run
+@item
+study
+@item
+change
+@item
+re-distribute
+@end enumerate
+
+@end itemize
+
+@menu
+* Why::
+* How::
+* What::
+@end menu
+
+@node Why
+@section Why
+Since blackjack is not straightforward to analyze with analytical
+statistics equations, a monte-carlo-based approach is needed.
+
+@node How
+@section How
+@itemize
+@item
+FOSS
+@item
+unix
+@end itemize
+
+@node What
+@section What
+a dealer (he) that knows how to deal blackjack, tells the player (her)
+what cards are dealt, asks the player for her choices (bet, hit, stand,
+etc.) and keeps track of the results so as to write a report with ev,
+sd, etc.
+
+@node Running @code{blackjack}
+@chapter Running @code{blackjack}
+
+@menu
+* Invocation::
+* Results::
+* Interactive game::
+@end menu
+
+@node Invocation
+@section Invocation
+The @code{blackjack} program executable follows the POSIX standard. Its
+usage is:
+
+@verbatim
+blackjack [-c path_to_conf_file] [options] 
+@end verbatim
+
+@table @asis
+@item @code{-c<}@emph{path}@code{>} or @code{--conf=}@emph{path}
+
+Specify the path to the configuration file. Default is
+@code{./blackjack.conf}.
+
+@item @code{-n<}@math{n}@code{>} or @code{--hands=}@math{n}
+
+Specify the number of hands to play. Corresponds to the @code{hands}
+variable in the configuration file.
+
+@item @code{-d<}@math{n}@code{>} or @code{--decks=}@math{n}
+
+Specify the number of decks to use in the shoe. Corresponds to the
+@code{decks} variable in the configuration file.
+
+@item @code{-f} or @code{--flatbet}
+
+Do not ask for the amount to bet before starting a new hand and use a
+flat unit bet. Corresponds to the @code{flat_bet} variable in the
+configuration file.
+
+@item @code{-i} or @code{--internal}
+
+Use the internal player to play against the dealer. See the manual for
+details and instructions to define the rules and optionally, the playing
+strategy and/or arranged shoes.
+
+@item @code{-h} or @code{--help}
+
+Print this informative help message into standard output and exit
+successfully.
+
+@item @code{-v} or @code{--version}
+
+Print the version number and licensing information into standard output
+and then exit successfully.
+
+@item @code{--}@emph{configuration_variable}@code{[=}@emph{value}@code{]}
+
+Any configuration variable from the configuration file can be set from
+the command line. For example, passing @code{--no_insurance} is like
+setting @code{no_insurance = 1} in the configuration file. Command-line
+options override setting in the configuration file.
+
+@end table
+
+If no configuration file is given, a file named @code{blackjack.conf} in
+the current directory is used, provided it exists.
+
+See the full documentation for the available options and the default
+values.
+
+Sec.@ 4 contains the details about the settings which can be used in the
+configuration file. As already stated, the options which can be given in
+the configuration file (explained in sec.@ 4) can be passed as a
+command-line argument following the POSIX double-dash format
+@code{--variable=value}. For example, running
+
+@verbatim
+blackjack --decks=4 --no_insurance=true
+@end verbatim
+
+is equivalent to using a configuration file with
+
+@verbatim
+decks = 4
+no_insurance = true
+@end verbatim
+
+With no command-line options and no configuration file, @code{blackjack}
+starts in interactive mode and it is ready to start a blackjack game
+(see sec.@ 2.3 for details).
+
+@node Results
+@section Results
+In YAML
+
+@code{yq}
+
+@node Interactive game
+@section Interactive game
+If @code{blackjack} is attached to an interactive TTY (i.e.@ neither the
+standard input nor outputs are redirected) and there is no @code{player}
+option in the configuration file, an interactive game is triggered.
+First thing the program will do is to ask for a bet:
+
+@verbatim
+xxxxx
+@end verbatim
+
+So the user should enter a number, say ``1'' and then press Enter and
+then a game will be dealt:
+
+@verbatim
+xxxxx
+@end verbatim
+
+A flat-betting game can be played by passing @code{--flat_bet=true} (or
+@code{--flat_bet=2} to bet two units each hand) through the command
+line:
+
+@verbatim
+$ blackjack --flat_bet=true
+xxxxx
+@end verbatim
+
+The user can quit by either typing @code{quit} (or @code{q}) or hitting
+Ctrl-D. See sec.@ 3 for a description of all the possible commands---in
+both ways, from the dealer to the player and from the player to the
+dealer.
+
+@node Playing blackjack
+@chapter Playing blackjack
+@quotation
+I overhear a lot of bad gambling advice in the casinos. Perhaps the most
+frequent is this one, ``The object of blackjack is to get as close to 21
+as possible, without going over.'' No! The object of blackjack is to
+beat the dealer. To beat the dealer the player must first not bust (go
+over 21) and second either outscore the dealer or have the dealer bust.
+
+The Wizard of Odds,
+@url{https://wizardofodds.com/games/blackjack/basics/#rules}
+@end quotation
+Here are the basic Blackjack rules:
+
+@enumerate 
+@item
+Blackjack may be played with one to eight decks of 52-card decks.
+@item
+Aces may be counted as 1 or 11 points, 2 to 9 according to pip value,
+and tens and face cards count as ten points.
+@item
+The value of a hand is the sum of the point values of the individual
+cards. Except, a ``blackjack'' is the highest hand, consisting of an ace
+and any 10-point card, and it outranks all other 21-point hands.
+@item
+After the players have bet, the dealer will give two cards to each
+player and two cards to himself. One of the dealer cards is dealt face
+up. The facedown card is called the ``hole card.''
+@item
+If the dealer has an ace showing, he will offer a side bet called
+``insurance.'' This side wager pays 2 to 1 if the dealer's hole card is
+any 10-point card. Insurance wagers are optional and may not exceed half
+the original wager.
+@item
+If the dealer has a ten or an ace showing (after offering insurance with
+an ace showing), then he will peek at his facedown card to see if he has
+a blackjack. If he does, then he will turn it over immediately.
+@item
+If the dealer does have a blackjack, then all wagers (except insurance)
+will lose, unless the player also has a blackjack, which will result in
+a push. The dealer will resolve insurance wagers at this time.
+@item
+Play begins with the player to the dealer's left. The following are the
+choices available to the player:
+@itemize
+@item
+@strong{Stand}: Player stands pat with his cards.
+@item
+@strong{Hit}: Player draws another card (and more if he wishes). If this
+card causes the player's total points to exceed 21 (known as
+``breaking'' or ``busting'') then he loses.
+@item
+@strong{Double}: Player doubles his bet and gets one, and only one, more
+card.
+@item
+@strong{Split}: If the player has a pair, or any two 10-point cards,
+then he may double his bet and separate his cards into two individual
+hands. The dealer will automatically give each card a second card. Then,
+the player may hit, stand, or double normally. However, when splitting
+aces, each ace gets only one card. Sometimes doubling after splitting is
+not allowed. If the player gets a ten and ace after splitting, then it
+counts as 21 points, not a blackjack. Usually the player may keep
+re-splitting up to a total of four hands. Sometimes re-splitting aces is
+not allowed.
+@item
+@strong{Surrender}: The player forfeits half his wager, keeping the
+other half, and does not play out his hand. This option is only
+available on the initial two cards, and depending on casino rules,
+sometimes it is not allowed at all.
+@end itemize
+
+@item
+After each player has had his turn, the dealer will turn over his hole
+card. If the dealer has 16 or less, then he will draw another card. A
+special situation is when the dealer has an ace and any number of cards
+totaling six points (known as a ``soft 17''). At some tables, the dealer
+will also hit a soft 17.
+@item
+If the dealer goes over 21 points, then any player who didn't already
+bust will win.
+@item
+If the dealer does not bust, then the higher point total between the
+player and dealer will win.
+@item
+Winning wagers pay even money, except a winning player blackjack usually
+pays 3 to 2. Some casinos have been short-paying blackjacks, which is a
+rule strongly in the casino's favor.
+@end enumerate
+
+In Libre@ Blackjack, the dealer (he) and the player (she) can “talk”
+through commands which are ASCII strings sent through the standard
+input/output. In the most basic case, a human player reads commands from
+the dealer from @code{blackjack}'s standard output and writes her
+commands into the dealer's standard input. Those commands from the
+dealer that require a particular action from the player end with a
+quotation sign such as @code{bet?}, @code{insurance?} or @code{play?}.
+
+All numerical values such as hand totals or bankrolls are given as
+decimal ASCII strings.
+
+@menu
+* Commands from the dealer to the player::
+* Commands from the player to the dealer::
+@end menu
+
+@node Commands from the dealer to the player
+@section Commands from the dealer to the player
+xxxx
+
+@node Commands from the player to the dealer
+@section Commands from the player to the dealer
+The following commands are available for the player for playing her
+hand.
+
+include(input-particular.md)
+
+The following are general commands in the sense that they can be sent
+from the player to the dealer at any moment of the game.
+
+include(input-general.md)
+
+@node Configuration
+@chapter Configuration
+Libre@ Blackjacks reads a configuration file that contains
+
+@itemize
+@item
+settings about the rules of the game
+@itemize
+@item
+number of decks,
+@item
+whether if the dealer has to hit soft seventeen or not,
+@item
+blackjack payout,
+@item
+maximum bet allowed,
+@item
+etc@dots{}
+@end itemize
+
+@item
+how the player is supposed to play
+@itemize
+@item
+number of hands
+@item
+whether a flat or variable bet is going to be used,
+@item
+etc@dots{}
+@end itemize
+
+@item
+if there are any particular shoe arrangement, i.e.@ a predefined set of
+cards dealt in a certain order for instance to play one million hands of
+a sixteen against a dealer's ten
+@item
+what kind of information is shown in the interactive session
+@itemize
+@item
+if ASCII-art cards are supposed to be shown,
+@item
+a real-time delay to make the game smoother,
+@item
+etc.
+@end itemize
+
+@item
+how the automated player communicates with the dealer
+@itemize
+@item
+using standard input/output,
+@item
+FIFO named pipes,
+@item
+POSIX message queues,
+@item
+POSIX shared memory,
+@item
+etc@dots{}
+@end itemize
+
+@end itemize
+
+The location of the configuration file can be given in the command line.
+If none is provided, a file named @code{blackjack.conf} in the current
+directory is used. If such file does not exists, the defaults values of
+each variable are used.
+
+@quotation
+It is thus recommended to run each monte-carlo simulation that needs a
+particular configuration---and possibly other files such as card
+arrangements, strategies and/or results---in a different directory
+(a.k.a. folder) with a @code{blackjack.conf} file in it.
+@end quotation
+Individual variables can be set from the command line by passing one or
+more times the option @code{--configuration_variable[=value]} as
+explained in [@@sec-invocation].
+
+Comments can be inserted using either a hash @code{#} or a colon
+@code{;} at any position in the line. The following configuration file
+is the default provided in the main distribution tarball:
+
+@verbatim
+# uncomment the following line to arrange cards
+# arranged_cards = AC 5H 8S 9D KH
+
+flat_bet = 1       # do not ask for bets
+no_insurance = 1   # do not ask for insurance
+decks = 1          # number of decks, negative means infinite
+@end verbatim
+
+@menu
+* Reference::
+@end menu
+
+@node Reference
+@section Reference
+xxxx
+
+@node Internal players
+@chapter Internal players
+
+@node Examples
+@chapter Examples
+The directory @code{players} contains a few examples of automated
+players, which are discussed in the following sections.
+
+@node Communication mechanisms
+@chapter Communication mechanisms
+
+@menu
+* Standard input & output::
+* FIFOs::
+* Message queues::
+@end menu
+
+@node Standard input & output
+@section Standard input & output
+
+@node FIFOs
+@section FIFOs
+
+@node Message queues
+@section Message queues
+
+@node Tests
+@chapter Tests
+
+@node Statistical utilities
+@chapter Statistical utilities
+
+@node Installation
+@chapter Installation
+
+@menu
+* From binaries::
+* From sources::
+@end menu
+
+@node From binaries
+@section From binaries
+
+@node From sources
+@section From sources
+
+@menu
+* Tarball::
+* Git repository::
+@end menu
+
+@node Tarball
+@subsection Tarball
+
+@node Git repository
+@subsection Git repository
+
+@bye

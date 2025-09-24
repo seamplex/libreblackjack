@@ -1,7 +1,7 @@
 ---
 title: Libre Blackjack
 subtitle:  A free blackjack back end
-desc: a completely free-as-in-freedom blackjack engine designed to study and analyze the game statistics using different playing strategies ranging from simple card counting up to other complex algorithms based on artificial intelligence.
+desc: a completely free-as-in-freedom blackjack engine designed to study and analyze the game statistics using different playing strategies, ranging from simple card counting up to other complex algorithms based on artificial-intelligence techniques
 author: Jeremy Theler
 infoname: blackjack
 lang: en-US
@@ -36,6 +36,9 @@ documentclass: report
 
 ## Why
 
+Since blackjack is not straightforward to analyze with analytical statistics equations, a monte-carlo-based approach is needed.
+
+
 ## How
 
  * FOSS
@@ -43,6 +46,7 @@ documentclass: report
 
 ## What
 
+a dealer (he) that knows how to deal blackjack, tells the player (her) what cards are dealt, asks the player for her choices (bet, hit, stand, etc.) and keeps track of the results so as to write a report with ev, sd, etc.
 
 
 # Running `blackjack`
@@ -51,20 +55,12 @@ documentclass: report
 
 The `blackjack` program executable follows the POSIX standard. Its usage is:
 
-```terminal
-blackjack [-c path_to_conf_file] [options] 
+```include
+help.md
 ```
 
-If no configuration file is given, a file named `blackjack.conf` in the current directory (a.k.a. folder) is used, provided it exists. See @sec:configuration for details about the settings which can be used in the configuration file.
-
-With no command-line options and no configuration file, `blackjack` starts in interactive mode and it is ready to start a blackjack game (see @sec:interactive for details).
-
-The `blackjack` executable supports the following options:
-
-
-xxxxxxxxxxxxxx
-
-All the options which can be given in the configuration file (explained in @sec:configuration) can be passed as a command-line argument following the POSIX double-dash format `--variable=value`.
+@Sec:configuration contains the details about the settings which can be used in the configuration file.
+As already stated, the options which can be given in the configuration file (explained in @sec:configuration) can be passed as a command-line argument following the POSIX double-dash format `--variable=value`.
 For example, running
 
 ```terminal
@@ -77,6 +73,8 @@ is equivalent to using a configuration file with
 decks = 4
 no_insurance = true
 ```
+
+With no command-line options and no configuration file, `blackjack` starts in interactive mode and it is ready to start a blackjack game (see @sec:interactive for details).
 
 ## Results
 
