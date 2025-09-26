@@ -2,15 +2,13 @@
 
  * RSA
  * ES10
- * arranged cards in shoes (i.e. decks != 0)
- * multiple players
+ * multiple players (actually multiple hands for a single player)
 
 # medium
 
  * tests
  * error handler, explain what the valid choices are (i.e. unknown rules)
  * update docs, write a nice manual (m4 -> md -> texinfo -> pdf)
-   - command line invocation
    - playing commands
    - configuration options
  * cpu and wall time in report

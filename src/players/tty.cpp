@@ -35,21 +35,12 @@
 
 namespace lbj {
 
-    // TODO: make class static
+// TODO: make class static
 std::vector<std::string> commands;
 
-// https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
-template<typename ... Args>
-std::string string_format2( const std::string& format, Args ... args)
-{
-  size_t size = snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
-  if (size <= 0) {
-    return std::string("");
-  }
-  std::unique_ptr<char[]> buf(new char[size]); 
-  snprintf(buf.get(), size, format.c_str(), args ...);
-  return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
-}
+// TODO: think of a better way
+extern std::string double_to_string_g_format(double value);
+
 
 Tty::Tty(Configuration &conf) : Player(conf) {
     
@@ -117,7 +108,7 @@ void Tty::info(lbj::Info msg, int p1, int p2) {
 
     case lbj::Info::NewHand:
       std::cout << std::endl;
-      s = "Starting new hand #" + std::to_string(p1) + " with bankroll " + string_format2("%g", 1e-3*p2);
+      s = "Starting new hand #" + std::to_string(p1) + " with bankroll " + double_to_string_g_format(1e-3*p2);
       
       // clear dealer's hand
       dealerHand.cards.clear();
@@ -235,12 +226,12 @@ void Tty::info(lbj::Info msg, int p1, int p2) {
     break;
     
     case lbj::Info::PlayerPushes:
-      s = "Player pushes " + string_format2("%g", 1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
+      s = "Player pushes " + double_to_string_g_format(1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
       render = true;
     break;
     
     case lbj::Info::PlayerLosses:
-      s = "Player losses " + string_format2("%g", 1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
+      s = "Player losses " + double_to_string_g_format(1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
       render = true;
     break;
     case lbj::Info::PlayerBlackjack:
@@ -248,7 +239,7 @@ void Tty::info(lbj::Info msg, int p1, int p2) {
       render = true;
     break;
     case lbj::Info::PlayerWins:
-      s = "Player wins " + string_format2("%g", 1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
+      s = "Player wins " + double_to_string_g_format(1e-3*p1) + ((p2 > 0) ? (" with " + std::to_string(p2)) : "");
       render = true;
     break;
     
@@ -265,7 +256,7 @@ void Tty::info(lbj::Info msg, int p1, int p2) {
     break;
 
     case lbj::Info::Bankroll:
-      std::cout << "Your bankroll is " << string_format2("%g", 1e-3*p1) << std::endl;        
+      std::cout << "Your bankroll is " << double_to_string_g_format(1e-3*p1) << std::endl;        
     break;
     
     

@@ -152,10 +152,13 @@ int Informed::play() {
 
 void Informed::dealer_bust_european_iteration(void)
 {
-  // All right, if the dealer has a-- that's the 17.
+  // dealer's probability of getting a total equal to the first index starting from a total equal to the second    
+  // double dealer_hard[SIZE][SIZE];
+    
   // There's a 100% chance he will end up with a 17 because he's going to stop
   // and same thing with an 18 through a 21.
   // With the soft hands, let's assume the rule that the dealer stands on a soft 17.
+  // TODO:
   for (int total = 17; total < 22; total++) {
     dealer_hard[total][total] = 1;    
     dealer_soft[total][total] = 1;
@@ -168,16 +171,17 @@ void Informed::dealer_bust_european_iteration(void)
 
   for (int outcome = 17; outcome < 23; outcome++) {
     for (int total = 16; total > 1; total--) {
-      dealer_hard[outcome][total] = 1.0/13.0*(dealer_hard[outcome][total+2] +
-                                              dealer_hard[outcome][total+3] +
-                                              dealer_hard[outcome][total+4] +
-                                              dealer_hard[outcome][total+5] +
-                                              dealer_hard[outcome][total+6] +
-                                              dealer_hard[outcome][total+7] +
-                                              dealer_hard[outcome][total+8] +
-                                              dealer_hard[outcome][total+9] +
-                                          4.0*dealer_hard[outcome][total+10] +
-                                              dealer_soft[outcome][total+11]);
+      // TODO: real cards left
+      dealer_hard[outcome][total] = 1.0/13.0*(dealer_hard[outcome][total+2]) +
+                                    1.0/13.0*(dealer_hard[outcome][total+3]) +
+                                    1.0/13.0*(dealer_hard[outcome][total+4]) +
+                                    1.0/13.0*(dealer_hard[outcome][total+5]) +
+                                    1.0/13.0*(dealer_hard[outcome][total+6]) +
+                                    1.0/13.0*(dealer_hard[outcome][total+7]) +
+                                    1.0/13.0*(dealer_hard[outcome][total+8]) +
+                                    1.0/13.0*(dealer_hard[outcome][total+9]) +
+                                    4.0/13.0*(dealer_hard[outcome][total+10]) +
+                                    1.0/13.0*(dealer_soft[outcome][total+11]);
     }
 
     // With a soft 22, that's going to be the same thing as a hard 12.  
@@ -186,16 +190,16 @@ void Informed::dealer_bust_european_iteration(void)
     }
     
     for (int total = 16; total > 11; total--) {
-      dealer_soft[outcome][total] = 1.0/13.0*(dealer_soft[outcome][total+1] +
-                                              dealer_soft[outcome][total+2] +
-                                              dealer_soft[outcome][total+3] +
-                                              dealer_soft[outcome][total+4] +
-                                              dealer_soft[outcome][total+5] +
-                                              dealer_soft[outcome][total+6] +
-                                              dealer_soft[outcome][total+7] +
-                                              dealer_soft[outcome][total+8] +
-                                              dealer_soft[outcome][total+9] +
-                                          4.0*dealer_soft[outcome][total+10]);
+      dealer_soft[outcome][total] = 1.0/13.0*(dealer_soft[outcome][total+1]) +
+                                    1.0/13.0*(dealer_soft[outcome][total+2]) +
+                                    1.0/13.0*(dealer_soft[outcome][total+3]) +
+                                    1.0/13.0*(dealer_soft[outcome][total+4]) +
+                                    1.0/13.0*(dealer_soft[outcome][total+5]) +
+                                    1.0/13.0*(dealer_soft[outcome][total+6]) +
+                                    1.0/13.0*(dealer_soft[outcome][total+7]) +
+                                    1.0/13.0*(dealer_soft[outcome][total+8]) +
+                                    1.0/13.0*(dealer_soft[outcome][total+9]) +
+                                    4.0/13.0*(dealer_soft[outcome][total+10]);
     }
   }
   
@@ -204,30 +208,31 @@ void Informed::dealer_bust_european_iteration(void)
 
 void Informed::dealer_european_to_american(void) {
 
+  // TODO: explain!
   for (int outcome = 17; outcome < 23; outcome++) {
     for (int total = 2; total < 10; total++) {
-      dealer_prob[outcome][total] = dealer_hard[outcome][total];
+      dealer_american[outcome][total] = dealer_hard[outcome][total];
     }
     
-    dealer_prob[outcome][10] = 1/12.0*(dealer_hard[outcome][10+2] +
-                                       dealer_hard[outcome][10+3] +
-                                       dealer_hard[outcome][10+4] +
-                                       dealer_hard[outcome][10+5] +
-                                       dealer_hard[outcome][10+6] +
-                                       dealer_hard[outcome][10+7] +
-                                       dealer_hard[outcome][10+8] +
-                                       dealer_hard[outcome][10+9] +
-                                   4.0*dealer_hard[outcome][10+10]);
+    dealer_american[outcome][10] = 1.0/12.0*(dealer_hard[outcome][10+2]) +
+                                   1.0/12.0*(dealer_hard[outcome][10+3]) +
+                                   1.0/12.0*(dealer_hard[outcome][10+4]) +
+                                   1.0/12.0*(dealer_hard[outcome][10+5]) +
+                                   1.0/12.0*(dealer_hard[outcome][10+6]) +
+                                   1.0/12.0*(dealer_hard[outcome][10+7]) +
+                                   1.0/12.0*(dealer_hard[outcome][10+8]) +
+                                   1.0/12.0*(dealer_hard[outcome][10+9]) +
+                                   4.0/12.0*(dealer_hard[outcome][10+10]);
     
-    dealer_prob[outcome][11] = 1/9.0*(dealer_soft[outcome][11+1] +
-                                      dealer_soft[outcome][11+2] +
-                                      dealer_soft[outcome][11+3] +
-                                      dealer_soft[outcome][11+4] +
-                                      dealer_soft[outcome][11+5] +
-                                      dealer_soft[outcome][11+6] +
-                                      dealer_soft[outcome][11+7] +
-                                      dealer_soft[outcome][11+8] +
-                                      dealer_soft[outcome][11+9]);
+    dealer_american[outcome][11] = 1.0/9.0*(dealer_soft[outcome][11+1] +
+                                            dealer_soft[outcome][11+2] +
+                                            dealer_soft[outcome][11+3] +
+                                            dealer_soft[outcome][11+4] +
+                                            dealer_soft[outcome][11+5] +
+                                            dealer_soft[outcome][11+6] +
+                                            dealer_soft[outcome][11+7] +
+                                            dealer_soft[outcome][11+8] +
+                                            dealer_soft[outcome][11+9]);
   }
   
   return;
@@ -237,16 +242,16 @@ void Informed::hit_iteration() {
   
   // do not go below 3 if not needed by value  
   for (int player = 20; player > 3; player--) {
-    hard_hit[player] = 1.0/13.0*(max(hard_stand[player+2], hard_hit[player+2]) +
-                                 max(hard_stand[player+3], hard_hit[player+3]) +
-                                 max(hard_stand[player+4], hard_hit[player+4]) +
-                                 max(hard_stand[player+5], hard_hit[player+5]) +
-                                 max(hard_stand[player+6], hard_hit[player+6]) +
-                                 max(hard_stand[player+7], hard_hit[player+7]) +
-                                 max(hard_stand[player+8], hard_hit[player+8]) +
-                                 max(hard_stand[player+9], hard_hit[player+9]) +
-                             4.0*max(hard_stand[player+10], hard_hit[player+10]) +
-                                 max(soft_stand[player+11], soft_hit[player+11]));
+    hard_hit[player] = 1.0/13.0*(max(hard_stand[player+2], hard_hit[player+2])) +
+                       1.0/13.0*(max(hard_stand[player+3], hard_hit[player+3])) +
+                       1.0/13.0*(max(hard_stand[player+4], hard_hit[player+4])) +
+                       1.0/13.0*(max(hard_stand[player+5], hard_hit[player+5])) +
+                       1.0/13.0*(max(hard_stand[player+6], hard_hit[player+6])) +
+                       1.0/13.0*(max(hard_stand[player+7], hard_hit[player+7])) +
+                       1.0/13.0*(max(hard_stand[player+8], hard_hit[player+8])) +
+                       1.0/13.0*(max(hard_stand[player+9], hard_hit[player+9])) +
+                       4.0/13.0*(max(hard_stand[player+10], hard_hit[player+10])) +
+                       1.0/13.0*(max(soft_stand[player+11], soft_hit[player+11]));
   }
 
   for (int player = 31; player > 21; player--) {
@@ -254,16 +259,16 @@ void Informed::hit_iteration() {
   }
 
   for (int player = 21; player > 11; player--) {
-    soft_hit[player] = 1.0/13.0*(max(soft_stand[player+1], soft_hit[player+1]) +
-                                 max(soft_stand[player+2], soft_hit[player+2]) +
-                                 max(soft_stand[player+3], soft_hit[player+3]) +
-                                 max(soft_stand[player+4], soft_hit[player+4]) +
-                                 max(soft_stand[player+5], soft_hit[player+5]) +
-                                 max(soft_stand[player+6], soft_hit[player+6]) +
-                                 max(soft_stand[player+7], soft_hit[player+7]) +
-                                 max(soft_stand[player+8], soft_hit[player+8]) +
-                                 max(soft_stand[player+9], soft_hit[player+9]) +
-                             4.0*max(soft_stand[player+10], soft_hit[player+10]));
+    soft_hit[player] = 1.0/13.0*(max(soft_stand[player+1], soft_hit[player+1])) +
+                       1.0/13.0*(max(soft_stand[player+2], soft_hit[player+2])) +
+                       1.0/13.0*(max(soft_stand[player+3], soft_hit[player+3])) +
+                       1.0/13.0*(max(soft_stand[player+4], soft_hit[player+4])) +
+                       1.0/13.0*(max(soft_stand[player+5], soft_hit[player+5])) +
+                       1.0/13.0*(max(soft_stand[player+6], soft_hit[player+6])) +
+                       1.0/13.0*(max(soft_stand[player+7], soft_hit[player+7])) +
+                       1.0/13.0*(max(soft_stand[player+8], soft_hit[player+8])) +
+                       1.0/13.0*(max(soft_stand[player+9], soft_hit[player+9])) +
+                       4.0/13.0*(max(soft_stand[player+10], soft_hit[player+10]));
   }
   
   return;
@@ -276,14 +281,14 @@ void Informed::stand(int upcard) {
   // minus the probability of anything else happening.
   //So, he can expect to lose by standing on a four against a two of about 29.3% of his bet. That's the same number for standing on everything all the way through a 16 because a 16 is no better than a four or a zero.
   for (int player = 4; player < 17; player++) {
-    hard_stand[player] = dealer_prob[22][upcard] - dealer_prob[21][upcard] - dealer_prob[20][upcard] - dealer_prob[19][upcard] - dealer_prob[18][upcard] - dealer_prob[17][upcard];
+    hard_stand[player] = dealer_american[22][upcard] - dealer_american[21][upcard] - dealer_american[20][upcard] - dealer_american[19][upcard] - dealer_american[18][upcard] - dealer_american[17][upcard];
   }
   
-  hard_stand[17] = dealer_prob[22][upcard] - dealer_prob[21][upcard] - dealer_prob[20][upcard] - dealer_prob[19][upcard] - dealer_prob[18][upcard];
-  hard_stand[18] = dealer_prob[22][upcard] - dealer_prob[21][upcard] - dealer_prob[20][upcard] - dealer_prob[19][upcard] + dealer_prob[17][upcard] ;
-  hard_stand[19] = dealer_prob[22][upcard] - dealer_prob[21][upcard] - dealer_prob[20][upcard] + dealer_prob[18][upcard] + dealer_prob[17][upcard] ;
-  hard_stand[20] = dealer_prob[22][upcard] - dealer_prob[21][upcard] + dealer_prob[19][upcard] + dealer_prob[18][upcard] + dealer_prob[17][upcard] ;
-  hard_stand[21] = dealer_prob[22][upcard] + dealer_prob[20][upcard] + dealer_prob[19][upcard] + dealer_prob[18][upcard] + dealer_prob[17][upcard] ;
+  hard_stand[17] = dealer_american[22][upcard] - dealer_american[21][upcard] - dealer_american[20][upcard] - dealer_american[19][upcard] - dealer_american[18][upcard];
+  hard_stand[18] = dealer_american[22][upcard] - dealer_american[21][upcard] - dealer_american[20][upcard] - dealer_american[19][upcard] + dealer_american[17][upcard] ;
+  hard_stand[19] = dealer_american[22][upcard] - dealer_american[21][upcard] - dealer_american[20][upcard] + dealer_american[18][upcard] + dealer_american[17][upcard] ;
+  hard_stand[20] = dealer_american[22][upcard] - dealer_american[21][upcard] + dealer_american[19][upcard] + dealer_american[18][upcard] + dealer_american[17][upcard] ;
+  hard_stand[21] = dealer_american[22][upcard] + dealer_american[20][upcard] + dealer_american[19][upcard] + dealer_american[18][upcard] + dealer_american[17][upcard] ;
   
   // soft stand
   for (int player = 12; player < 22; player++) {

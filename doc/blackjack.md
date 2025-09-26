@@ -51,7 +51,7 @@ a dealer (he) that knows how to deal blackjack, tells the player (her) what card
 
 # Running `blackjack`
 
-## Invocation
+## Invocation {#sec:invocation}
 
 The `blackjack` program executable follows the POSIX standard. Its usage is:
 
@@ -74,15 +74,25 @@ decks = 4
 no_insurance = true
 ```
 
+Proper quotation migh be needed if the value contains spaces. For example,
+
+```terminal
+blackjack --internal --cards="TH JS 6D"
+```
+
 With no command-line options and no configuration file, `blackjack` starts in interactive mode and it is ready to start a blackjack game (see @sec:interactive for details).
 
-## Results
+## Results {#sec:results}
+
+TBD
 
 In YAML
 
 `yq`
 
 ## Interactive game {#sec:interactive}
+
+TBD
 
 If `blackjack` is attached to an interactive TTY (i.e. neither the standard input nor outputs are redirected) and there is no `player` option in the configuration file, an interactive game is triggered. First thing the program will do is to ask for a bet:
 
@@ -105,7 +115,7 @@ xxxxx
 ```
 
 The user can quit by either typing `quit` (or `q`) or hitting Ctrl-D.
-See @sec:playing for a description of all the possible commands---in both ways, from the dealer to the player and from the player to the dealer.
+Write `help` or see @sec:p2d for a description of all the possible commands the player can give to the dealer.
 
 
 # Playing blackjack {#sec:playing}
@@ -125,36 +135,81 @@ Here are the basic Blackjack rules:
  6. If the dealer has a ten or an ace showing (after offering insurance with an ace showing), then he will peek at his facedown card to see if he has a blackjack. If he does, then he will turn it over immediately.
  7. If the dealer does have a blackjack, then all wagers (except insurance) will lose, unless the player also has a blackjack, which will result in a push. The dealer will resolve insurance wagers at this time.
  8. Play begins with the player to the dealer's left. The following are the choices available to the player:
-     - **Stand**: Player stands pat with his cards.
-     - **Hit**: Player draws another card (and more if he wishes). If this card causes the player's total points to exceed 21 (known as "breaking" or "busting") then he loses.
-     - **Double**: Player doubles his bet and gets one, and only one, more card.
-     - **Split**: If the player has a pair, or any two 10-point cards, then he may double his bet and separate his cards into two individual hands. The dealer will automatically give each card a second card. Then, the player may hit, stand, or double         normally. However, when splitting aces, each ace gets only one card. Sometimes doubling after splitting is not allowed. If the player gets a ten and ace after splitting, then it counts as 21 points, not a blackjack. Usually the player may keep
-        re-splitting up to a total of four hands. Sometimes re-splitting aces is not allowed.
-     - **Surrender**: The player forfeits half his wager, keeping the other half, and does not play out his hand. This option is only available on the initial two cards, and depending on casino rules, sometimes it is not allowed at all.
+ 
+    Stand
+
+    :   Player stands pat with his cards.
+
+    Hit
+    
+    :   Player draws another card (and more if he wishes). If this card causes the player's total points to exceed 21 (known as "breaking" or "busting") then he loses.
+    
+    Double
+    
+    :   Player doubles his bet and gets one, and only one, more card.
+    
+    Split
+    
+    :   If the player has a pair, or any two 10-point cards, then he may double his bet and separate his cards into two individual hands. The dealer will automatically give each card a second card. Then, the player may hit, stand, or double         normally. However, when splitting aces, each ace gets only one card. Sometimes doubling after splitting is not allowed. If the player gets a ten and ace after splitting, then it counts as 21 points, not a blackjack. Usually the player may keep re-splitting up to a total of four hands. Sometimes re-splitting aces is not allowed.
+    
+    Surrender
+    
+    :   The player forfeits half his wager, keeping the other half, and does not play out his hand. This option is only available on the initial two cards, and depending on casino rules, sometimes it is not allowed at all.
+    
  9.  After each player has had his turn, the dealer will turn over his hole card. If the dealer has 16 or less, then he will draw another card. A special situation is when the dealer has an ace and any number of cards totaling six points (known as a "soft 17"). At some tables, the dealer will also hit a soft 17.
  10. If the dealer goes over 21 points, then any player who didn't already bust will win.
  11. If the dealer does not bust, then the higher point total between the player and dealer will win.
  12. Winning wagers pay even money, except a winning player blackjack usually pays 3 to 2. Some casinos have been short-paying blackjacks, which is a rule strongly in the casino's favor.
 
+To perform monte-carlo simulations, in Libre Blackjack the dealer (he) and the player (she) can “talk” through commands which are ASCII strings sent through an inter-process communcation (IPC) mechanism.
+In the most basic case, an automated player reads messages from the dealer from `blackjack`’s  standard output and writes her ASCII commands into the dealer’s standard input.
 
-In Libre Blackjack, the dealer (he) and the player (she) can “talk” through commands which are ASCII strings sent through the standard input/output. In the most basic case, a human player reads commands from the dealer from `blackjack`’s  standard output and writes her commands into the dealer’s standard input. Those commands from the dealer that require a particular action from the player end with a quotation sign such as `bet?`, `insurance?` or `play?`.
 
-All numerical values such as hand totals or bankrolls are given as decimal ASCII strings.
+## Messages from the dealer to the player {#sec:d2p}
 
-## Commands from the dealer to the player
+ * Messages are ASCII-formatted string composed of tokens separated by spaces.
+ * Each message starts with a single token which is either a single English word (e.g. `bet` or `play`) or more than one English words concatenated using a low hyphen `_` (e.g. `new_hand` or `player_card`). That is to say, the first token of the message is a single-token string.
+ * The first token might or might not end with a question mark `?` (e.g. `card_player 4H` or `play? 18 4`):
+   - Messages with tokens that do not end in a question mark `?` are informative and do not need any response from the player.
+   - Interrogative messages strating with tokens than end in a question mark `?` need to be answered by the player. That is to say, after issuing a message as a question the dealer starts listening to the proper communication channel (see @sec:communication) for a valid command from the dealer (detailed in @sec:p2d). 
+ * A message might have extra tokens that convey information to the player, e.g. `new_hand 15141 -4587.5`, `card_player 9S`, `play? 16 10`.
+ * All numerical values such as hand totals or bankrolls are given as decimal ASCII strings.
 
-xxxx
 
-## Commands from the player to the dealer
+### Informative messages
+
+ ```include
+commands-inf.md
+```
+
+#### `new_hand` $n$ $b$ {#sec:new_hand}
+
+The dealer states that a new hand is starting. The integer $n$ states the number of the hand (starting from 1).
+The decimal number $b$ states the player's bankroll before placing the bet in the starting hand.
+
+    
+**Examples**
+    
+```
+new_hand 1 0.000000
+new_hand 22 -8.000000
+new_hand 24998 -7609.500000
+```
+
+### Interrogative messages
+
+
+
+## Commands from the player to the dealer {#sec:p2d}
+
+TBD
 
 The following commands are available for the player for playing her hand.
 
-include(input-particular.md)
 
 
 The following are general commands in the sense that they can be sent from the player to the dealer at any moment of the game.
 
-include(input-general.md)
 
 
 
@@ -207,19 +262,21 @@ decks = 1          # number of decks, negative means infinite
 
 ## Reference 
 
-xxxx
+TBD
 
 
 # Internal players
 
-
+TBD
 
 # Examples
 
 The directory `players` contains a few examples of automated players, which are discussed in the following sections.
 
 
-# Communication mechanisms
+
+
+# Communication mechanisms {#sec:communication}
 
 ## Standard input & output
 

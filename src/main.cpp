@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
 //    progress_bar_width = 50;
   } else if (player_name == "informed") {
     player = new lbj::Informed(conf);
-//    progress_bar_width = 50;
+    progress_bar_width = 50;
   } else {
     std::cerr << "error: unknown player '" << player_name <<"'" << std::endl;
     return 1;

@@ -39,10 +39,10 @@ class Informed : public Player {
 
   private:
     
-    // dealer's probability of getting a total equal to the first index starting from a total equal to  the second
+    // dealer's probability of getting a total equal to the first index starting from a total equal to the second
     double dealer_hard[SIZE][SIZE];   // european hard hand
     double dealer_soft[SIZE][SIZE];   // european soft hand
-    double dealer_prob[SIZE][SIZE];   // american hard hand
+    double dealer_american[SIZE][SIZE];   // american hard hand
 
     // expected values of the player having a total equal to the first index
     // for a given dealer's upcard

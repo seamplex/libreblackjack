@@ -1,7 +1,8 @@
 
-# ./reference.sh bjinit va > conf.md
-# ./reference.sh dealer ig > input-general.md
-# ./reference.sh dealer ip > input-particular.md
+./reference.sh ../src/players/stdinout.cpp inf > commands-inf.md
+
+
+
 
 echo "help as markdown definition list"
 ./help-md.sh > help.md
@@ -15,5 +16,5 @@ echo "help as a raw txt (which can be used in blackjack -h)"
 ./md2.sh --texi blackjack.md
 mv blackjack.texi libreblackjack.texi
 
-./md.sh --pdf  blackjack.pdf
-./md.sh --html blackjack.html
+./md2.sh --pdf  blackjack
+./md2.sh --html blackjack

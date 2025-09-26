@@ -3,8 +3,11 @@ import random
 
 def main():
     cards_file = open("cards.txt", "w")
+    log_file = open("log.txt", "w")
     while True:
         line = sys.stdin.readline()
+        log_file.write(line)
+        
         if not line:
             break
         line = line.strip()

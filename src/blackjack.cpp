@@ -39,7 +39,7 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
   conf.set(&n_hands, {"n_hands", "hands"});
   conf.set(&n_decks, {"decks", "n_decks"});
 
-  conf.set(&max_bet, {"max_bet", "maxbet"});
+  conf.set(&max_bet, {"maximum_bet", "max_bet", "maxbet"});
   
   
   // rules are base, particular options take precedence

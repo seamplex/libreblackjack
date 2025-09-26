@@ -21,6 +21,7 @@
  */
 
 #include <iostream>
+#include <sstream>
 
 #include "../conf.h"
 #include "../blackjack.h"
@@ -28,6 +29,19 @@
 
 namespace lbj {
 
+std::string double_to_string_g_format(double value) {
+#ifdef HAS_CPP_20
+  // C++20 implementation using std::format
+  return std::format("{}", value);
+#else
+  // Pre-C++20 implementation using stringstream
+  std::ostringstream oss;
+  oss << value;
+  return oss.str();
+#endif
+}
+  
+  
 StdInOut::StdInOut(Configuration &conf) : Player(conf) {
     
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
@@ -48,27 +62,37 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
   
   switch (msg) {
 
-    case lbj::Info::BetInvalid:
-      if (p1 < 0) {
-        s = "bet_negative" + std::to_string(p1);  
-      } else if (p1 > 0) {
-        s = "bet_maximum" + std::to_string(p1);  
-      } else {
-        s = "bet_zero";
-      }
+    case lbj::Info::Shuffle:
+///inf+shuffling+usage `shuffling`
+///inf+shuffling+details The dealer informs that he is shuffling the decks.
+///inf+shuffling+details This only happens when a non-zero value for the option `decks` is set.
+///inf+shuffling+details If `decks = 0` (or the command-line option `-d0` is passed), then cards
+///inf+shuffling+details are drawn randomnly from an infinite set of cards and there is no need to shuffle.
+///inf+shuffling+example shuffling
+      // TODO: ask the user to cut  
+      s = "shuffling";  
     break;
 
     case lbj::Info::NewHand:
-      s = "new_hand " + std::to_string(p1) + " " + std::to_string(1e-3*p2);  
+///inf+new_hand+usage `new_hand` $n$ $b$
+///inf+new_hand+details The dealer states that a new hand is starting. The integer $n$ gives
+///inf+new_hand+details the number of the hand that is about to start (first hand is $n=1$).
+///inf+new_hand+details The decimal number $b$ states the player's bankroll before placing
+///inf+new_hand+details the bet in the hand that is about to start.
+///inf+new_hand+details Even though bets have to be integers, pay offs might be non-integer
+///inf+new_hand+details such as when winning a natural (e.g. $3/2 = 1.5$ or $6/5$ = 1.2).    
+///inf+new_hand+example new_hand 1 0
+///inf+new_hand+example new_hand 22 -8
+///inf+new_hand+example new_hand 24998 -7609.5
+      s = "new_hand " + std::to_string(p1) + " " + double_to_string_g_format(1e-3*p2);
       
+      // TODO: is this dealerHand a private member of player? if so, it should be lowercase
       // clear dealer's hand
       dealerHand.cards.clear();
 
       // erase all of our hands
-      {
-        for (auto hand = hands.begin(); hand != hands.end(); ++hand) {
-          hand->cards.clear();
-        }
+      for (auto &hand : hands) {
+        hand.cards.clear();
       }
       // create one, add and make it the current one
       hands.clear();
@@ -76,13 +100,67 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
       currentHand = hands.begin();
       currentHandId = 0;
     break;
-    
-    case lbj::Info::Shuffle:
-      // TODO: ask the user to cut  
-      s = "shuffling";  
+
+    case lbj::Info::BetInvalid:
+      if (p1 < 0) {
+///inf+bet_negative+usage `bet_negative`
+///inf+bet_negative+details The dealer complains that the bet the placer placed is invalid.
+///inf+bet_negative+details Only positive integer numbers are allowed.
+///inf+bet_negative+details The player will receive a new `bet?` message.
+///inf+bet_negative+example bet_negative
+        s = "bet_negative" + std::to_string(p1);  
+      } else if (p1 > 0) {
+///inf+bet_maximum+usage `bet_maximum`
+///inf+bet_maximum+details The dealer complains that the bet the placer placed is invalid.
+///inf+bet_maximum+details The bet is larger than the maximum wager allowed by `maximum_bet`.
+///inf+bet_maximum+details The player will receive a new `bet?` message.
+///inf+bet_maximum+example bet_maximum
+        s = "bet_maximum" + std::to_string(p1);  
+      } else {
+///inf+bet_zero+usage `bet_zero`
+///inf+bet_zero+details The dealer complains that the bet the placer placed is invalid.
+///inf+bet_zero+details Only positive integer numbers are allowed.
+///inf+bet_zero+details The player will receive a new `bet?` message.
+///inf+bet_zero+example bet_zero
+        s = "bet_zero";
+      }
     break;
     
     case lbj::Info::CardPlayer:
+///inf+card_player+usage `card_player` $rs$
+///inf+card_player+details The dealer informs that the player has been dealt a card.
+///inf+card_player+details The card is given as a two-character ASCII representation where
+///inf+card_player+details the first character $r$ indicates the rank and the second 
+///inf+card_player+details character $s$ gives the suit.
+///inf+card_player+details @
+///inf+card_player+details | Character |  Rank            |
+///inf+card_player+details |:---------:|------------------|
+///inf+card_player+details |    `A`    | Ace              |
+///inf+card_player+details |    `2`    | Deuce            |
+///inf+card_player+details |    `3`    | Three            |
+///inf+card_player+details |    `4`    | Four             |
+///inf+card_player+details |    `5`    | Five             |
+///inf+card_player+details |    `6`    | Six              |
+///inf+card_player+details |    `7`    | Seven            |
+///inf+card_player+details |    `8`    | Eight            |
+///inf+card_player+details |    `9`    | Nine             |
+///inf+card_player+details |    `T`    | Ten              |
+///inf+card_player+details |    `J`    | Jack             |
+///inf+card_player+details |    `Q`    | Queen            |
+///inf+card_player+details |    `J`    | King             |
+///inf+card_player+details @
+///inf+card_player+details | Character |  Suit            |
+///inf+card_player+details |:---------:|------------------|
+///inf+card_player+details |    `C`    | ♣ Clubs          |
+///inf+card_player+details |    `D`    | ♦ Diamonds       |
+///inf+card_player+details |    `H`    | ♥ Hearts         |
+///inf+card_player+details |    `S`    | ♠ Spades         |
+///inf+card_player+example card_player 9C 
+///inf+card_player+example card_player JD 
+///inf+card_player+example card_player QC 
+///inf+card_player+example card_player KS 
+///inf+card_player+example card_player TD
+///inf+card_player+example card_player 6H 
       s = "card_player " + card[p1].ascii() + " " + ((p2 != 0)?(std::to_string(p2)+ " "):"") ;
       if (p2 != static_cast<int>(currentHandId)) {
         for (currentHand = hands.begin(); currentHand != hands.end(); ++currentHand) {

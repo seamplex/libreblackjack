@@ -3,7 +3,7 @@
 @documentencoding UTF-8
 
 @setfilename blackjack.info
-@set UPDATED 2025-09-24
+@set UPDATED 2025-09-26
 @set VERSION 
 
 @copying
@@ -31,7 +31,7 @@ Texts.  A copy of the license is included in the section entitled
 @titlepage
 @title Libre@ Blackjack
 @author Jeremy Theler
-2025-09-24
+2025-09-26
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -196,18 +196,29 @@ decks = 4
 no_insurance = true
 @end verbatim
 
+Proper quotation migh be needed if the value contains spaces. For
+example,
+
+@verbatim
+blackjack --internal --cards="TH JS 6D"
+@end verbatim
+
 With no command-line options and no configuration file, @code{blackjack}
 starts in interactive mode and it is ready to start a blackjack game
 (see sec.@ 2.3 for details).
 
 @node Results
 @section Results
+TBD
+
 In YAML
 
 @code{yq}
 
 @node Interactive game
 @section Interactive game
+TBD
+
 If @code{blackjack} is attached to an interactive TTY (i.e.@ neither the
 standard input nor outputs are redirected) and there is no @code{player}
 option in the configuration file, an interactive game is triggered.
@@ -255,59 +266,75 @@ Here are the basic Blackjack rules:
 @enumerate 
 @item
 Blackjack may be played with one to eight decks of 52-card decks.
+
 @item
 Aces may be counted as 1 or 11 points, 2 to 9 according to pip value,
 and tens and face cards count as ten points.
+
 @item
 The value of a hand is the sum of the point values of the individual
 cards. Except, a ``blackjack'' is the highest hand, consisting of an ace
 and any 10-point card, and it outranks all other 21-point hands.
+
 @item
 After the players have bet, the dealer will give two cards to each
 player and two cards to himself. One of the dealer cards is dealt face
 up. The facedown card is called the ``hole card.''
+
 @item
 If the dealer has an ace showing, he will offer a side bet called
 ``insurance.'' This side wager pays 2 to 1 if the dealer's hole card is
 any 10-point card. Insurance wagers are optional and may not exceed half
 the original wager.
+
 @item
 If the dealer has a ten or an ace showing (after offering insurance with
 an ace showing), then he will peek at his facedown card to see if he has
 a blackjack. If he does, then he will turn it over immediately.
+
 @item
 If the dealer does have a blackjack, then all wagers (except insurance)
 will lose, unless the player also has a blackjack, which will result in
 a push. The dealer will resolve insurance wagers at this time.
+
 @item
 Play begins with the player to the dealer's left. The following are the
 choices available to the player:
-@itemize
-@item
-@strong{Stand}: Player stands pat with his cards.
-@item
-@strong{Hit}: Player draws another card (and more if he wishes). If this
-card causes the player's total points to exceed 21 (known as
-``breaking'' or ``busting'') then he loses.
-@item
-@strong{Double}: Player doubles his bet and gets one, and only one, more
-card.
-@item
-@strong{Split}: If the player has a pair, or any two 10-point cards,
-then he may double his bet and separate his cards into two individual
-hands. The dealer will automatically give each card a second card. Then,
-the player may hit, stand, or double normally. However, when splitting
-aces, each ace gets only one card. Sometimes doubling after splitting is
-not allowed. If the player gets a ten and ace after splitting, then it
-counts as 21 points, not a blackjack. Usually the player may keep
-re-splitting up to a total of four hands. Sometimes re-splitting aces is
-not allowed.
-@item
-@strong{Surrender}: The player forfeits half his wager, keeping the
-other half, and does not play out his hand. This option is only
-available on the initial two cards, and depending on casino rules,
-sometimes it is not allowed at all.
-@end itemize
+
+@table @asis
+@item Stand
+
+Player stands pat with his cards.
+
+@item Hit
+
+Player draws another card (and more if he wishes). If this card causes
+the player's total points to exceed 21 (known as ``breaking'' or
+``busting'') then he loses.
+
+@item Double
+
+Player doubles his bet and gets one, and only one, more card.
+
+@item Split
+
+If the player has a pair, or any two 10-point cards, then he may double
+his bet and separate his cards into two individual hands. The dealer
+will automatically give each card a second card. Then, the player may
+hit, stand, or double normally. However, when splitting aces, each ace
+gets only one card. Sometimes doubling after splitting is not allowed.
+If the player gets a ten and ace after splitting, then it counts as 21
+points, not a blackjack. Usually the player may keep re-splitting up to
+a total of four hands. Sometimes re-splitting aces is not allowed.
+
+@item Surrender
+
+The player forfeits half his wager, keeping the other half, and does not
+play out his hand. This option is only available on the initial two
+cards, and depending on casino rules, sometimes it is not allowed at
+all.
+
+@end table
 
 @item
 After each player has had his turn, the dealer will turn over his hole
@@ -315,16 +342,20 @@ card. If the dealer has 16 or less, then he will draw another card. A
 special situation is when the dealer has an ace and any number of cards
 totaling six points (known as a ``soft 17''). At some tables, the dealer
 will also hit a soft 17.
+
 @item
 If the dealer goes over 21 points, then any player who didn't already
 bust will win.
+
 @item
 If the dealer does not bust, then the higher point total between the
 player and dealer will win.
+
 @item
 Winning wagers pay even money, except a winning player blackjack usually
 pays 3 to 2. Some casinos have been short-paying blackjacks, which is a
 rule strongly in the casino's favor.
+
 @end enumerate
 
 In Libre@ Blackjack, the dealer (he) and the player (she) can “talk”
@@ -339,25 +370,249 @@ All numerical values such as hand totals or bankrolls are given as
 decimal ASCII strings.
 
 @menu
-* Commands from the dealer to the player::
+* Messages from the dealer to the player::
 * Commands from the player to the dealer::
 @end menu
 
-@node Commands from the dealer to the player
-@section Commands from the dealer to the player
-xxxx
+@node Messages from the dealer to the player
+@section Messages from the dealer to the player
+@itemize
+@item
+Messages are ASCII-formatted string composed of tokens separated by
+spaces.
+@item
+Each message starts with a single token which is either a single English
+word (e.g.@ @code{bet} or @code{play}) or more than one English words
+concatenated using a low hyphen @code{_} (e.g.@ @code{new_hand} or
+@code{player_card}). That is to say, the first token of the message is a
+single-token string.
+@item
+The first token might or might not end with a question mark @code{?}
+(e.g.@ @code{card_player 4H} or @code{play? 18 4}):
+@itemize
+@item
+Messages with tokens that do not end in a question mark @code{?} are
+informative and do not need any response from the player.
+@item
+Interrogative messages strating with tokens than end in a question mark
+@code{?} need to be answered by the player. That is to say, after
+issuing a message as a question the dealer starts listening to the
+proper communication channel (see sec.@ 7) for a valid command from the
+dealer (detailed in sec.@ 3.2).
+@end itemize
+
+@item
+A message might have extra tokens that convey information to the player,
+e.g.@ @code{new_hand 4 -1.000000} or @code{play? 16 10}.
+@end itemize
+
+@menu
+* Informative messages::
+* Interrogative messages::
+@end menu
+
+@node Informative messages
+@subsection Informative messages
+@itemize
+@item
+@code{shuffling} (sec.@ 3.1.1.1)
+@item
+@code{new_hand} (sec.@ 3.1.1.7)
+@item
+@code{bet_negative} (sec.@ 3.1.1.3)
+@item
+@code{bet_maximum} (sec.@ 3.1.1.4)
+@item
+@code{bet_zero} (sec.@ 3.1.1.5)
+@item
+@code{card_player} (sec.@ 3.1.1.6)
+@end itemize
+
+@menu
+* @code{shuffling}::
+* @code{new_hand} @math{n} @math{b}::
+* @code{bet_negative}::
+* @code{bet_maximum}::
+* @code{bet_zero}::
+* @code{card_player} @math{rs}::
+* @code{new_hand} @math{n} @math{b}: @code{new_hand} @math{n} @math{b} 2.
+@end menu
+
+@node @code{shuffling}
+@subsubsection @code{shuffling}
+The dealer informs that he is shuffling the decks. This only happens
+when a non-zero value for the option @code{decks} is set. If
+@code{decks = 0} (or the command-line option @code{-d0} is passed), then
+cards are drawn randomnly from an infinite set of cards and there is no
+need to shuffle.
+
+@strong{Examples}
+
+@verbatim
+shuffling
+@end verbatim
+
+@node @code{new_hand} @math{n} @math{b}
+@subsubsection @code{new_hand} @math{n} @math{b}
+The dealer states that a new hand is starting. The integer@ @math{n}
+gives the number of the hand that is about to start (first hand is
+@math{n=1}). The decimal number@ @math{b} states the player's bankroll
+before placing the bet in the hand that is about to start. Even though
+bets have to be integers, pay offs might be non-integer such as when
+winning a natural (e.g.@ @math{3/2 = 1.5} or @math{6/5} = 1.2).
+
+@strong{Examples}
+
+@verbatim
+new_hand 1 0
+new_hand 22 -8
+new_hand 24998 -7609.5
+@end verbatim
+
+@node @code{bet_negative}
+@subsubsection @code{bet_negative}
+The dealer complains that the bet the placer placed is invalid. Only
+positive integer numbers are allowed. The player will receive a new
+@code{bet?} message.
+
+@strong{Examples}
+
+@verbatim
+bet_negative
+@end verbatim
+
+@node @code{bet_maximum}
+@subsubsection @code{bet_maximum}
+The dealer complains that the bet the placer placed is invalid. The bet
+is larger than the maximum wager allowed by @code{maximum_bet}. The
+player will receive a new @code{bet?} message.
+
+@strong{Examples}
+
+@verbatim
+bet_maximum
+@end verbatim
+
+@node @code{bet_zero}
+@subsubsection @code{bet_zero}
+The dealer complains that the bet the placer placed is invalid. Only
+positive integer numbers are allowed. The player will receive a new
+@code{bet?} message.
+
+@strong{Examples}
+
+@verbatim
+bet_zero
+@end verbatim
+
+@node @code{card_player} @math{rs}
+@subsubsection @code{card_player} @math{rs}
+The dealer informs that the player has been dealt a card. The card is
+given as a two-character ASCII representation where the first
+character@ @math{r} indicates the rank and the second
+character@ @math{s} gives the suit.
+
+@multitable {Character} {Queen} 
+@headitem 
+Character
+ @tab Rank
+@item 
+@code{A}
+ @tab Ace
+@item 
+@code{2}
+ @tab Deuce
+@item 
+@code{3}
+ @tab Three
+@item 
+@code{4}
+ @tab Four
+@item 
+@code{5}
+ @tab Five
+@item 
+@code{6}
+ @tab Six
+@item 
+@code{7}
+ @tab Seven
+@item 
+@code{8}
+ @tab Eight
+@item 
+@code{9}
+ @tab Nine
+@item 
+@code{T}
+ @tab Ten
+@item 
+@code{J}
+ @tab Jack
+@item 
+@code{Q}
+ @tab Queen
+@item 
+@code{J}
+ @tab King
+@end multitable
+
+@multitable {Character} {♦ Diamonds} 
+@headitem 
+Character
+ @tab Suit
+@item 
+@code{C}
+ @tab ♣ Clubs
+@item 
+@code{D}
+ @tab ♦ Diamonds
+@item 
+@code{H}
+ @tab ♥ Hearts
+@item 
+@code{S}
+ @tab ♠ Spades
+@end multitable
+
+@strong{Examples}
+
+@verbatim
+card_player 9C 
+card_player JD 
+card_player QC 
+card_player KS 
+card_player TD
+card_player 6H 
+@end verbatim
+
+@node @code{new_hand} @math{n} @math{b} 2
+@subsubsection @code{new_hand} @math{n} @math{b}
+The dealer states that a new hand is starting. The integer@ @math{n}
+states the number of the hand (starting from 1). The decimal
+number@ @math{b} states the player's bankroll before placing the bet in
+the starting hand.
+
+@strong{Examples}
+
+@verbatim
+new_hand 1 0.000000
+new_hand 22 -8.000000
+new_hand 24998 -7609.500000
+@end verbatim
+
+@node Interrogative messages
+@subsection Interrogative messages
 
 @node Commands from the player to the dealer
 @section Commands from the player to the dealer
+TBD
+
 The following commands are available for the player for playing her
 hand.
 
-include(input-particular.md)
-
 The following are general commands in the sense that they can be sent
 from the player to the dealer at any moment of the game.
-
-include(input-general.md)
 
 @node Configuration
 @chapter Configuration
@@ -456,10 +711,11 @@ decks = 1          # number of decks, negative means infinite
 
 @node Reference
 @section Reference
-xxxx
+TBD
 
 @node Internal players
 @chapter Internal players
+TBD
 
 @node Examples
 @chapter Examples
