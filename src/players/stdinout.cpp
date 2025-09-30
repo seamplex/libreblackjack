@@ -40,26 +40,25 @@ std::string double_to_string_g_format(double value) {
   return oss.str();
 #endif
 }
-  
-  
+
 StdInOut::StdInOut(Configuration &conf) : Player(conf) {
-    
+
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
   conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});  
   conf.set(&always_insure, {"always_insure"});  
-  
+
   verbose = false;
   if (conf.exists("verbose")) {
     conf.set(&verbose, {"verbose"});
   }
-  
+
   return;
 }
 
 void StdInOut::info(lbj::Info msg, int p1, int p2) {
-    
+
   std::string s;
-  
+
   switch (msg) {
 
     case lbj::Info::Shuffle:
@@ -173,14 +172,33 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
       currentHand->cards.push_back(p1);
       break;
     break;
-    
+
     case lbj::Info::CardDealer:
       if (p1 > 0) {
         switch (dealerHand.cards.size()) {
           case 0:
+///inf+card_dealer_up+usage `card_dealer_up` $rs$
+///inf+card_dealer_up+details The dealer informs that the dealer has been dealt the up card (i.e.
+///inf+card_dealer_up+details the first card facing up). This message is issued only once per hand.
+///inf+card_dealer_up+details The card is given as the two-character ASCII representation discussed
+///inf+card_dealer_up+details in @sec:card_player.
+///inf+card_dealer_up+example card_dealer_up KD
+///inf+card_dealer_up+example card_dealer_up 7H
+///inf+card_dealer_up+example card_dealer_up KH
+///inf+card_dealer_up+example card_dealer_up QD
+///inf+card_dealer_up+example card_dealer_up 6C
             s = "card_dealer_up " + card[p1].ascii();
           break;
           default:
+///inf+card_dealer+usage `card_dealer` $rs$
+///inf+card_dealer+details The dealer informs that the dealer has been dealt a card.
+///inf+card_dealer+details The card is given as the two-character ASCII representation discussed
+///inf+card_dealer+details in @sec:card_player.
+///inf+card_dealer+example card_dealer TH
+///inf+card_dealer+example card_dealer JC
+///inf+card_dealer+example card_dealer 5D
+///inf+card_dealer+example card_dealer 5H
+///inf+card_dealer+example card_dealer QH
             s = "card_dealer " + card[p1].ascii();;
           break;
         }
@@ -190,30 +208,62 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
       dealerHand.cards.push_back(p1);
       currentHandId = 0;
     break;
-    
+
     case lbj::Info::CardDealerRevealsHole:
+///inf+card_dealer_hole+usage `card_dealer_hole` $rs$
+///inf+card_dealer_hole+details The dealer informs what his hole card is.
+///inf+card_dealer_hole+details This message is issued only if playing the american rules, i.e.
+///inf+card_dealer_hole+details with `enhc = false` or `ahc = true`.
+///inf+card_dealer_hole+details The card is given as the two-character ASCII representation discussed
+///inf+card_dealer_hole+details in @sec:card_player.
+///inf+card_dealer_hole+example card_dealer_hole KH
+///inf+card_dealer_hole+example card_dealer_hole AC
+///inf+card_dealer_hole+example card_dealer_hole 4H
+///inf+card_dealer_hole+example card_dealer_hole 5D
+///inf+card_dealer_hole+example card_dealer_hole 7H
       s = "card_dealer_hole " + card[p1].ascii();;
       *(++(dealerHand.cards.begin())) = p1;
       currentHandId = 0;
     break;
-    
+
     case lbj::Info::DealerBlackjack:
+///inf+dealer_blackjack+usage `dealer_blackjack`
+///inf+dealer_blackjack+details The dealer informs that he has blackjack.
+///inf+dealer_blackjack+example dealer_blackjack
       s = "dealer_blackjack";
     break;
-    
+
     case lbj::Info::PlayerWinsInsurance:
+///inf+player_wins_insurance+usage `player_wins_insurance`
+///inf+player_wins_insurance+details The dealer informs that the user won the insurance.
+///inf+player_wins_insurance+example player_wins_insurance
       s = "player_wins_insurance";
     break;
-    
+
     case lbj::Info::PlayerBlackjackAlso:
+///inf+player_blackjack_also+usage `player_blackjack_also`
+///inf+player_blackjack_also+details The dealer informs that both he and the user have blackjack.
+///inf+player_blackjack_also+example player_blackjack_also
       s = "player_blackjack_also";
     break;
 
     case lbj::Info::PlayerSplitInvalid:
+///inf+player_split_invalid+usage `player_split_invalid`
+///inf+player_split_invalid+details The dealer complains that the split request cannot be
+///inf+player_split_invalid+details fulfilled. Splitting is only possible when exactly two
+///inf+player_split_invalid+details cards with the same rank have been dealt in a hand.
+///inf+player_split_invalid+details The player will receive a new `play?` message.
+///inf+player_split_invalid+example player_split_invalid
       s = "player_split_invalid";
     break;
 
     case lbj::Info::PlayerSplitOk:
+///inf+player_split_ok+usage `player_split_ok` $k$
+///inf+player_split_ok+details The dealer informs that the split request was successfully be
+///inf+player_split_ok+details fulfilled. The integer $k$ indicates the id of the split hand (the
+///inf+player_split_ok+details first hand has an id equal to one so $k>1$ when splitting).
+///inf+player_split_ok+example player_split_ok 2
+///inf+player_split_ok+example player_split_ok 3
       s = "player_split_ok" + ((p1 != 0)?std::to_string(p1):"");
       handToSplit = p1;
     break;
@@ -234,22 +284,28 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
         if (found == false) {
           exit(0); 
         }
-      
+
         // create a new hand
         PlayerHand newHand;
         newHand.id = p2;
         newHand.cards.push_back(cardToSplit);
         hands.push_back(std::move(newHand));
-      }  
-    
+      }
+
       currentHandId = p1;  
       s = "new_split_hand " + std::to_string(p2) + " " + card[cardToSplit].ascii();
     break;
 
     case lbj::Info::PlayerDoubleInvalid:
+///inf+player_double_invalid+usage `player_double_invalid`
+///inf+player_double_invalid+details The dealer complains that the doubling-down request cannot be
+///inf+player_double_invalid+details fulfilled. Doubling down is only possible when exactly two
+///inf+player_double_invalid+details cards have been dealt in a hand and the `doa` or `da9` option is met.
+///inf+player_double_invalid+details The player will receive a new `play?` message.
+///inf+player_double_invalid+example player_double_invalid
       s = "player_double_invalid";
     break;
-    
+
     case lbj::Info::PlayerNextHand:
       s = "player_next_hand";
     break;
@@ -293,37 +349,65 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
     case lbj::Info::Bye:
       s = "bye";  
     break;
-    
+
     case lbj::Info::None:
     break;
-    
+
   }
-  
+
   std::cout << s << std::endl;
-  
+
   return;
 }
 
 int StdInOut::play(void) {
-  
+
   std::string s;
-  
+
   switch (actionRequired) {
     case lbj::PlayerActionRequired::Bet:
-      s = "bet?";  
+///int+bet?+usage `bet?`
+///int+bet?+details The dealer asks the user the amount to wage in the hand that is about to start.
+///int+bet?+details The player should send a positive integer in response.
+///int+bet?+details first hand has an id equal to one so $k>1$ when splitting).
+///int+bet?+example bet?
+      s = "bet?";
     break;
 
     case lbj::PlayerActionRequired::Insurance:
-      s = "insurance?";  
+///int+insurance?+usage `insurance?`
+///int+insurance?+details The dealer asks the user if she wants to insure her hand when the dealer's
+///int+insurance?+details upcards is an ace.
+///int+insurance?+details This message is only sent if `no_insurance` and `always_insure` are both false.
+///int+insurance?+details The player should answer either `yes` (or `y`) or `no` (or `n`).
+///int+insurance?+example insurance?
+      s = "insurance?";
     break;
-    
+
     case lbj::PlayerActionRequired::Play:
+///int+play?+usage `play?` $p$ $d$
+///int+play?+details The dealer asks the user to play, i.e. to choose wether to
+///int+play?+details @
+///int+play?+details  * `pair` (or `p`)
+///int+play?+details  * `double` (or `d`)
+///int+play?+details  * `hit` (or `h`)
+///int+play?+details  * `stand` (or `s`)
+///int+play?+details @
+///int+play?+details given that the value of the player's hand id $p$ and that the value of the dealer's hand is $d$,
+///int+play?+details where $p$ and $d$ are integers. If $p$ is negative, the hand is soft with a value equal to $|p|$.
+///int+play?+example play? 17 10
+///int+play?+example play? 20 10
+///int+play?+example play? -17 3
+///int+play?+example play? -19 7
+///int+play?+example play? 16 10
+///int+play?+example play? -16 10
+///int+play?+example play? 16 5
+///int+play?+example play? 7 7
       s = "play? " + std::to_string(playerValue) + " " + std::to_string(dealerValue);
     break;  
-    
+
     case lbj::PlayerActionRequired::None:
     break;
-    
   }
 
   std::cout << s << std::endl;

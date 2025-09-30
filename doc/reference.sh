@@ -24,7 +24,8 @@ kws=$(grep "^///${tag}+" ${src} | awk '{print $1}' | awk -F+ '{print $2}' | uniq
 echo
 
 for kw in ${kws}; do
-  echo "* \`${kw}\` (@sec:${kw})"
+  plain_kw=$(echo ${kw} | tr -d ?)
+  echo "* \`${kw}\` (@sec:${plain_kw})"
 done
 
 echo
@@ -32,40 +33,32 @@ echo
 
 for kw in ${kws}; do
 
-#  * `new_hand` (@sec:new_hand)
-# 
-# #### `new_hand` $n$ $b$ {#sec:new_hand}
-# 
-# The dealer states that a new hand is starting. The integer $n$ states the number of the hand (starting from 1).
-# The decimal number $b$ states the player's bankroll before placing the bet in the starting hand.
-# 
-#     
-# **Examples**
-#     
-# ```
-# new_hand 1 0.000000
-# new_hand 22 -8.000000
-# new_hand 24998 -7609.500000
-# ```
-
   usage=$(grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2-)
+  plain_kw=$(echo ${kw} | tr -d ?)
 
-
-  #### 
-  echo "#### ${usage} {#sec:${kw}}"
+  echo "#### ${usage} {#sec:${plain_kw}}"
   echo
-  
+
   grep "^///${tag}+${kw}+detail" ${src} | cut -d" " -f2- | sed 's/@$//' 
   echo
-  
-  echo "**Examples**"
-  echo
-  echo "~~~"
-  grep "^///${tag}+${kw}+example" ${src} | cut -d" " -f2- | sed 's/@$//' 
-  echo "~~~"
-  echo
-  
-  
+
+  examples=$(grep "^///${tag}+${kw}+default" ${src} | wc -l)
+  if [ $examples -ne 0 ]; then
+    echo "**Default**:"
+    grep "^///${tag}+${kw}+default" ${src} | cut -d" " -f2- | sed 's/@$//' 
+    echo
+  fi
+
+  examples=$(grep "^///${tag}+${kw}+example" ${src} | wc -l)
+  if [ $examples -ne 0 ]; then
+    echo "**Examples**"
+    echo
+    echo "~~~"
+    grep "^///${tag}+${kw}+example" ${src} | cut -d" " -f2- | sed 's/@$//' 
+    echo "~~~"
+    echo
+  fi
+
 done
 
 echo 

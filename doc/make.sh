@@ -1,6 +1,12 @@
 
+echo "interrogative messages"
+./reference.sh ../src/players/stdinout.cpp int > commands-int.md
+
+echo "informative messages"
 ./reference.sh ../src/players/stdinout.cpp inf > commands-inf.md
 
+echo "configuration"
+./reference.sh ../src/conf.cpp conf > conf.md
 
 
 

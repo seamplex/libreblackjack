@@ -175,28 +175,23 @@ In the most basic case, an automated player reads messages from the dealer from 
  * A message might have extra tokens that convey information to the player, e.g. `new_hand 15141 -4587.5`, `card_player 9S`, `play? 16 10`.
  * All numerical values such as hand totals or bankrolls are given as decimal ASCII strings.
 
+### Interrogative messages {#sec:interrogative}
 
-### Informative messages
+These messages have to answered by the user.
+If an invalid answer is received, an informative message (@sec:informative) with a complain will be sent and then the same interrogative message will be re-sent.
 
- ```include
+```include
+commands-int.md
+```
+
+### Informative messages {#sec:informative}
+
+For basic players, all of the informative messages listed in this section can be ignored.
+For advanced players, almost all of the messages can be ignored.
+
+```include
 commands-inf.md
 ```
-
-#### `new_hand` $n$ $b$ {#sec:new_hand}
-
-The dealer states that a new hand is starting. The integer $n$ states the number of the hand (starting from 1).
-The decimal number $b$ states the player's bankroll before placing the bet in the starting hand.
-
-    
-**Examples**
-    
-```
-new_hand 1 0.000000
-new_hand 22 -8.000000
-new_hand 24998 -7609.500000
-```
-
-### Interrogative messages
 
 
 
@@ -255,14 +250,16 @@ The following configuration file is the default provided in the main distributio
 # uncomment the following line to arrange cards
 # arranged_cards = AC 5H 8S 9D KH
 
-flat_bet = 1       # do not ask for bets
-no_insurance = 1   # do not ask for insurance
-decks = 1          # number of decks, negative means infinite
+flat_bet = true       # do not ask for bets
+no_insurance = true   # do not ask for insurance
+decks = 1             # number of decks, negative means infinite
 ```
 
-## Reference 
+## Reference
 
-TBD
+```include
+conf.md
+```
 
 
 # Internal players

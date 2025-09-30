@@ -32,7 +32,7 @@
 
 namespace lbj {
 Configuration::Configuration(int argc, char **argv) {
-  
+
 ///help+usage+desc [-c path_to_conf_file] [options] 
 
 ///help+extra+desc If no configuration file is given, a file named `blackjack.conf`
@@ -66,7 +66,7 @@ Configuration::Configuration(int argc, char **argv) {
 ///op+help+option `-h` or `--help`
 ///op+help+desc Print this informative help message into standard output and exit successfully.
     {"help", no_argument, NULL, 'h'},
-    
+
 ///op+version+option `-v` or `--version`
 ///op+version+desc Print the version number and licensing information into standard output and then exit successfully.
     {"version", no_argument, NULL, 'v'},
@@ -76,9 +76,8 @@ Configuration::Configuration(int argc, char **argv) {
 ///op+general+desc Any configuration variable from the configuration file can be set from the command line.
 ///op+general+desc For example, passing `--no_insurance` is like setting `no_insurance = 1` in the configuration file.
 ///op+general+desc Command-line options override setting in the configuration file.
-  
 
-  
+
   int optc = 0;
   int option_index = 0;
   opterr = 0;
@@ -107,7 +106,7 @@ Configuration::Configuration(int argc, char **argv) {
         conf["flat_bet"] = (optarg != NULL) ? optarg : "yes";
       break;
       case '?':
-        {  
+        {
           std::string line(argv[optind - 1]);
           std::size_t delimiterPos = line.find("=");
           if (delimiterPos != std::string::npos) {
@@ -123,28 +122,51 @@ Configuration::Configuration(int argc, char **argv) {
           } else {
             conf[line] = "true";
           }
-          
-        }  
+        }
       break;
       default:
       break;
     }
   }
-  
-  
+
   std::ifstream default_file(config_file_path);
   if (default_file.good()) {
     if (readConfigFile(config_file_path, explicit_config_file) != 0) {
       exit(1);
     }
   }
-  
-  
+
+///conf+dealer+usage `dealer = ` *game*
+///conf+dealer+details Defines the game the dealer will deal.
+///conf+dealer+details Currently, the only valid choice is `blackjack`.
+///conf+dealer+default `blackjack`
+///conf+dealer+example dealer = blackjack
   if (set(dealer, {"dealer", "game"}) == false) {
     // we play old-school blackjack by default      
     dealer = "blackjack";
   }
-  
+
+///conf+player+usage `player =  ` *player*
+///conf+player+details Defines which player will be playing against the dealer.
+///conf+player+details Currently, the only valid choices are
+///conf+player+details @
+///conf+player+details  * `tty`: the game starts in an interactive mode where the dealer's messages and dealt cards
+///conf+player+details are printed in the terminal, and the user is asked to issue her commands through the keyboard.
+///conf+player+details This player is usually used to test if the configuration settings (i.e. `enhc` or `cards_file`)
+///conf+player+details work as expected, although it can be used to just play ASCII blackjack.
+///conf+player+details  * `stdio`: the dealer writes messages into the standard output and reads
+///conf+player+details back commands from the standard input. With proper redirection (and possibly FIFO devices), this
+///conf+player+details option can be used to have an ad-hoc player to programatically play blackjack.
+///conf+player+details See @sec-players for examples.
+///conf+player+details  * `internal`: the dealer plays against an internal player already programmed in
+///conf+player+details Libre Blackjack that bets flat, never takes insurance and follows the basic strategy. 
+///conf+player+details The strategy can be changed by setting the configuration variable `strategy_file`.
+///conf+player+details This player is chosen if `-i` is passed in the command line.
+///conf+player+default If neither the standard input nor output of the executable `blackjack` is re-directed, the default is `tty`.
+///conf+player+default If at least one of them is re-directed or piped, the default is `stdio`.
+///conf+player+example player = tty
+///conf+player+example player = stdio
+///conf+player+example player = internal
   if (set(player, {"player"}) == false) {
     // if we are on an interactive terminal we play through tty otherwise stdinout
     if (isatty(fileno(stdin)) && isatty(fileno(stdout)))  {
@@ -153,12 +175,18 @@ Configuration::Configuration(int argc, char **argv) {
       player = "stdio";
     }
   }
-  
+
   // common settings to all dealers and players
+///conf+max_incorrect_commands+usage `max_incorrect_commands = ` $n$
+///conf+max_incorrect_commands+details Tells the dealer how many consecutive incorrect or invalid commands to accept before quitting.
+///conf+max_incorrect_commands+details A finite value of $n$ avoids infinite loops where the player sends commands
+///conf+max_incorrect_commands+details that do not make sense (such as garbage) or that are not valid (such as doubling when not allowed).
+///conf+max_incorrect_commands+default 10
+///conf+max_incorrect_commands+example max_incorrect_commands = 20
   set(&max_incorrect_commands, {"max_incorrect_commands"});
-  
+
   return;
-    
+
 }
 
 std::string trim(const std::string& str) {

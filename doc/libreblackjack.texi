@@ -3,7 +3,7 @@
 @documentencoding UTF-8
 
 @setfilename blackjack.info
-@set UPDATED 2025-09-26
+@set UPDATED 2025-09-29
 @set VERSION 
 
 @copying
@@ -31,7 +31,7 @@ Texts.  A copy of the license is included in the section entitled
 @titlepage
 @title Libre@ Blackjack
 @author Jeremy Theler
-2025-09-26
+2025-09-29
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -44,7 +44,7 @@ Texts.  A copy of the license is included in the section entitled
 
 @menu
 * Overview::
-* Running @code{blackjack}::
+* Running blackjack::
 * Playing blackjack::
 * Configuration::
 * Internal players::
@@ -57,6 +57,7 @@ Texts.  A copy of the license is included in the section entitled
 
 @node Overview
 @chapter Overview
+@anchor{#overview}
 @itemize
 @item
 Explain what the goal is.
@@ -89,11 +90,13 @@ re-distribute
 
 @node Why
 @section Why
+@anchor{#why}
 Since blackjack is not straightforward to analyze with analytical
 statistics equations, a monte-carlo-based approach is needed.
 
 @node How
 @section How
+@anchor{#how}
 @itemize
 @item
 FOSS
@@ -103,13 +106,15 @@ unix
 
 @node What
 @section What
+@anchor{#what}
 a dealer (he) that knows how to deal blackjack, tells the player (her)
 what cards are dealt, asks the player for her choices (bet, hit, stand,
 etc.) and keeps track of the results so as to write a report with ev,
 sd, etc.
 
-@node Running @code{blackjack}
+@node Running blackjack
 @chapter Running @code{blackjack}
+@anchor{#running-blackjack}
 
 @menu
 * Invocation::
@@ -119,6 +124,7 @@ sd, etc.
 
 @node Invocation
 @section Invocation
+@anchor{#sec:invocation}
 The @code{blackjack} program executable follows the POSIX standard. Its
 usage is:
 
@@ -209,6 +215,7 @@ starts in interactive mode and it is ready to start a blackjack game
 
 @node Results
 @section Results
+@anchor{#sec:results}
 TBD
 
 In YAML
@@ -217,6 +224,7 @@ In YAML
 
 @node Interactive game
 @section Interactive game
+@anchor{#sec:interactive}
 TBD
 
 If @code{blackjack} is attached to an interactive TTY (i.e.@ neither the
@@ -245,12 +253,12 @@ xxxxx
 @end verbatim
 
 The user can quit by either typing @code{quit} (or @code{q}) or hitting
-Ctrl-D. See sec.@ 3 for a description of all the possible commands---in
-both ways, from the dealer to the player and from the player to the
-dealer.
+Ctrl-D. Write @code{help} or see sec.@ 3.2 for a description of all the
+possible commands the player can give to the dealer.
 
 @node Playing blackjack
 @chapter Playing blackjack
+@anchor{#sec:playing}
 @quotation
 I overhear a lot of bad gambling advice in the casinos. Perhaps the most
 frequent is this one, ``The object of blackjack is to get as close to 21
@@ -358,16 +366,12 @@ rule strongly in the casino's favor.
 
 @end enumerate
 
-In Libre@ Blackjack, the dealer (he) and the player (she) can “talk”
-through commands which are ASCII strings sent through the standard
-input/output. In the most basic case, a human player reads commands from
-the dealer from @code{blackjack}'s standard output and writes her
-commands into the dealer's standard input. Those commands from the
-dealer that require a particular action from the player end with a
-quotation sign such as @code{bet?}, @code{insurance?} or @code{play?}.
-
-All numerical values such as hand totals or bankrolls are given as
-decimal ASCII strings.
+To perform monte-carlo simulations, in Libre@ Blackjack the dealer (he)
+and the player (she) can ``talk'' through commands which are ASCII
+strings sent through an inter-process communcation (IPC) mechanism. In
+the most basic case, an automated player reads messages from the dealer
+from @code{blackjack}'s standard output and writes her ASCII commands
+into the dealer's standard input.
 
 @menu
 * Messages from the dealer to the player::
@@ -376,6 +380,7 @@ decimal ASCII strings.
 
 @node Messages from the dealer to the player
 @section Messages from the dealer to the player
+@anchor{#sec:d2p}
 @itemize
 @item
 Messages are ASCII-formatted string composed of tokens separated by
@@ -403,43 +408,163 @@ dealer (detailed in sec.@ 3.2).
 
 @item
 A message might have extra tokens that convey information to the player,
-e.g.@ @code{new_hand 4 -1.000000} or @code{play? 16 10}.
+e.g.@ @code{new_hand 15141 -4587.5}, @code{card_player 9S},
+@code{play? 16 10}.
+@item
+All numerical values such as hand totals or bankrolls are given as
+decimal ASCII strings.
 @end itemize
 
 @menu
-* Informative messages::
 * Interrogative messages::
+* Informative messages::
 @end menu
+
+@node Interrogative messages
+@subsection Interrogative messages
+@anchor{#sec:interrogative}
+These messages have to answered by the user. If an invalid answer is
+received, an informative message (sec.@ 3.1.2) with a complain will be
+sent and then the same interrogative message will be re-sent.
+
+@itemize
+@item
+@code{bet?} (sec.@ 3.1.1.1)
+@item
+@code{insurance?} (sec.@ 3.1.1.2)
+@item
+@code{play?} (sec.@ 3.1.1.3)
+@end itemize
+
+@menu
+* bet?::
+* insurance?::
+* play? p d::
+@end menu
+
+@node bet?
+@subsubsection @code{bet?}
+@anchor{#sec:bet}
+The dealer asks the user the amount to wage in the hand that is about to
+start. The player should send a positive integer in response. first hand
+has an id equal to one so @math{k>1} when splitting).
+
+@strong{Examples}
+
+@verbatim
+bet?
+@end verbatim
+
+@node insurance?
+@subsubsection @code{insurance?}
+@anchor{#sec:insurance}
+The dealer asks the user if she wants to insure her hand when the
+dealer's upcards is an ace. This message is only sent if
+@code{no_insurance} and @code{always_insure} are both false. The player
+should answer either @code{yes} (or @code{y}) or @code{no} (or
+@code{n}).
+
+@strong{Examples}
+
+@verbatim
+insurance?
+@end verbatim
+
+@node play? p d
+@subsubsection @code{play?} @math{p} @math{d}
+@anchor{#sec:play}
+The dealer asks the user to play, i.e.@ to choose wether to
+
+@itemize
+@item
+@code{pair} (or @code{p})
+@item
+@code{double} (or @code{d})
+@item
+@code{hit} (or @code{h})
+@item
+@code{stand} (or @code{s})
+@end itemize
+
+given that the value of the player's hand id @math{p} and that the value
+of the dealer's hand is @math{d}, where @math{p} and @math{d} are
+integers. If @math{p} is negative, the hand is soft with a value equal
+to @math{|p|}.
+
+@strong{Examples}
+
+@verbatim
+play? 17 10
+play? 20 10
+play? -17 3
+play? -19 7
+play? 16 10
+play? -16 10
+play? 16 5
+play? 7 7
+@end verbatim
 
 @node Informative messages
 @subsection Informative messages
+@anchor{#sec:informative}
+For basic players, all of the informative messages listed in this
+section can be ignored. For advanced players, almost all of the messages
+can be ignored.
+
 @itemize
 @item
-@code{shuffling} (sec.@ 3.1.1.1)
+@code{shuffling} (sec.@ 3.1.2.1)
 @item
-@code{new_hand} (sec.@ 3.1.1.7)
+@code{new_hand} (sec.@ 3.1.2.2)
 @item
-@code{bet_negative} (sec.@ 3.1.1.3)
+@code{bet_negative} (sec.@ 3.1.2.3)
 @item
-@code{bet_maximum} (sec.@ 3.1.1.4)
+@code{bet_maximum} (sec.@ 3.1.2.4)
 @item
-@code{bet_zero} (sec.@ 3.1.1.5)
+@code{bet_zero} (sec.@ 3.1.2.5)
 @item
-@code{card_player} (sec.@ 3.1.1.6)
+@code{card_player} (sec.@ 3.1.2.6)
+@item
+@code{card_dealer_up} (sec.@ 3.1.2.7)
+@item
+@code{card_dealer} (sec.@ 3.1.2.8)
+@item
+@code{card_dealer_hole} (sec.@ 3.1.2.9)
+@item
+@code{dealer_blackjack} (sec.@ 3.1.2.10)
+@item
+@code{player_wins_insurance} (sec.@ 3.1.2.11)
+@item
+@code{player_blackjack_also} (sec.@ 3.1.2.12)
+@item
+@code{player_split_invalid} (sec.@ 3.1.2.13)
+@item
+@code{player_split_ok} (sec.@ 3.1.2.14)
+@item
+@code{player_double_invalid} (sec.@ 3.1.2.15)
 @end itemize
 
 @menu
-* @code{shuffling}::
-* @code{new_hand} @math{n} @math{b}::
-* @code{bet_negative}::
-* @code{bet_maximum}::
-* @code{bet_zero}::
-* @code{card_player} @math{rs}::
-* @code{new_hand} @math{n} @math{b}: @code{new_hand} @math{n} @math{b} 2.
+* shuffling::
+* new_hand n b::
+* bet_negative::
+* bet_maximum::
+* bet_zero::
+* card_player rs::
+* card_dealer_up rs::
+* card_dealer rs::
+* card_dealer_hole rs::
+* dealer_blackjack::
+* player_wins_insurance::
+* player_blackjack_also::
+* player_split_invalid::
+* player_split_ok k::
+* player_double_invalid::
 @end menu
 
-@node @code{shuffling}
+@node shuffling
 @subsubsection @code{shuffling}
+@anchor{#sec:shuffling}
 The dealer informs that he is shuffling the decks. This only happens
 when a non-zero value for the option @code{decks} is set. If
 @code{decks = 0} (or the command-line option @code{-d0} is passed), then
@@ -452,8 +577,9 @@ need to shuffle.
 shuffling
 @end verbatim
 
-@node @code{new_hand} @math{n} @math{b}
+@node new_hand n b
 @subsubsection @code{new_hand} @math{n} @math{b}
+@anchor{#sec:new_hand}
 The dealer states that a new hand is starting. The integer@ @math{n}
 gives the number of the hand that is about to start (first hand is
 @math{n=1}). The decimal number@ @math{b} states the player's bankroll
@@ -469,8 +595,9 @@ new_hand 22 -8
 new_hand 24998 -7609.5
 @end verbatim
 
-@node @code{bet_negative}
+@node bet_negative
 @subsubsection @code{bet_negative}
+@anchor{#sec:bet_negative}
 The dealer complains that the bet the placer placed is invalid. Only
 positive integer numbers are allowed. The player will receive a new
 @code{bet?} message.
@@ -481,8 +608,9 @@ positive integer numbers are allowed. The player will receive a new
 bet_negative
 @end verbatim
 
-@node @code{bet_maximum}
+@node bet_maximum
 @subsubsection @code{bet_maximum}
+@anchor{#sec:bet_maximum}
 The dealer complains that the bet the placer placed is invalid. The bet
 is larger than the maximum wager allowed by @code{maximum_bet}. The
 player will receive a new @code{bet?} message.
@@ -493,8 +621,9 @@ player will receive a new @code{bet?} message.
 bet_maximum
 @end verbatim
 
-@node @code{bet_zero}
+@node bet_zero
 @subsubsection @code{bet_zero}
+@anchor{#sec:bet_zero}
 The dealer complains that the bet the placer placed is invalid. Only
 positive integer numbers are allowed. The player will receive a new
 @code{bet?} message.
@@ -505,8 +634,9 @@ positive integer numbers are allowed. The player will receive a new
 bet_zero
 @end verbatim
 
-@node @code{card_player} @math{rs}
+@node card_player rs
 @subsubsection @code{card_player} @math{rs}
+@anchor{#sec:card_player}
 The dealer informs that the player has been dealt a card. The card is
 given as a two-character ASCII representation where the first
 character@ @math{r} indicates the rank and the second
@@ -586,26 +716,137 @@ card_player TD
 card_player 6H 
 @end verbatim
 
-@node @code{new_hand} @math{n} @math{b} 2
-@subsubsection @code{new_hand} @math{n} @math{b}
-The dealer states that a new hand is starting. The integer@ @math{n}
-states the number of the hand (starting from 1). The decimal
-number@ @math{b} states the player's bankroll before placing the bet in
-the starting hand.
+@node card_dealer_up rs
+@subsubsection @code{card_dealer_up} @math{rs}
+@anchor{#sec:card_dealer_up}
+The dealer informs that the dealer has been dealt the up card (i.e. the
+first card facing up). This message is issued only once per hand. The
+card is given as the two-character ASCII representation discussed in
+sec.@ 3.1.2.6.
 
 @strong{Examples}
 
 @verbatim
-new_hand 1 0.000000
-new_hand 22 -8.000000
-new_hand 24998 -7609.500000
+card_dealer_up KD
+card_dealer_up 7H
+card_dealer_up KH
+card_dealer_up QD
+card_dealer_up 6C
 @end verbatim
 
-@node Interrogative messages
-@subsection Interrogative messages
+@node card_dealer rs
+@subsubsection @code{card_dealer} @math{rs}
+@anchor{#sec:card_dealer}
+The dealer informs that the dealer has been dealt a card. The card is
+given as the two-character ASCII representation discussed in
+sec.@ 3.1.2.6.
+
+@strong{Examples}
+
+@verbatim
+card_dealer TH
+card_dealer JC
+card_dealer 5D
+card_dealer 5H
+card_dealer QH
+@end verbatim
+
+@node card_dealer_hole rs
+@subsubsection @code{card_dealer_hole} @math{rs}
+@anchor{#sec:card_dealer_hole}
+The dealer informs what his hole card is. This message is issued only if
+playing the american rules, i.e. with @code{enhc = false} or
+@code{ahc = true}. The card is given as the two-character ASCII
+representation discussed in sec.@ 3.1.2.6.
+
+@strong{Examples}
+
+@verbatim
+card_dealer_hole KH
+card_dealer_hole AC
+card_dealer_hole 4H
+card_dealer_hole 5D
+card_dealer_hole 7H
+@end verbatim
+
+@node dealer_blackjack
+@subsubsection @code{dealer_blackjack}
+@anchor{#sec:dealer_blackjack}
+The dealer informs that he has blackjack.
+
+@strong{Examples}
+
+@verbatim
+dealer_blackjack
+@end verbatim
+
+@node player_wins_insurance
+@subsubsection @code{player_wins_insurance}
+@anchor{#sec:player_wins_insurance}
+The dealer informs that the user won the insurance.
+
+@strong{Examples}
+
+@verbatim
+player_wins_insurance
+@end verbatim
+
+@node player_blackjack_also
+@subsubsection @code{player_blackjack_also}
+@anchor{#sec:player_blackjack_also}
+The dealer informs that both he and the user have blackjack.
+
+@strong{Examples}
+
+@verbatim
+player_blackjack_also
+@end verbatim
+
+@node player_split_invalid
+@subsubsection @code{player_split_invalid}
+@anchor{#sec:player_split_invalid}
+The dealer complains that the split request cannot be fulfilled.
+Splitting is only possible when exactly two cards with the same rank
+have been dealt in a hand. The player will receive a new @code{play?}
+message.
+
+@strong{Examples}
+
+@verbatim
+player_split_invalid
+@end verbatim
+
+@node player_split_ok k
+@subsubsection @code{player_split_ok} @math{k}
+@anchor{#sec:player_split_ok}
+The dealer informs that the split request was successfully be fulfilled.
+The integer @math{k} indicates the id of the split hand (the first hand
+has an id equal to one so @math{k>1} when splitting).
+
+@strong{Examples}
+
+@verbatim
+player_split_ok 2
+player_split_ok 3
+@end verbatim
+
+@node player_double_invalid
+@subsubsection @code{player_double_invalid}
+@anchor{#sec:player_double_invalid}
+The dealer complains that the doubling-down request cannot be fulfilled.
+Doubling down is only possible when exactly two cards have been dealt in
+a hand and the @code{doa} or @code{da9} option is met. The player will
+receive a new @code{play?} message.
+
+@strong{Examples}
+
+@verbatim
+player_double_invalid
+@end verbatim
 
 @node Commands from the player to the dealer
 @section Commands from the player to the dealer
+@anchor{#sec:p2d}
 TBD
 
 The following commands are available for the player for playing her
@@ -616,6 +857,7 @@ from the player to the dealer at any moment of the game.
 
 @node Configuration
 @chapter Configuration
+@anchor{#sec:configuration}
 Libre@ Blackjacks reads a configuration file that contains
 
 @itemize
@@ -700,9 +942,9 @@ is the default provided in the main distribution tarball:
 # uncomment the following line to arrange cards
 # arranged_cards = AC 5H 8S 9D KH
 
-flat_bet = 1       # do not ask for bets
-no_insurance = 1   # do not ask for insurance
-decks = 1          # number of decks, negative means infinite
+flat_bet = true       # do not ask for bets
+no_insurance = true   # do not ask for insurance
+decks = 1             # number of decks, negative means infinite
 @end verbatim
 
 @menu
@@ -711,19 +953,101 @@ decks = 1          # number of decks, negative means infinite
 
 @node Reference
 @section Reference
-TBD
+@anchor{#reference}
+@itemize
+@item
+@code{dealer} (sec.@ 4.1.0.1)
+@item
+@code{player} (sec.@ 4.1.0.2)
+@item
+@code{max_incorrect_commands} (sec.@ 4.1.0.3)
+@end itemize
+
+@node dealer = game
+@subsubsection @code{dealer =} @emph{game}
+@anchor{#sec:dealer}
+Defines the game the dealer will deal. Currently, the only valid choice
+is @code{blackjack}.
+
+@strong{Default}: blackjack
+
+@strong{Examples}
+
+@verbatim
+dealer = blackjack
+@end verbatim
+
+@node player = player
+@subsubsection @code{player =} @emph{player}
+@anchor{#sec:player}
+Defines which player will be playing against the dealer. Currently, the
+only valid choices are
+
+@itemize
+@item
+@code{tty}: the game starts in an interactive mode where the dealer's
+messages and dealt cards are printed in the terminal, and the user is
+asked to issue her commands through the keyboard. This player is usually
+used to test if the configuration settings (i.e.@ @code{enhc} or
+@code{cards_file}) work as expected, although it can be used to just
+play ASCII blackjack.
+@item
+@code{stdio}: the dealer writes messages into the standard output and
+reads back commands from the standard input. With proper redirection
+(and possibly FIFO devices), this option can be used to have an ad-hoc
+player to programatically play blackjack. See [@@sec-players] for
+examples.
+@item
+@code{internal}: the dealer plays against an internal player already
+programmed in Libre@ Blackjack that bets flat, never takes insurance and
+follows the basic strategy. The strategy can be changed by setting the
+configuration variable @code{strategy_file}. This player is chosen if
+@code{-i} is passed in the command line.
+@end itemize
+
+@strong{Default}: If neither the standard input nor output of the
+executable @code{blackjack} is re-directed, the default is @code{tty}.
+If at least one of them is re-directed or piped, the default is
+@code{stdio}.
+
+@strong{Examples}
+
+@verbatim
+player = tty
+player = stdio
+player = internal
+@end verbatim
+
+@node max_incorrect_commands = n
+@subsubsection @code{max_incorrect_commands =} @math{n}
+@anchor{#sec:max_incorrect_commands}
+Tells the dealer how many consecutive incorrect or invalid commands to
+accept before quitting. A finite value of @math{n} avoids infinite loops
+where the player sends commands that do not make sense (such as garbage)
+or that are not valid (such as doubling when not allowed).
+
+@strong{Default}: 10
+
+@strong{Examples}
+
+@verbatim
+max_incorrect_commands = 20
+@end verbatim
 
 @node Internal players
 @chapter Internal players
+@anchor{#internal-players}
 TBD
 
 @node Examples
 @chapter Examples
+@anchor{#examples}
 The directory @code{players} contains a few examples of automated
 players, which are discussed in the following sections.
 
 @node Communication mechanisms
 @chapter Communication mechanisms
+@anchor{#sec:communication}
 
 @menu
 * Standard input & output::
@@ -733,21 +1057,27 @@ players, which are discussed in the following sections.
 
 @node Standard input & output
 @section Standard input & output
+@anchor{#standard-input-output}
 
 @node FIFOs
 @section FIFOs
+@anchor{#fifos}
 
 @node Message queues
 @section Message queues
+@anchor{#message-queues}
 
 @node Tests
 @chapter Tests
+@anchor{#tests}
 
 @node Statistical utilities
 @chapter Statistical utilities
+@anchor{#statistical-utilities}
 
 @node Installation
 @chapter Installation
+@anchor{#installation}
 
 @menu
 * From binaries::
@@ -756,9 +1086,11 @@ players, which are discussed in the following sections.
 
 @node From binaries
 @section From binaries
+@anchor{#from-binaries}
 
 @node From sources
 @section From sources
+@anchor{#from-sources}
 
 @menu
 * Tarball::
@@ -767,8 +1099,10 @@ players, which are discussed in the following sections.
 
 @node Tarball
 @subsection Tarball
+@anchor{#tarball}
 
 @node Git repository
 @subsection Git repository
+@anchor{#git-repository}
 
 @bye
