@@ -79,10 +79,14 @@ int main(int argc, char **argv) {
     player = new lbj::StdInOut(conf);
   } else if (player_name == "basic" || player_name == "internal") {
     player = new lbj::Basic(conf);
-//    progress_bar_width = 50;
+    if (conf.progress != 0) {
+      progress_bar_width = 50;
+    }
   } else if (player_name == "informed") {
     player = new lbj::Informed(conf);
-    progress_bar_width = 50;
+    if (conf.progress != 0) {
+      progress_bar_width = 50;
+    }
   } else {
     std::cerr << "error: unknown player '" << player_name <<"'" << std::endl;
     return 1;

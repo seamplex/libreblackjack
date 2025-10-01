@@ -56,11 +56,9 @@ class Configuration {
     std::string getPlayerName(void) { return player; };
 
     unsigned int max_incorrect_commands = 10;
+    unsigned int progress = 0;
     std::string report_file_path;
-    // TODO: 
 
-//    unsigned int hands_per_char = false;
-    
     bool show_help = false;
     bool show_version = false;
     
@@ -72,10 +70,6 @@ class Configuration {
     
     std::string dealer;
     std::string player;
-    
-//    bool show_bar = false;
-//    bool bar_already_alloced = false;
-    
 };
 }
 #endif

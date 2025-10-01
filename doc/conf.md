@@ -1,16 +1,16 @@
 
 * `dealer` (@sec:dealer)
-* `player` (@sec:player)
 * `max_incorrect_commands` (@sec:max_incorrect_commands)
+* `player` (@sec:player)
 
 
-#### `dealer = ` *game* {#sec:dealer}
+# `dealer = ` *game* {#sec:dealer}
 
 Defines the game the dealer will deal.
 Currently, the only valid choice is `blackjack`.
 
-**Default**:
-blackjack
+**Default**
+`blackjack`
 
 **Examples**
 
@@ -18,7 +18,22 @@ blackjack
 dealer = blackjack
 ~~~
 
-#### `player =  ` *player* {#sec:player}
+# `max_incorrect_commands = ` $n$ {#sec:max_incorrect_commands}
+
+Tells the dealer how many consecutive incorrect or invalid commands to accept before quitting.
+A finite value of $n$ avoids infinite loops where the player sends commands
+that do not make sense (such as garbage) or that are not valid (such as doubling when not allowed).
+
+**Default**
+10
+
+**Examples**
+
+~~~
+max_incorrect_commands = 20
+~~~
+
+# `player =  ` *player* {#sec:player}
 
 Defines which player will be playing against the dealer.
 Currently, the only valid choices are
@@ -36,7 +51,7 @@ Libre Blackjack that bets flat, never takes insurance and follows the basic str
 The strategy can be changed by setting the configuration variable `strategy_file`.
 This player is chosen if `-i` is passed in the command line.
 
-**Default**:
+**Default**
 If neither the standard input nor output of the executable `blackjack` is re-directed, the default is `tty`.
 If at least one of them is re-directed or piped, the default is `stdio`.
 
@@ -46,21 +61,6 @@ If at least one of them is re-directed or piped, the default is `stdio`.
 player = tty
 player = stdio
 player = internal
-~~~
-
-#### `max_incorrect_commands = ` $n$ {#sec:max_incorrect_commands}
-
-Tells the dealer how many consecutive incorrect or invalid commands to accept before quitting.
-A finite value of $n$ avoids infinite loops where the player sends commands
-that do not make sense (such as garbage) or that are not valid (such as doubling when not allowed).
-
-**Default**:
-10
-
-**Examples**
-
-~~~
-max_incorrect_commands = 20
 ~~~
 
 

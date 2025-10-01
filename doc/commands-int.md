@@ -4,7 +4,7 @@
 * `play?` (@sec:play)
 
 
-#### `bet?` {#sec:bet}
+# `bet?` {#sec:bet}
 
 The dealer asks the user the amount to wage in the hand that is about to start.
 The player should send a positive integer in response.
@@ -16,7 +16,7 @@ first hand has an id equal to one so $k>1$ when splitting).
 bet?
 ~~~
 
-#### `insurance?` {#sec:insurance}
+# `insurance?` {#sec:insurance}
 
 The dealer asks the user if she wants to insure her hand when the dealer's
 upcards is an ace.
@@ -29,7 +29,7 @@ The player should answer either `yes` (or `y`) or `no` (or `n`).
 insurance?
 ~~~
 
-#### `play?` $p$ $d$ {#sec:play}
+# `play?` $p$ $d$ {#sec:play}
 
 The dealer asks the user to play, i.e. to choose wether to
 

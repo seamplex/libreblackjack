@@ -306,41 +306,41 @@ void Informed::double_down() {
   // because when you double, you get one card only. There's no option to hit after that.
   for (int dealer = 2; dealer < 12; dealer++) {
     for (int player = 4; player < 12; player++) {
-      hard_double[player] = 2.0/13.0*(hard_stand[player+2] +
-                                      hard_stand[player+3] +    
-                                      hard_stand[player+4] +    
-                                      hard_stand[player+5] +    
-                                      hard_stand[player+6] +    
-                                      hard_stand[player+7] +    
-                                      hard_stand[player+8] +    
-                                      hard_stand[player+9] +    
-                                  4.0*hard_stand[player+10] +    
-                                      soft_stand[player+11]);
+      hard_double[player] = 2.0/13.0*(hard_stand[player+2]) +
+                            2.0/13.0*(hard_stand[player+3]) +    
+                            2.0/13.0*(hard_stand[player+4]) +    
+                            2.0/13.0*(hard_stand[player+5]) +    
+                            2.0/13.0*(hard_stand[player+6]) +    
+                            2.0/13.0*(hard_stand[player+7]) +    
+                            2.0/13.0*(hard_stand[player+8]) +    
+                            2.0/13.0*(hard_stand[player+9]) +    
+                            8.0/13.0*(hard_stand[player+10]) +    
+                            2.0/13.0*(soft_stand[player+11]);
     }
     
     // With the 12, it gets a little bit different because now the ace is going to count as-- it must count as a one.
     for (int player = 12; player < 22; player++) {
-      hard_double[player] = 2.0/13.0*(hard_stand[player+1] +
-                                      hard_stand[player+2] +
-                                      hard_stand[player+3] +    
-                                      hard_stand[player+4] +    
-                                      hard_stand[player+5] +    
-                                      hard_stand[player+6] +    
-                                      hard_stand[player+7] +    
-                                      hard_stand[player+8] +    
-                                      hard_stand[player+9] +    
-                                  4.0*hard_stand[player+10]);
+      hard_double[player] = 2.0/13.0*(hard_stand[player+1]) +
+                            2.0/13.0*(hard_stand[player+2]) +
+                            2.0/13.0*(hard_stand[player+3]) +    
+                            2.0/13.0*(hard_stand[player+4]) +    
+                            2.0/13.0*(hard_stand[player+5]) +    
+                            2.0/13.0*(hard_stand[player+6]) +    
+                            2.0/13.0*(hard_stand[player+7]) +    
+                            2.0/13.0*(hard_stand[player+8]) +    
+                            2.0/13.0*(hard_stand[player+9]) +    
+                            8.0/13.0*(hard_stand[player+10]);
       
-      soft_double[player] = 2.0/13.0*(soft_stand[player+1] +
-                                      soft_stand[player+2] +
-                                      soft_stand[player+3] +    
-                                      soft_stand[player+4] +    
-                                      soft_stand[player+5] +    
-                                      soft_stand[player+6] +    
-                                      soft_stand[player+7] +    
-                                      soft_stand[player+8] +    
-                                      soft_stand[player+9] +    
-                                  4.0*soft_stand[player+10]);
+      soft_double[player] = 2.0/13.0*(soft_stand[player+1]) +
+                            2.0/13.0*(soft_stand[player+2]) +
+                            2.0/13.0*(soft_stand[player+3]) +    
+                            2.0/13.0*(soft_stand[player+4]) +    
+                            2.0/13.0*(soft_stand[player+5]) +    
+                            2.0/13.0*(soft_stand[player+6]) +    
+                            2.0/13.0*(soft_stand[player+7]) +    
+                            2.0/13.0*(soft_stand[player+8]) +    
+                            2.0/13.0*(soft_stand[player+9]) +    
+                            8.0/13.0*(soft_stand[player+10]);
       
     } 
     
@@ -358,28 +358,28 @@ void Informed::pairs() {
   // TODO: allow resplitting
   for (int player = 2; player < 11; player++) {
     // note that first index here is the single card not the total
-    split[player] = 2.0/13.0*(hard_hsd_ev(player+2) +
-                              hard_hsd_ev(player+3) +    
-                              hard_hsd_ev(player+4) +    
-                              hard_hsd_ev(player+5) +    
-                              hard_hsd_ev(player+6) +    
-                              hard_hsd_ev(player+7) +    
-                              hard_hsd_ev(player+8) +    
-                              hard_hsd_ev(player+9) +    
-                          4.0*hard_hsd_ev(player+10) +    
-                              soft_hsd_ev(player+11));
+    split[player] = 2.0/13.0*(hard_hsd_ev(player+2)) +
+                    2.0/13.0*(hard_hsd_ev(player+3)) +    
+                    2.0/13.0*(hard_hsd_ev(player+4)) +    
+                    2.0/13.0*(hard_hsd_ev(player+5)) +    
+                    2.0/13.0*(hard_hsd_ev(player+6)) +    
+                    2.0/13.0*(hard_hsd_ev(player+7)) +    
+                    2.0/13.0*(hard_hsd_ev(player+8)) +    
+                    2.0/13.0*(hard_hsd_ev(player+9)) +    
+                    8.0/13.0*(hard_hsd_ev(player+10)) +    
+                    2.0/13.0*(soft_hsd_ev(player+11));
 
     // aces get only one card so they are different
-    split[11] = 2.0/13.0*(soft_stand[11+1] +
-                          soft_stand[11+2] +
-                          soft_stand[11+3] +
-                          soft_stand[11+4] +
-                          soft_stand[11+5] +
-                          soft_stand[11+6] +
-                          soft_stand[11+7] +
-                          soft_stand[11+8] +
-                          soft_stand[11+9] +
-                      4.0*soft_stand[11+10]);
+    split[11] = 2.0/13.0*(soft_stand[11+1]) +
+                2.0/13.0*(soft_stand[11+2]) +
+                2.0/13.0*(soft_stand[11+3]) +
+                2.0/13.0*(soft_stand[11+4]) +
+                2.0/13.0*(soft_stand[11+5]) +
+                2.0/13.0*(soft_stand[11+6]) +
+                2.0/13.0*(soft_stand[11+7]) +
+                2.0/13.0*(soft_stand[11+8]) +
+                2.0/13.0*(soft_stand[11+9]) +
+                8.0/13.0*(soft_stand[11+10]);
   }
 
   return;

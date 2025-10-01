@@ -13,13 +13,17 @@ checkyq
 
 # https://wizardofodds.com/games/blackjack/appendix/9/6dh17r4/
 # ref=-0.006151
-ref=-0.007
+ref=-0.006556
 
-echo "6 decks h17 das nrsa 1e6"
-$blackjack -i --report=ahc.yaml --decks=6
+n=1e6
+d=6
+echo "${d}decks h17 das nrsa ${n}"
+$blackjack -i -p --report=ahc.yaml -n${n} --h17 --shuffle_every_hand=true --decks=${d}
 actual=$(yq .mean ahc.yaml)
 tol=$(yq .error ahc.yaml)
-echo $actual $ref $tol
+echo $actual
+echo $ref
+echo " $tol"
 awk -v a="$actual" -v r="$ref" -v t="$tol" 'BEGIN { exit !((a >= (r-t)) && (a <= (r+t))) }'
 exitifwrong $?
 echo "ok"

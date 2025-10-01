@@ -62,6 +62,10 @@ Configuration::Configuration(int argc, char **argv) {
 ///op+internal+desc Use the internal player to play against the dealer. See the manual for details
 ///op+internal+desc and instructions to define the rules and optionally, the playing strategy and/or arranged shoes.
     {"internal", no_argument, NULL, 'i'},
+
+///op+internal+option `-p` or `--progress`
+///op+internal+desc Show a progress bar.
+    {"progress", no_argument, NULL, 'p'},
     
 ///op+help+option `-h` or `--help`
 ///op+help+desc Print this informative help message into standard output and exit successfully.
@@ -81,7 +85,7 @@ Configuration::Configuration(int argc, char **argv) {
   int optc = 0;
   int option_index = 0;
   opterr = 0;
-  while ((optc = getopt_long_only(argc, argv, "c:hvd:n:if", longopts, &option_index)) != -1) {
+  while ((optc = getopt_long_only(argc, argv, "c:hvd:n:ifp", longopts, &option_index)) != -1) {
     switch (optc) {
       case 'h':
         show_help = true;
@@ -104,6 +108,9 @@ Configuration::Configuration(int argc, char **argv) {
       break;
       case 'f':
         conf["flat_bet"] = (optarg != NULL) ? optarg : "yes";
+      break;
+      case 'p':
+        progress = 1;
       break;
       case '?':
         {

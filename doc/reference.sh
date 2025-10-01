@@ -17,9 +17,9 @@ if [ -z "${tag}" ]; then
   exit 0
 fi
 
-# kws=$(grep "^///${tag}+" ${src} | awk '{print $1}' | awk -F+ '{print $2}' | sort | uniq)
+kws=$(grep "^///${tag}+" ${src} | awk '{print $1}' | awk -F+ '{print $2}' | sort | uniq)
 # no sorting, use the order in the file
-kws=$(grep "^///${tag}+" ${src} | awk '{print $1}' | awk -F+ '{print $2}' | uniq)
+# kws=$(grep "^///${tag}+" ${src} | awk '{print $1}' | awk -F+ '{print $2}' | uniq)
 
 echo
 
@@ -36,7 +36,7 @@ for kw in ${kws}; do
   usage=$(grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2-)
   plain_kw=$(echo ${kw} | tr -d ?)
 
-  echo "#### ${usage} {#sec:${plain_kw}}"
+  echo "# ${usage} {#sec:${plain_kw}}"
   echo
 
   grep "^///${tag}+${kw}+detail" ${src} | cut -d" " -f2- | sed 's/@$//' 
@@ -44,13 +44,16 @@ for kw in ${kws}; do
 
   examples=$(grep "^///${tag}+${kw}+default" ${src} | wc -l)
   if [ $examples -ne 0 ]; then
-    echo "**Default**:"
+#     echo "## Default {-}"
+#     echo
+    echo "**Default**"
     grep "^///${tag}+${kw}+default" ${src} | cut -d" " -f2- | sed 's/@$//' 
     echo
   fi
 
   examples=$(grep "^///${tag}+${kw}+example" ${src} | wc -l)
   if [ $examples -ne 0 ]; then
+#     echo "## Examples {-}"
     echo "**Examples**"
     echo
     echo "~~~"

@@ -33,10 +33,16 @@ documentclass: report
     1. study
     2. change
     3. re-distribute
+    
+> This manual is like an implicit equation.
 
 ## Why
 
 Since blackjack is not straightforward to analyze with analytical statistics equations, a monte-carlo-based approach is needed.
+
+ * compute evs and sds for different rules, decks and strategies
+ * study arranged shoes
+ * ...
 
 
 ## How
@@ -180,7 +186,7 @@ In the most basic case, an automated player reads messages from the dealer from 
 These messages have to answered by the user.
 If an invalid answer is received, an informative message (@sec:informative) with a complain will be sent and then the same interrogative message will be re-sent.
 
-```include
+```{.include shift-heading-level-by=3}
 commands-int.md
 ```
 
@@ -189,7 +195,7 @@ commands-int.md
 For basic players, all of the informative messages listed in this section can be ignored.
 For advanced players, almost all of the messages can be ignored.
 
-```include
+```{.include shift-heading-level-by=3}
 commands-inf.md
 ```
 
@@ -257,7 +263,7 @@ decks = 1             # number of decks, negative means infinite
 
 ## Reference
 
-```include
+```{.include shift-heading-level-by=2}
 conf.md
 ```
 
