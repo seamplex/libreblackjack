@@ -56,6 +56,21 @@ namespace lbj {
 
 Informed::Informed(Configuration &conf) : Player(conf) {
   // TODO: read conf
+
+  // TODO. move to reset    
+  decks = 1;
+  remaining_cards = 52*decks;
+  for (int rank = 1; rank < 9; rank++) {
+    remaining[rank] = 4*decks;
+  }
+  // first  4 = 4 ranks (T,J,Q,K)
+  // second 4 = 4 suits (H,S,C,D)
+  remaining[10] = 4*4*decks;
+  
+  if (decks != 0) {
+    verbose = true;
+  }
+  
   return;
 }
 
@@ -87,26 +102,7 @@ int Informed::play() {
       // -------------------------------------------------------
       // compute the expected values
       // -------------------------------------------------------
-      for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-          dealer_hard[i][j] = 0;
-        }
-      }
-      for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-          dealer_soft[i][j] = 0;
-        }
-      }
-      for (int i = 0; i < SIZE; i++) {
-        hard_stand[i] = -1;
-        soft_stand[i] = -1;
-        hard_hit[i] = -1;
-        soft_hit[i] = -1;
-        hard_double[i] = -2;
-        soft_double[i] = -2;
-        split[i] = -1;
-      }    
-
+      init();
       for (int i = 0; i < 8; i++) {
         dealer_bust_european_iteration();
       }
@@ -139,6 +135,7 @@ int Informed::play() {
     break;  
     
     case lbj::PlayerActionRequired::None:
+      std::cout << "mongocho" << std::endl;
         // TODO: count cards!
     break;  
     
@@ -148,58 +145,88 @@ int Informed::play() {
 }
 
 
+void Informed::init(void) {
+  for (int i = 0; i < SIZE; i++) {
+    for (int j = 0; j < SIZE; j++) {
+      dealer_hard[i][j] = 0;
+    }
+  }
+  for (int i = 0; i < SIZE; i++) {
+    for (int j = 0; j < SIZE; j++) {
+      dealer_soft[i][j] = 0;
+    }
+  }
+  // assume everything is lost
+  for (int i = 0; i < SIZE; i++) {
+    hard_stand[i] = -1;
+    soft_stand[i] = -1;
+    hard_hit[i] = -1;
+    soft_hit[i] = -1;
+    hard_double[i] = -2;
+    soft_double[i] = -2;
+    split[i] = -1;
+  }    
+  return;
+}  
 
 
-void Informed::dealer_bust_european_iteration(void)
-{
-  // dealer's probability of getting a total equal to the first index starting from a total equal to the second    
-  // double dealer_hard[SIZE][SIZE];
+
+
+void Informed::dealer_bust_european_iteration(void) {
+  // dealer_hard[final][initial] stores the probability that the dealer will get
+  // a total equal to the first (final) index given that
+  //  the current hand is equal to the second index (initial)
+  // same thing for dealer_soft[][]  
     
-  // There's a 100% chance he will end up with a 17 because he's going to stop
+  // if the dealer has a hard 17 he has to stand
+  // therefore, the probability of getting a total equal to 17 given that he has 17 is one
   // and same thing with an 18 through a 21.
-  // With the soft hands, let's assume the rule that the dealer stands on a soft 17.
-  // TODO:
+  // same for soft hands, and let's assume s17
+  // TODO: h17
   for (int total = 17; total < 22; total++) {
     dealer_hard[total][total] = 1;    
     dealer_soft[total][total] = 1;
   }
   
-  // The dealer ends up with a hard 22 or more. There's a 100% chance he's going to bust.
+  // if the dealer has hard 22 or more, chances of busting are 100%
   for (int total = 22; total < 32; total++) {
     dealer_hard[22][total] = 1;    
   }
 
-  for (int outcome = 17; outcome < 23; outcome++) {
-    for (int total = 16; total > 1; total--) {
+  //
+  for (int final_total = 17; final_total < 23; final_total++) {
+    for (int initial = 16; initial > 1; initial--) {
+      // the probability of getting final_total starting from initial_total is 
+      // the sum over n of the existing probabilities (initial+n)->final * chances of getting a card equal to n
       // TODO: real cards left
-      dealer_hard[outcome][total] = 1.0/13.0*(dealer_hard[outcome][total+2]) +
-                                    1.0/13.0*(dealer_hard[outcome][total+3]) +
-                                    1.0/13.0*(dealer_hard[outcome][total+4]) +
-                                    1.0/13.0*(dealer_hard[outcome][total+5]) +
-                                    1.0/13.0*(dealer_hard[outcome][total+6]) +
-                                    1.0/13.0*(dealer_hard[outcome][total+7]) +
-                                    1.0/13.0*(dealer_hard[outcome][total+8]) +
-                                    1.0/13.0*(dealer_hard[outcome][total+9]) +
-                                    4.0/13.0*(dealer_hard[outcome][total+10]) +
-                                    1.0/13.0*(dealer_soft[outcome][total+11]);
+      dealer_hard[final_total][initial] = 1.0/13.0*(dealer_hard[final_total][initial+2]) +
+                                          1.0/13.0*(dealer_hard[final_total][initial+3]) +
+                                          1.0/13.0*(dealer_hard[final_total][initial+4]) +
+                                          1.0/13.0*(dealer_hard[final_total][initial+5]) +
+                                          1.0/13.0*(dealer_hard[final_total][initial+6]) +
+                                          1.0/13.0*(dealer_hard[final_total][initial+7]) +
+                                          1.0/13.0*(dealer_hard[final_total][initial+8]) +
+                                          1.0/13.0*(dealer_hard[final_total][initial+9]) +
+                                          4.0/13.0*(dealer_hard[final_total][initial+10]) +
+                                          1.0/13.0*(dealer_soft[final_total][initial+11]);
     }
 
     // With a soft 22, that's going to be the same thing as a hard 12.  
-    for (int total = 31; total > 21; total--) {
-       dealer_soft[outcome][total] = dealer_hard[outcome][total-10];
+    for (int initial = 31; initial > 21; initial--) {
+       dealer_soft[final_total][initial] = dealer_hard[final_total][initial-10];
     }
     
-    for (int total = 16; total > 11; total--) {
-      dealer_soft[outcome][total] = 1.0/13.0*(dealer_soft[outcome][total+1]) +
-                                    1.0/13.0*(dealer_soft[outcome][total+2]) +
-                                    1.0/13.0*(dealer_soft[outcome][total+3]) +
-                                    1.0/13.0*(dealer_soft[outcome][total+4]) +
-                                    1.0/13.0*(dealer_soft[outcome][total+5]) +
-                                    1.0/13.0*(dealer_soft[outcome][total+6]) +
-                                    1.0/13.0*(dealer_soft[outcome][total+7]) +
-                                    1.0/13.0*(dealer_soft[outcome][total+8]) +
-                                    1.0/13.0*(dealer_soft[outcome][total+9]) +
-                                    4.0/13.0*(dealer_soft[outcome][total+10]);
+    for (int initial = 16; initial > 11; initial--) {
+      dealer_soft[final_total][initial] = 1.0/13.0*(dealer_soft[final_total][initial+1]) +
+                                          1.0/13.0*(dealer_soft[final_total][initial+2]) +
+                                          1.0/13.0*(dealer_soft[final_total][initial+3]) +
+                                          1.0/13.0*(dealer_soft[final_total][initial+4]) +
+                                          1.0/13.0*(dealer_soft[final_total][initial+5]) +
+                                          1.0/13.0*(dealer_soft[final_total][initial+6]) +
+                                          1.0/13.0*(dealer_soft[final_total][initial+7]) +
+                                          1.0/13.0*(dealer_soft[final_total][initial+8]) +
+                                          1.0/13.0*(dealer_soft[final_total][initial+9]) +
+                                          4.0/13.0*(dealer_soft[final_total][initial+10]);
     }
   }
   
@@ -384,4 +411,133 @@ void Informed::pairs() {
 
   return;
 }
+
+
+void Informed::info(lbj::Info msg, int p1, int p2) {
+
+  switch (msg) {
+
+    case lbj::Info::Shuffle:
+      std::cout << "Shuffle" << std::endl;
+      // TODO: reset()
+      
+  remaining_cards = 52*decks;
+  for (int rank = 1; rank < 9; rank++) {
+    remaining[rank] = 4*decks;
+  }
+  // first  4 = 4 ranks (T,J,Q,K)
+  // second 4 = 4 suits (H,S,C,D)
+  remaining[10] = 4*4*decks;
+      
+    break;
+
+    case lbj::Info::NewHand:
+        std::cout << "NewHand" << std::endl;
+    break;
+
+    case lbj::Info::BetInvalid:
+        std::cout << "BetInvalid" << std::endl;
+    break;
+    
+    case lbj::Info::CardPlayer:
+        std::cout << "CardPlayer" << std::endl;
+        remaining[p1]--;
+        remaining_cards--;
+    break;
+
+    case lbj::Info::CardDealer:
+        std::cout << "CardDealer" << std::endl;
+        if (p1 > 0) {
+          remaining[p1]--;
+          remaining_cards--;
+        }
+    break;
+
+    case lbj::Info::CardDealerRevealsHole:
+        std::cout << "CardDealerRevealsHole" << std::endl;
+        remaining[p1]--;
+        remaining_cards--;
+    break;
+
+    case lbj::Info::DealerBlackjack:
+        std::cout << "DealerBlackjack" << std::endl;
+    break;
+
+    case lbj::Info::PlayerWinsInsurance:
+        std::cout << "PlayerWinsInsurance" << std::endl;
+    break;
+
+    case lbj::Info::PlayerBlackjackAlso:
+        std::cout << "PlayerBlackjackAlso" << std::endl;
+    break;
+
+    case lbj::Info::PlayerSplitInvalid:
+        std::cout << "PlayerSplitInvalid" << std::endl;
+    break;
+
+    case lbj::Info::PlayerSplitOk:
+        std::cout << "PlayerSplitOk" << std::endl;
+    break;
+
+    case lbj::Info::PlayerSplitIds:
+        std::cout << "PlayerSplitIds" << std::endl;
+    break;
+
+    case lbj::Info::PlayerDoubleInvalid:
+        std::cout << "PlayerDoubleInvalid" << std::endl;
+    break;
+
+    case lbj::Info::PlayerNextHand:
+        std::cout << "PlayerNextHand" << std::endl;
+    break;
+    
+    case lbj::Info::PlayerPushes:
+        std::cout << "PlayerPushes" << std::endl;
+    break;
+    
+    case lbj::Info::PlayerLosses:
+        std::cout << "PlayerLosses" << std::endl;
+    break;
+    case lbj::Info::PlayerBlackjack:
+        std::cout << "PlayerBlackjack" << std::endl;
+    break;
+    case lbj::Info::PlayerWins:
+        std::cout << "PlayerWins" << std::endl;
+    break;
+    
+    case lbj::Info::NoBlackjacks:
+        std::cout << "NoBlackjacks" << std::endl;
+    break;
+
+    case lbj::Info::DealerBusts:
+        std::cout << "DealerBusts" << std::endl;
+    break;  
+    
+    case lbj::Info::Help:
+        std::cout << "Help" << std::endl;
+    break;
+
+    case lbj::Info::Bankroll:
+        std::cout << "Bankroll" << std::endl;
+    break;
+    
+    case lbj::Info::CommandInvalid:
+        std::cout << "CommandInvalid" << std::endl;
+    break;
+    
+    case lbj::Info::Bye:
+        std::cout << "Bye" << std::endl;
+    break;
+
+    case lbj::Info::None:
+    break;
+
+  }
+
+  return;
 }
+
+}
+
+
+

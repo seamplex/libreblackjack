@@ -272,7 +272,7 @@ void Blackjack::deal(void) {
       // state that the player did not win anything nor split nor doubled down
       playerStats.splits = 0;
       
-      if (last_pass) {
+      if (last_pass || shuffle_every_hand) {
         info(lbj::Info::Shuffle);
           
         // shuffle the shoe

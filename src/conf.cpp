@@ -115,19 +115,22 @@ Configuration::Configuration(int argc, char **argv) {
       case '?':
         {
           std::string line(argv[optind - 1]);
+          
+          std::size_t offset = 0;  
+          if (line.substr(0, 2) == "--") {
+            offset = 2;
+          } else if (line.substr(0, 1) == "-") {
+            offset = 1;
+          }
+          
           std::size_t delimiterPos = line.find("=");
           if (delimiterPos != std::string::npos) {
-            std::size_t offset = 0;  
-            if (line.substr(0, 2) == "--") {
-              offset = 2;
-            } else if (line.substr(0, 1) == "-") {
-              offset = 1;
-            }
             auto name = line.substr(offset, delimiterPos-offset);
             auto value = line.substr(delimiterPos + 1);
             conf[name] = value;
           } else {
-            conf[line] = "true";
+            auto name = line.substr(offset);
+            conf[name] = "true";
           }
         }
       break;

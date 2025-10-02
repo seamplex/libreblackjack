@@ -36,8 +36,23 @@ class Informed : public Player {
     ~Informed() { };
     
     int play(void) override;
+    void info(lbj::Info = lbj::Info::None, int = 0, int = 0) override;
 
   private:
+    
+    // number of decks (0 = infinite)
+    int decks;
+    
+    // ditto
+    int remaining_cards;
+    
+    // how many remaining cards of each rank are left
+    // index = 0  -> invalid
+    // index = 1  -> ace
+    // index = 2  -> deuce
+    // ...
+    // index = 10 -> faces
+    int remaining[11];
     
     // dealer's probability of getting a total equal to the first index starting from a total equal to the second
     double dealer_hard[SIZE][SIZE];   // european hard hand
@@ -54,6 +69,7 @@ class Informed : public Player {
     double soft_double[SIZE];
     double split[SIZE];
 
+    void init(void);
     void dealer_bust_european_iteration(void);
     void dealer_european_to_american(void);
     void stand(int upcard);
