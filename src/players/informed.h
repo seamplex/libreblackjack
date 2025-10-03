@@ -41,7 +41,8 @@ class Informed : public Player {
   private:
     
     // number of decks (0 = infinite)
-    int decks;
+    int decks = 0;
+    bool enhc = false;
     
     // ditto
     int remaining_cards;
@@ -52,7 +53,8 @@ class Informed : public Player {
     // index = 2  -> deuce
     // ...
     // index = 10 -> faces
-    int remaining[11];
+    // index = 11 -> again ace
+    int remaining[12];
     
     // dealer's probability of getting a total equal to the first index starting from a total equal to the second
     double dealer_hard[SIZE][SIZE];   // european hard hand
@@ -70,6 +72,7 @@ class Informed : public Player {
     double split[SIZE];
 
     void init(void);
+    void reset(void);
     void dealer_bust_european_iteration(void);
     void dealer_european_to_american(void);
     void stand(int upcard);
