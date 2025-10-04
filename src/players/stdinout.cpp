@@ -126,7 +126,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
     break;
     
     case lbj::Info::CardPlayer:
-///inf+card_player+usage `card_player` $rs$
+///inf+card_player+usage `card_player` $rs$ `[` $h$ `]`
 ///inf+card_player+details The dealer informs that the player has been dealt a card.
 ///inf+card_player+details The card is given as a two-character ASCII representation where
 ///inf+card_player+details the first character $r$ indicates the rank and the second 
@@ -154,12 +154,18 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_player+details |    `D`    | ♦ Diamonds       |
 ///inf+card_player+details |    `H`    | ♥ Hearts         |
 ///inf+card_player+details |    `S`    | ♠ Spades         |
+///inf+card_player+details @
+///inf+card_player+details The optional argument $h$ indicates the id of the player's hand
+///inf+card_player+details being dealt. If it not present, that means the base hand.
+///inf+card_player+details When performing a splitting on the base hand, the original hand
+///inf+card_player+details has id equal to zero and the new hand has id equal to one.
+///inf+card_player+details Subsequent splits trigger new hands with sequential ids.
 ///inf+card_player+example card_player 9C 
 ///inf+card_player+example card_player JD 
-///inf+card_player+example card_player QC 
-///inf+card_player+example card_player KS 
-///inf+card_player+example card_player TD
-///inf+card_player+example card_player 6H 
+///inf+card_player+example card_player QC
+///inf+card_player+example card_player KS
+///inf+card_player+example card_player TD 1
+///inf+card_player+example card_player 6H 2 
       s = "card_player " + card[p1].ascii() + " " + ((p2 != 0)?(std::to_string(p2)+ " "):"") ;
       if (p2 != static_cast<int>(currentHandId)) {
         for (currentHand = hands.begin(); currentHand != hands.end(); ++currentHand) {

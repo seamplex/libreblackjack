@@ -57,8 +57,23 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 ///conf+decks+example decks = 8
   conf.set(&n_decks, {"decks", "n_decks"});
 
+///conf+maximum_bet+usage `maximum_bet = ` $n$
+///conf+maximum_bet+details Sets a limit on the size of the bet.
+///conf+maximum_bet+details If a bet larger than the limit is placed, the dealer answers
+///conf+maximum_bet+details `bet_maximum` and asks again. A value of 0 means no limit.
+///conf+maximum_bet+details This is only useful when modeling variable-betting schemes.
+///conf+maximum_bet+default $0$
+///conf+maximum_bet+example maximum_bet = 0
+///conf+maximum_bet+example maximum_bet = 1
+///conf+maximum_bet+example maximum_bet = 20
   conf.set(&max_bet, {"maximum_bet", "max_bet", "maxbet"});
 
+///conf+rules+usage `rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | da9 ]`
+///conf+rules+details Defines the rules of the game. 
+///conf+rules+default Empty, meaning `ahc`, `h17`, `das`, `doa`.
+///conf+rules+example maximum_bet = 0
+///conf+rules+example maximum_bet = 1
+///conf+rules+example maximum_bet = 20
   // rules are base, particular options take precedence
   if (conf.exists("rules")) {
     std::istringstream iss(conf.getString("rules"));
@@ -81,10 +96,12 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
         doa = true;
       } else if (token == "da9" || token == "DA9") {
         doa = false;
+/*        
       } else if (token == "rsa" || token == "RSA") {
         rsa = true;
       } else if (token == "nrsa" || token == "NRSA") {
         rsa = false;
+*/
       } else {
         std::cerr << "error: unknown rule " << token << std::endl;
         exit(1);
@@ -96,7 +113,7 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
   conf.set(&h17, {"h17", "hit_soft_17"});
   conf.set(&das, {"das", "double_after_split"});
   conf.set(&doa, {"doa", "double_on_any"});
-  conf.set(&rsa, {"rsa", "resplit_aces"});
+//  conf.set(&rsa, {"rsa", "resplit_aces"});
   conf.set(&enhc, {"enhc", "european_no_hole_card"});
   conf.set(&blackjack_pays, {"blackjack_pays"});
 
@@ -1034,7 +1051,7 @@ std::string Blackjack::rules(void) {
          ((h17)  ? "h17"  : "s17")  + std::string(" ") +
          ((das)  ? "das"  : "ndas") + std::string(" ") +
          ((doa)  ? "doa"  : "da9")  + std::string(" ") +
-         ((rsa)  ? "rsa"  : "nrsa") + std::string(" ") +
+//         ((rsa)  ? "rsa"  : "nrsa") + std::string(" ") +
          std::to_string(n_decks) + "decks" ;
 }
 }

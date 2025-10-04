@@ -61,7 +61,7 @@ class Blackjack : public Dealer {
     bool das = true;
     bool doa = true;
     bool enhc = false;
-    bool rsa = false;  // TODO
+//    bool rsa = false;  // TODO
     bool shuffle_every_hand = false;
     bool quit_when_arranged_cards_run_out = false;
     bool new_hand_reset_cards = true;

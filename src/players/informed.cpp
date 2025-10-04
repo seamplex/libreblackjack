@@ -165,6 +165,17 @@ int Informed::play() {
           actionTaken = lbj::PlayerActionTaken::Hit;
         }
       }
+      if (actionTaken == lbj::PlayerActionTaken::Stand) {
+        std::cout << "stand" << std::endl;
+      } else if (actionTaken == lbj::PlayerActionTaken::Hit) {
+        std::cout << "hit" << std::endl;
+      } else if (actionTaken == lbj::PlayerActionTaken::Double) {
+        std::cout << "double" << std::endl;
+      } else if (actionTaken == lbj::PlayerActionTaken::Split) {
+        std::cout << "split" << std::endl;
+      } else {
+        std::cout << "unknonw" << std::endl;
+      }
       
     break;  
     
@@ -420,115 +431,115 @@ void Informed::info(lbj::Info msg, int p1, int p2) {
     break;
 
     case lbj::Info::NewHand:
-        std::cout << "NewHand" << std::endl;
+      std::cout << "NewHand" << std::endl;
     break;
 
     case lbj::Info::BetInvalid:
-        std::cout << "BetInvalid" << std::endl;
+//        std::cout << "BetInvalid" << std::endl;
     break;
 
     case lbj::Info::CardPlayer:
-        std::cout << "CardPlayer" << std::endl;
-        if (decks > 0 && p1 > 0) {
-          remaining[p1]--;
-          remaining_cards--;
-          if (p1 == 1) {
-            remaining[11]--;
-          }
+      std::cout << "card_player " + card[p1].ascii() + " " + ((p2 != 0)?(std::to_string(p2)+ " "):"")  << std::endl;
+      if (decks > 0 && p1 > 0) {
+        remaining[p1]--;
+        remaining_cards--;
+        if (p1 == 1) {
+          remaining[11]--;
         }
+      }
     break;
 
     case lbj::Info::CardDealer:
-        std::cout << "CardDealer" << std::endl;
-        if (decks > 0 && p1 > 0) {
-          remaining[p1]--;
-          remaining_cards--;
-          if (p1 == 1) {
-            remaining[11]--;
-          }
+      std::cout << "card_dealer " + card[p1].ascii() << std::endl;
+      if (decks > 0 && p1 > 0) {
+        remaining[p1]--;
+        remaining_cards--;
+        if (p1 == 1) {
+          remaining[11]--;
         }
+      }
     break;
 
     case lbj::Info::CardDealerRevealsHole:
-        std::cout << "CardDealerRevealsHole" << std::endl;
-        if (decks > 0 && p1 > 0) {
-          remaining[p1]--;
-          remaining_cards--;
-          if (p1 == 1) {
-            remaining[11]--;
-          }
+      std::cout << "card_dealer_hole " + card[p1].ascii() << std::endl;
+      if (decks > 0 && p1 > 0) {
+        remaining[p1]--;
+        remaining_cards--;
+        if (p1 == 1) {
+          remaining[11]--;
         }
+      }
 
     break;
 
     case lbj::Info::DealerBlackjack:
-        std::cout << "DealerBlackjack" << std::endl;
+      std::cout << "DealerBlackjack" << std::endl;
     break;
 
     case lbj::Info::PlayerWinsInsurance:
-        std::cout << "PlayerWinsInsurance" << std::endl;
+      std::cout << "PlayerWinsInsurance" << std::endl;
     break;
 
     case lbj::Info::PlayerBlackjackAlso:
-        std::cout << "PlayerBlackjackAlso" << std::endl;
+      std::cout << "PlayerBlackjackAlso" << std::endl;
     break;
 
     case lbj::Info::PlayerSplitInvalid:
-        std::cout << "PlayerSplitInvalid" << std::endl;
+      std::cout << "PlayerSplitInvalid" << std::endl;
     break;
 
     case lbj::Info::PlayerSplitOk:
-        std::cout << "PlayerSplitOk" << std::endl;
+      std::cout << "PlayerSplitOk" << std::endl;
     break;
 
     case lbj::Info::PlayerSplitIds:
-        std::cout << "PlayerSplitIds" << std::endl;
+//        std::cout << "PlayerSplitIds" << std::endl;
     break;
 
     case lbj::Info::PlayerDoubleInvalid:
-        std::cout << "PlayerDoubleInvalid" << std::endl;
+//        std::cout << "PlayerDoubleInvalid" << std::endl;
     break;
 
     case lbj::Info::PlayerNextHand:
-        std::cout << "PlayerNextHand" << std::endl;
+//        std::cout << "PlayerNextHand" << std::endl;
     break;
     
     case lbj::Info::PlayerPushes:
-        std::cout << "PlayerPushes" << std::endl;
+      std::cout << "PlayerPushes" << std::endl;
     break;
     
     case lbj::Info::PlayerLosses:
-        std::cout << "PlayerLosses" << std::endl;
+      std::cout << "PlayerLosses" << std::endl;
     break;
     case lbj::Info::PlayerBlackjack:
-        std::cout << "PlayerBlackjack" << std::endl;
+      std::cout << "PlayerBlackjack" << std::endl;
     break;
     case lbj::Info::PlayerWins:
-        std::cout << "PlayerWins" << std::endl;
+      std::cout << "PlayerWins" << std::endl;
     break;
     
     case lbj::Info::NoBlackjacks:
-        std::cout << "NoBlackjacks" << std::endl;
+      std::cout << "NoBlackjacks" << std::endl;
     break;
 
     case lbj::Info::DealerBusts:
-        std::cout << "DealerBusts" << std::endl;
+      std::cout << "DealerBusts" << std::endl;
     break;  
     
     case lbj::Info::Help:
-        std::cout << "Help" << std::endl;
+//        std::cout << "Help" << std::endl;
     break;
 
     case lbj::Info::Bankroll:
-        std::cout << "Bankroll" << std::endl;
+//        std::cout << "Bankroll" << std::endl;
     break;
     
     case lbj::Info::CommandInvalid:
-        std::cout << "CommandInvalid" << std::endl;
+//        std::cout << "CommandInvalid" << std::endl;
     break;
     
     case lbj::Info::Bye:
-        std::cout << "Bye" << std::endl;
+//        std::cout << "Bye" << std::endl;
     break;
 
     case lbj::Info::None:
