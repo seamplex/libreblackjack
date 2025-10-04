@@ -204,7 +204,7 @@ std::string trim(const std::string& str) {
   if (first == std::string::npos) {
     return ""; // String is all whitespace
   }
-    
+
   size_t last = str.find_last_not_of(" \t\n\r\f\v");
   return str.substr(first, (last - first + 1));
 }
@@ -229,10 +229,9 @@ std::string strip_inline_comment(const std::string& line) {
 }
 
 int Configuration::readConfigFile(std::string file_path, bool mandatory) {
-  
-  // std::ifstream is RAII, i.e. no need to call close
+
   std::ifstream fileStream(file_path);
-  
+
   if (fileStream.is_open()) {
     int line_num = 0; 
     std::string line;
@@ -242,7 +241,7 @@ int Configuration::readConfigFile(std::string file_path, bool mandatory) {
       if (line[0] == '#' || line[0] == ';' || line.empty()) {
         continue;
       }
-                
+
       std::size_t delimiter_pos = line.find("=");
       if (delimiter_pos != std::string::npos) {
         std::string name = trim(line.substr(0, delimiter_pos));
@@ -250,18 +249,18 @@ int Configuration::readConfigFile(std::string file_path, bool mandatory) {
         if (!exists(name)) {
           conf[name] = value;
           used[name] = false;
-        }  
+        }
       } else {
         std::cerr << "error: cannot find '=' in " << file_path << ":" << line_num << std::endl;
         return -1;
-      } 
+      }
     }
   } else {
     return -1;
   }
-  
+
   return 0;
-  
+
 }
 
 bool Configuration::set(bool *value, std::list<std::string> key) {

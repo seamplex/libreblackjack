@@ -34,19 +34,19 @@ class Informed : public Player {
   public:  
     Informed(Configuration &);
     ~Informed() { };
-    
+
     int play(void) override;
     void info(lbj::Info = lbj::Info::None, int = 0, int = 0) override;
 
   private:
-    
+
     // number of decks (0 = infinite)
     int decks = 0;
     bool enhc = false;
-    
+
     // ditto
     int remaining_cards;
-    
+
     // how many remaining cards of each rank are left
     // index = 0  -> invalid
     // index = 1  -> ace
@@ -55,7 +55,7 @@ class Informed : public Player {
     // index = 10 -> faces
     // index = 11 -> again ace
     int remaining[12];
-    
+
     // dealer's probability of getting a total equal to the first index starting from a total equal to the second
     double dealer_hard[SIZE][SIZE];   // european hard hand
     double dealer_soft[SIZE][SIZE];   // european soft hand

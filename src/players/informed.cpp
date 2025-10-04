@@ -57,23 +57,24 @@ namespace lbj {
 Informed::Informed(Configuration &conf) : Player(conf) {
   // TODO: read conf
 
-  decks = conf.getInt("decks");  
+  decks = conf.getInt("decks");
   enhc = true;
   verbose = true;
-  
+  reset();
   return;
 }
 
 void Informed::reset(void) {
 
-  remaining_cards = 52*decks;
+  int d = (decks == 0) ? 1 : decks;
+  remaining_cards = 52*d;
   for (int rank = 1; rank < 10; rank++) {
-    remaining[rank] = 4*decks;
+    remaining[rank] = 4*d;
   }
   // first  4 = 4 ranks (T,J,Q,K)
   // second 4 = 4 suits (H,S,C,D)
-  remaining[10] = 4*4*decks;
-  
+  remaining[10] = 4*4*d;
+
   // aces are both at 1 & 11
   remaining[11] = remaining[1];
   return;
@@ -83,7 +84,7 @@ int Informed::play() {
 
   std::size_t value = 0;
   std::size_t upcard = 0;
-  
+
   switch (actionRequired) {
     case lbj::PlayerActionRequired::Bet:
       // TODO: compute expected value and change bet
@@ -95,51 +96,57 @@ int Informed::play() {
       // TODO: compute  
       actionTaken = lbj::PlayerActionTaken::DontInsure;
     break;
-    
+
     case lbj::PlayerActionRequired::Play:
 
 #ifdef BJDEBUG
       std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
-#endif      
+#endif
       value = std::abs(playerValue);
       upcard = std::abs(dealerValue);
-      
+
       // -------------------------------------------------------
       // compute the expected values
       // -------------------------------------------------------
       init();
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 8; i++) {
         dealer_bust_european_iteration();
       }
       dealer_european_to_american();
 
       stand(upcard);
-      
-      for (int i = 0; i < 100; i++) {
+
+      for (int i = 0; i < 8; i++) {
         hit_iteration();
       }
       double_down();
       // -------------------------------------------------------      
-      
-#define BJDEBUG
-#ifdef BJDEBUG      
-      for (int f = 0; f < 23; f++) {
-        std::cout << f << "\t";
-        for (int i = 0; i < 31; i++) {
-          std::cout << dealer_hard[f][i] << "\t";
-        }
-        std::cout << std::endl;
-      }
-      std::cout << std::endl;
-      
-      for (int f = 0; f < 23; f++) {
-        std::cout << f << "\t";
-        for (int i = 0; i < 31; i++) {
-          std::cout << dealer_soft[f][i] << "\t";
-        }
-        std::cout << std::endl;
-      }
-      
+
+//#define BJDEBUG
+#ifdef BJDEBUG
+      // for (int f = 0; f < 23; f++) {
+      //   std::cout << f << "\t";
+      //   for (int i = 0; i < 31; i++) {
+      //     std::cout << dealer_hard[f][i] << "\t";
+      //   }
+      //   std::cout << std::endl;
+      // }
+      // std::cout << std::endl;
+      // 
+      // for (int f = 0; f < 23; f++) {
+      //   std::cout << f << "\t";
+      //   for (int i = 0; i < 31; i++) {
+      //     std::cout << dealer_soft[f][i] << "\t";
+      //   }
+      //   std::cout << std::endl;
+      // }
+      std::cout << hard_stand[value] << std::endl;
+      std::cout << hard_hit[value] << std::endl;
+      std::cout << hard_double[value] << std::endl;
+      std::cout << soft_stand[18] << std::endl;
+      std::cout << soft_hit[18] << std::endl;
+      std::cout << soft_double[18] << std::endl;
+
       exit(1);
 #endif
       
@@ -223,58 +230,28 @@ void Informed::dealer_bust_european_iteration(void) {
     for (int initial = 16; initial > 1; initial--) {
       // the probability of getting final_total starting from initial_total is 
       // the sum over n of the existing probabilities (initial+n)->final * chances of getting a card equal to n
-      // TODO: real cards left
-      if (decks == 0) {
-        dealer_hard[final_total][initial] = 1.0/13.0*(dealer_hard[final_total][initial+2]) +
-                                            1.0/13.0*(dealer_hard[final_total][initial+3]) +
-                                            1.0/13.0*(dealer_hard[final_total][initial+4]) +
-                                            1.0/13.0*(dealer_hard[final_total][initial+5]) +
-                                            1.0/13.0*(dealer_hard[final_total][initial+6]) +
-                                            1.0/13.0*(dealer_hard[final_total][initial+7]) +
-                                            1.0/13.0*(dealer_hard[final_total][initial+8]) +
-                                            1.0/13.0*(dealer_hard[final_total][initial+9]) +
-                                            4.0/13.0*(dealer_hard[final_total][initial+10]) +
-                                            1.0/13.0*(dealer_soft[final_total][initial+11]);
-          
-      } else {
-          
-        dealer_hard[final_total][initial] = 0;
-        // TODO: divide at the end
-        double den = remaining_cards;
-        for (int d = 2; d < 11; d++) {
-          dealer_hard[final_total][initial] += remaining[d] * dealer_hard[final_total][initial + d] / den;
-        }
-        dealer_hard[final_total][initial] += remaining[11] * dealer_soft[final_total][initial + 11] / den;
+      dealer_hard[final_total][initial] = 0;
+      for (int card = 2; card < 11; card++) {
+        dealer_hard[final_total][initial] += remaining[card] * dealer_hard[final_total][initial + card];
       }
+      dealer_hard[final_total][initial] += remaining[11] * dealer_soft[final_total][initial + 11];
+      dealer_hard[final_total][initial] /= remaining_cards;
     }
 
     // With a soft 22, that's going to be the same thing as a hard 12.  
     for (int initial = 31; initial > 21; initial--) {
        dealer_soft[final_total][initial] = dealer_hard[final_total][initial-10];
     }
-    
+
     for (int initial = 16; initial > 11; initial--) {
-      if (decks == 0) {
-        dealer_soft[final_total][initial] = 1.0/13.0*(dealer_soft[final_total][initial+1]) +
-                                            1.0/13.0*(dealer_soft[final_total][initial+2]) +
-                                            1.0/13.0*(dealer_soft[final_total][initial+3]) +
-                                            1.0/13.0*(dealer_soft[final_total][initial+4]) +
-                                            1.0/13.0*(dealer_soft[final_total][initial+5]) +
-                                            1.0/13.0*(dealer_soft[final_total][initial+6]) +
-                                            1.0/13.0*(dealer_soft[final_total][initial+7]) +
-                                            1.0/13.0*(dealer_soft[final_total][initial+8]) +
-                                            1.0/13.0*(dealer_soft[final_total][initial+9]) +
-                                            4.0/13.0*(dealer_soft[final_total][initial+10]);
-      } else {
-        dealer_soft[final_total][initial] = 0;
-        double den = remaining_cards;
-        for (int d = 1; d < 11; d++) {
-          dealer_soft[final_total][initial] += remaining[d] * dealer_soft[final_total][initial + d] / den;
-        }
+      dealer_soft[final_total][initial] = 0;
+      for (int card = 1; card < 11; card++) {
+        dealer_soft[final_total][initial] += remaining[card] * dealer_soft[final_total][initial + card];
       }
+      dealer_soft[final_total][initial] /= remaining_cards;
     }
   }
-  
+
   return;
 }
 
@@ -286,95 +263,49 @@ void Informed::dealer_european_to_american(void) {
     for (int total = 2; total < 10; total++) {
       dealer_american[outcome][total] = dealer_hard[outcome][total];
     }
-    
+
     if (enhc == true) {
-        
-    } else if (decks == 0) {
-      dealer_american[outcome][10] = 1.0/12.0*(dealer_hard[outcome][10+2]) +
-                                     1.0/12.0*(dealer_hard[outcome][10+3]) +
-                                     1.0/12.0*(dealer_hard[outcome][10+4]) +
-                                     1.0/12.0*(dealer_hard[outcome][10+5]) +
-                                     1.0/12.0*(dealer_hard[outcome][10+6]) +
-                                     1.0/12.0*(dealer_hard[outcome][10+7]) +
-                                     1.0/12.0*(dealer_hard[outcome][10+8]) +
-                                     1.0/12.0*(dealer_hard[outcome][10+9]) +
-                                     4.0/12.0*(dealer_hard[outcome][10+10]);
-    
-      dealer_american[outcome][11] = 1.0/9.0*(dealer_soft[outcome][11+1] +
-                                              dealer_soft[outcome][11+2] +
-                                              dealer_soft[outcome][11+3] +
-                                              dealer_soft[outcome][11+4] +
-                                              dealer_soft[outcome][11+5] +
-                                              dealer_soft[outcome][11+6] +
-                                              dealer_soft[outcome][11+7] +
-                                              dealer_soft[outcome][11+8] +
-                                              dealer_soft[outcome][11+9]);
-    } else {
-      double den = remaining_cards - remaining[11];
       dealer_american[outcome][10] = 0;
-      for (int d = 2; d < 11; d++) {
-        dealer_american[outcome][10] += remaining[d] * dealer_hard[outcome][10 + d] / den;
+      for (int card = 2; card < 11; card++) {
+        dealer_american[outcome][10] += remaining[card] * dealer_hard[outcome][10 + card];
       }
-      den = remaining_cards - remaining[10];
+      dealer_american[outcome][10] /= (remaining_cards - remaining[11]);
+
       dealer_american[outcome][11] = 0;
-      for (int d = 1; d < 10; d++) {
-        dealer_american[outcome][11] += remaining[d] * dealer_soft[outcome][11 + d] / den;
+      for (int card = 1; card < 10; card++) {
+        dealer_american[outcome][11] += remaining[card] * dealer_soft[outcome][11 + card];
       }
+      dealer_american[outcome][11] /= (remaining_cards - remaining[10]);
     }
   }
-  
+
   return;
 }
 
 void Informed::hit_iteration() {
-  
+
   // do not go below 3 if not needed by value  
   for (int player = 20; player > 3; player--) {
-    if (decks == 0) {
-      hard_hit[player] = 1.0/13.0*(max(hard_stand[player+2], hard_hit[player+2])) +
-                         1.0/13.0*(max(hard_stand[player+3], hard_hit[player+3])) +
-                         1.0/13.0*(max(hard_stand[player+4], hard_hit[player+4])) +
-                         1.0/13.0*(max(hard_stand[player+5], hard_hit[player+5])) +
-                         1.0/13.0*(max(hard_stand[player+6], hard_hit[player+6])) +
-                         1.0/13.0*(max(hard_stand[player+7], hard_hit[player+7])) +
-                         1.0/13.0*(max(hard_stand[player+8], hard_hit[player+8])) +
-                         1.0/13.0*(max(hard_stand[player+9], hard_hit[player+9])) +
-                         4.0/13.0*(max(hard_stand[player+10], hard_hit[player+10])) +
-                         1.0/13.0*(max(soft_stand[player+11], soft_hit[player+11]));
-    } else {
-      hard_hit[player] = 0;
-      double den = remaining_cards;
-      for (int d = 2; d < 12; d++) {
-        hard_hit[player] += remaining[d] * (max(hard_stand[player+d], hard_hit[player+d])) / den;
-      }
+    hard_hit[player] = 0;
+    for (int card = 2; card < 11; card++) {
+      hard_hit[player] += remaining[card] * (max(hard_stand[player+card], hard_hit[player+card]));
     }
+    hard_hit[player] += remaining[11] * (max(soft_stand[player + 11], soft_hit[player + 11]));
+    hard_hit[player] /= remaining_cards;
   }
-    
+
   for (int player = 31; player > 21; player--) {
     soft_hit[player] = hard_hit[player-10];
   }
 
   for (int player = 21; player > 11; player--) {
-    if (decks == 0) {
-      soft_hit[player] = 1.0/13.0*(max(soft_stand[player+1], soft_hit[player+1])) +
-                         1.0/13.0*(max(soft_stand[player+2], soft_hit[player+2])) +
-                         1.0/13.0*(max(soft_stand[player+3], soft_hit[player+3])) +
-                         1.0/13.0*(max(soft_stand[player+4], soft_hit[player+4])) +
-                         1.0/13.0*(max(soft_stand[player+5], soft_hit[player+5])) +
-                         1.0/13.0*(max(soft_stand[player+6], soft_hit[player+6])) +
-                         1.0/13.0*(max(soft_stand[player+7], soft_hit[player+7])) +
-                         1.0/13.0*(max(soft_stand[player+8], soft_hit[player+8])) +
-                         1.0/13.0*(max(soft_stand[player+9], soft_hit[player+9])) +
-                         4.0/13.0*(max(soft_stand[player+10], soft_hit[player+10]));
-    } else {
-      soft_hit[player] = 0;
-      double den = remaining_cards;
-      for (int d = 1; d < 11; d++) {
-        soft_hit[player] += remaining[d] * (max(soft_stand[player+d], soft_hit[player+d])) / den;
-      }
+    soft_hit[player] = 0;
+    for (int card = 1; card < 11; card++) {
+      soft_hit[player] += remaining[card] * (max(soft_stand[player+card], soft_hit[player+card]));
     }
+    soft_hit[player] /= remaining_cards;
   }
-  
+
   return;
 }
 
@@ -388,13 +319,13 @@ void Informed::stand(int upcard) {
   for (int player = 4; player < 17; player++) {
     hard_stand[player] = dealer_american[22][upcard] - dealer_american[21][upcard] - dealer_american[20][upcard] - dealer_american[19][upcard] - dealer_american[18][upcard] - dealer_american[17][upcard];
   }
-  
+
   hard_stand[17] = dealer_american[22][upcard] - dealer_american[21][upcard] - dealer_american[20][upcard] - dealer_american[19][upcard] - dealer_american[18][upcard];
   hard_stand[18] = dealer_american[22][upcard] - dealer_american[21][upcard] - dealer_american[20][upcard] - dealer_american[19][upcard] + dealer_american[17][upcard] ;
   hard_stand[19] = dealer_american[22][upcard] - dealer_american[21][upcard] - dealer_american[20][upcard] + dealer_american[18][upcard] + dealer_american[17][upcard] ;
   hard_stand[20] = dealer_american[22][upcard] - dealer_american[21][upcard] + dealer_american[19][upcard] + dealer_american[18][upcard] + dealer_american[17][upcard] ;
   hard_stand[21] = dealer_american[22][upcard] + dealer_american[20][upcard] + dealer_american[19][upcard] + dealer_american[18][upcard] + dealer_american[17][upcard] ;
-  
+
   // soft stand, as for standing it does not make a difference if it is soft or hards
   for (int player = 12; player < 22; player++) {
     soft_stand[player] = hard_stand[player];
@@ -411,42 +342,30 @@ void Informed::double_down() {
   // because when you double, you get one card only. There's no option to hit after that.
   for (int dealer = 2; dealer < 12; dealer++) {
     for (int player = 4; player < 12; player++) {
-      hard_double[player] = 2.0/13.0*(hard_stand[player+2]) +
-                            2.0/13.0*(hard_stand[player+3]) +    
-                            2.0/13.0*(hard_stand[player+4]) +    
-                            2.0/13.0*(hard_stand[player+5]) +    
-                            2.0/13.0*(hard_stand[player+6]) +    
-                            2.0/13.0*(hard_stand[player+7]) +    
-                            2.0/13.0*(hard_stand[player+8]) +    
-                            2.0/13.0*(hard_stand[player+9]) +    
-                            8.0/13.0*(hard_stand[player+10]) +    
-                            2.0/13.0*(soft_stand[player+11]);
+      hard_double[player] = 0;
+      for (int card = 2; card < 11; card++) {
+        hard_double[player] += remaining[card] * hard_stand[player + card];
+      }
+      hard_double[player] += remaining[11] * soft_stand[player + 11];
+      hard_double[player] *= 2;
+      hard_double[player] /= remaining_cards;
     }
     
     // With the 12, it gets a little bit different because now the ace is going to count as-- it must count as a one.
     for (int player = 12; player < 22; player++) {
-      hard_double[player] = 2.0/13.0*(hard_stand[player+1]) +
-                            2.0/13.0*(hard_stand[player+2]) +
-                            2.0/13.0*(hard_stand[player+3]) +    
-                            2.0/13.0*(hard_stand[player+4]) +    
-                            2.0/13.0*(hard_stand[player+5]) +    
-                            2.0/13.0*(hard_stand[player+6]) +    
-                            2.0/13.0*(hard_stand[player+7]) +    
-                            2.0/13.0*(hard_stand[player+8]) +    
-                            2.0/13.0*(hard_stand[player+9]) +    
-                            8.0/13.0*(hard_stand[player+10]);
-      
-      soft_double[player] = 2.0/13.0*(soft_stand[player+1]) +
-                            2.0/13.0*(soft_stand[player+2]) +
-                            2.0/13.0*(soft_stand[player+3]) +    
-                            2.0/13.0*(soft_stand[player+4]) +    
-                            2.0/13.0*(soft_stand[player+5]) +    
-                            2.0/13.0*(soft_stand[player+6]) +    
-                            2.0/13.0*(soft_stand[player+7]) +    
-                            2.0/13.0*(soft_stand[player+8]) +    
-                            2.0/13.0*(soft_stand[player+9]) +    
-                            8.0/13.0*(soft_stand[player+10]);
-      
+      hard_double[player] = 0;
+      for (int card = 1; card < 11; card++) {
+        hard_double[player] += remaining[card] * hard_stand[player + card];
+      }
+      hard_double[player] *= 2;
+      hard_double[player] /= remaining_cards;
+
+      soft_double[player] = 0;
+      for (int card = 1; card < 11; card++) {
+        soft_double[player] += remaining[card] * soft_stand[player + card];
+      }
+      soft_double[player] *= 2;
+      soft_double[player] /= remaining_cards;
     } 
     
     for (int player = 22; player < 32; player++) {
@@ -507,25 +426,39 @@ void Informed::info(lbj::Info msg, int p1, int p2) {
     case lbj::Info::BetInvalid:
         std::cout << "BetInvalid" << std::endl;
     break;
-    
+
     case lbj::Info::CardPlayer:
         std::cout << "CardPlayer" << std::endl;
-        remaining[p1]--;
-        remaining_cards--;
+        if (decks > 0 && p1 > 0) {
+          remaining[p1]--;
+          remaining_cards--;
+          if (p1 == 1) {
+            remaining[11]--;
+          }
+        }
     break;
 
     case lbj::Info::CardDealer:
         std::cout << "CardDealer" << std::endl;
-        if (p1 > 0) {
+        if (decks > 0 && p1 > 0) {
           remaining[p1]--;
           remaining_cards--;
+          if (p1 == 1) {
+            remaining[11]--;
+          }
         }
     break;
 
     case lbj::Info::CardDealerRevealsHole:
         std::cout << "CardDealerRevealsHole" << std::endl;
-        remaining[p1]--;
-        remaining_cards--;
+        if (decks > 0 && p1 > 0) {
+          remaining[p1]--;
+          remaining_cards--;
+          if (p1 == 1) {
+            remaining[11]--;
+          }
+        }
+
     break;
 
     case lbj::Info::DealerBlackjack:

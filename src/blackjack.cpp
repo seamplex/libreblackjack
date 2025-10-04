@@ -36,12 +36,29 @@
 namespace lbj {
 Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fiftyTwoCards(1, 52) {
 
+///conf+hands+usage `hands = ` $n$
+///conf+hands+details Sets the number of hands to play before quiting.
+///conf+hands+details If $n$ is zero, the program keeps playing until it receives the command `quit`.
+///conf+hands+details Otherwise it plays $n$ hands and quits.
+///conf+hands+details This parameter can be set on the command line with the option `-n`$n$ or `--hands=`$n$.
+///conf+hands+default $0$
+///conf+hands+example hands = 1
+///conf+hands+example hands = 1000000
+///conf+hands+example hands = 1e6
   conf.set(&n_hands, {"n_hands", "hands"});
+
+///conf+decks+usage `decks = ` $n$
+///conf+decks+details Sets the number of decks used in the game.
+///conf+decks+details If $n$ is zero, the program draws cards from an infinte set.
+///conf+decks+details For a finite $n$, the cards are drawn from a shoe.
+///conf+decks+default $0$
+///conf+decks+example decks = 1
+///conf+decks+example decks = 2
+///conf+decks+example decks = 8
   conf.set(&n_decks, {"decks", "n_decks"});
 
   conf.set(&max_bet, {"maximum_bet", "max_bet", "maxbet"});
-  
-  
+
   // rules are base, particular options take precedence
   if (conf.exists("rules")) {
     std::istringstream iss(conf.getString("rules"));
@@ -75,16 +92,16 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
     }
     conf.markUsed("rules");
   }
-  
+
   conf.set(&h17, {"h17", "hit_soft_17"});
   conf.set(&das, {"das", "double_after_split"});
   conf.set(&doa, {"doa", "double_on_any"});
   conf.set(&rsa, {"rsa", "resplit_aces"});
   conf.set(&enhc, {"enhc", "european_no_hole_card"});
   conf.set(&blackjack_pays, {"blackjack_pays"});
-  
+
   conf.set(&playerStats.bankroll, {"bankroll", "initial_bankroll"});
-  
+
   // parent class_
   conf.set(&number_of_burnt_cards, {"number_of_burnt_cards", "n_burnt_cards", "burnt_cards"});
   conf.set(&penetration, {"penetration"});
@@ -92,8 +109,7 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
   conf.set(&shuffle_every_hand, {"shuffle", "shuffle_every_hand"});
   conf.set(&quit_when_arranged_cards_run_out, {"quit_when_arranged_cards_run_out"});
   conf.set(&new_hand_reset_cards, {"new_hand_reset_cards"});
-  
-  
+
   // read arranged cards
   if (conf.exists("cards")) {
     if (conf.exists("cards_file")) {
@@ -106,13 +122,13 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
     }
     conf.markUsed("cards");
   }
-  
+
   if (conf.exists("cards_file")) {
     if (conf.exists("cards")) {
       std::cerr << "error: cannot have both cards and cards_file" << std::endl;
       exit(1);
     }
-    
+
     std::ifstream file(conf.getString("cards_file"));
     if (!file.is_open()) {
       std::cerr << "error: opening file " << conf.getString("cards_file") << std::endl;
@@ -120,21 +136,21 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
     }
     std::string file_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     file.close();
-    
+
     std::istringstream iss(file_content);
     if (read_arranged_cards(std::move(iss)) != 0) {
       exit(1);
     }
     conf.markUsed("cards_file");
   }
-  
+
   n_arranged_cards = arranged_cards.size();
-  
+
   bool explicit_seed = conf.set(&rng_seed, {"rng_seed", "seed"});
   if (explicit_seed) {
     rng = std::mt19937(rng_seed);
   }
-  
+
   // initialize shoe and perform initial shuffle
   if (n_decks > 0) {
     shoe.reserve(52*n_decks);
@@ -155,13 +171,13 @@ Blackjack::~Blackjack() {
 int Blackjack::read_arranged_cards(std::istringstream iss) {
   std::string token;
   while(iss >> token) {
-      
+
     // TODO: move to cards.cpp  
     bool number = true;
     for (char c : token) {
       number &= std::isdigit(c);
     }
-      
+
     int n = 0;
     if (number) {
       n = std::stoi(token);
@@ -190,7 +206,7 @@ int Blackjack::read_arranged_cards(std::istringstream iss) {
         std::cerr << "error: invalid ASCII card rank " << token << std::endl;
         return 1;
       }
-        
+
       if (suit != '\0') {
         if (suit == 'C') {
           n += static_cast<int>(lbj::Suit::Clubs) * 13;
@@ -206,11 +222,11 @@ int Blackjack::read_arranged_cards(std::istringstream iss) {
         }
       }
     }
-      
+
     if (n == 0) {
       std::cerr << "error: invalid card " << token << std::endl;
     }
-      
+
     arranged_cards.push_back(n);
   }
   return 0;
@@ -226,28 +242,28 @@ void Blackjack::can_double_split(void) {
     int value = playerStats.currentHand->value();
     player->canDouble &= (value == 9 || value == 10 || value == 11);
   }
-      
+
   player->canSplit = n_cards == 2 && (card[*(playerStats.currentHand->cards.begin())].value == card[*(++playerStats.currentHand->cards.begin())].value);
   return;
-}  
+}
 
 
 void Blackjack::deal(void) {
-  
+
   bool player_blackjack = false;
   // let's start by assuming the player does not need to do anything
   player->actionRequired = lbj::PlayerActionRequired::None;
-  
+
   switch(nextAction) {
     // -------------------------------------------------------------------------  
     case lbj::DealerAction::StartNewHand:
-        
+
       // check if we are done
       if (n_hands > 0 && n_hand >= n_hands) {
         finished(true);
         return;
       }
-      
+
       if (n_hand != 0) {
         updateMeanAndVariance();
       }
@@ -257,7 +273,7 @@ void Blackjack::deal(void) {
       }
       playerStats.currentOutcome = 0;
       n_hand++;
-      
+
       // clear dealer's hand
       hand.cards.clear();
 
@@ -268,16 +284,16 @@ void Blackjack::deal(void) {
       playerStats.hands.clear();
       playerStats.hands.push_back(std::move(PlayerHand()));
       playerStats.currentHand = playerStats.hands.begin();
-      
+
       // state that the player did not win anything nor split nor doubled down
       playerStats.splits = 0;
-      
+
       if (last_pass || shuffle_every_hand) {
         info(lbj::Info::Shuffle);
-          
+
         // shuffle the shoe
-        shuffle();        
-          
+        shuffle();
+
         // burn as many cards as asked
         pos += number_of_burnt_cards;
         last_pass = false;
@@ -287,9 +303,9 @@ void Blackjack::deal(void) {
 #ifdef BJDEBUG
       std::cout << "new hand #" << n_hand << std::endl;
 #endif
-      
+
       if (player->flat_bet) {
-          
+
         // TODO: check bankroll
         playerStats.currentHand->bet = player->flat_bet;
         // take player's money
@@ -298,12 +314,12 @@ void Blackjack::deal(void) {
           playerStats.worstBankroll = playerStats.bankroll;
         }
         playerStats.totalMoneyWaged += playerStats.currentHand->bet;
-        
+
         player->actionRequired = lbj::PlayerActionRequired::None;
         nextAction = lbj::DealerAction::DealPlayerFirstCard;
-        
+
       } else {
-          
+
         player->actionRequired = lbj::PlayerActionRequired::Bet;
         nextAction = lbj::DealerAction::None;
         
