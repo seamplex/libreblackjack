@@ -2,7 +2,7 @@
 
  * RSA
  * ES10
- * multiple players (actually multiple hands for a single player)
+ * multiple players
 
 # medium
 
@@ -12,6 +12,7 @@
    - playing commands
    - configuration options
  * cpu and wall time in report
+ * ability to re-start simulation, i.e. write the status so if the program ran 1e6 hands it can pick it up from there and go up to 2e6 without having to start from scratch
 
 # low
 
@@ -19,7 +20,6 @@
  * report
    * show how to add yaml filters to get JSON (`jq`), markdown table (`awk`), etc.
    * verbosity (extra small, small, medium, large, extra large)
- * max_splits through conf (default 3)
  * name of the game the dealer deals
  * name of the games the player can play
  * dealers
@@ -29,13 +29,12 @@
    * card war
    * between
  * players
-   * internal reko
    * runtime-linked in a shared object
  * conf
    * bankroll_history_file_path
    * removed_cards
    * chance of getting first two cards
- 
+
  * multithreading (not sure)
  * optimize using const and restrict 
 

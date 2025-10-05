@@ -1,6 +1,7 @@
 # Development (current)
 
  * ...
+ * Choose maximum number of re-splits through configuration
  * Removed informed player.
 
 # v0.3 (2025)
