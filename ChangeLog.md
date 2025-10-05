@@ -1,6 +1,7 @@
 # Development (current)
 
  * ...
+ * Removed informed player.
 
 # v0.3 (2025)
 

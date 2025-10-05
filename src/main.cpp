@@ -28,7 +28,6 @@
 #include "players/tty.h"
 #include "players/stdinout.h"
 #include "players/basic.h"
-#include "players/informed.h"
 
 void progress_bar(size_t n, size_t N, int bar_width) {
   float progress = float(n) / N;
@@ -82,16 +81,11 @@ int main(int argc, char **argv) {
     if (conf.progress != 0) {
       progress_bar_width = 50;
     }
-  } else if (player_name == "informed") {
-    player = new lbj::Informed(conf);
-    if (conf.progress != 0) {
-      progress_bar_width = 50;
-    }
   } else {
     std::cerr << "error: unknown player '" << player_name <<"'" << std::endl;
     return 1;
   }
-  
+
   // complain if there are configuration options which are not used
   if (conf.checkUsed() != 0) {
     return 1;

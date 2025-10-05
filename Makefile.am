@@ -30,8 +30,7 @@ blackjack_SOURCES = \
  src/cards.cpp \
  src/players/stdinout.cpp \
  src/players/tty.cpp \
- src/players/basic.cpp \
- src/players/informed.cpp
+ src/players/basic.cpp
 
 noinst_HEADERS = \
  src/dealer.h \
@@ -41,8 +40,7 @@ noinst_HEADERS = \
  src/version-vcs.h \
  src/players/stdinout.h \
  src/players/tty.h \
- src/players/basic.h \
- src/players/informed.h
+ src/players/basic.h
 
 .PHONY: dist-macos dist-macos-x86_64 dist-macos-arm64
 
