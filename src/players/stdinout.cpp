@@ -43,8 +43,25 @@ std::string double_to_string_g_format(double value) {
 
 StdInOut::StdInOut(Configuration &conf) : Player(conf) {
 
+///conf+flat_bet+usage `flat_bet = ` $b$
+///conf+flat_bet+details Tells both the dealer and the player that the betting scheme is flat or not.
+///conf+flat_bet+details The dealer will not ask for bets and the internal player, if asked, always says `1`.
+///conf+flat_bet+details The value can be either `false` or `true` or `0` or `1`.
+///conf+flat_bet+default $false$
+///conf+flat_bet+example flat_bet = false
+///conf+flat_bet+example flat_bet = true
+///conf+flat_bet+example flat_bet = 1
   conf.set(&flat_bet, {"flat_bet", "flatbet"});  
-  conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});  
+
+///conf+no_insurance+usage `no_insurance = ` $b$
+///conf+no_insurance+details If $b$ is `true`, the dealer will not ask for insurance and assume
+///conf+no_insurance+details the player will never take it when the dealer shows an ace.
+///conf+no_insurance+details The value can be either `false` or `true` or `0` or `1`.
+///conf+no_insurance+default $false$
+///conf+no_insurance+example no_insurance = false
+///conf+no_insurance+example no_insurance = true
+///conf+no_insurance+example no_insurance = 1
+  conf.set(&no_insurance, {"no_insurance", "never_insurance", "never_insure", "dont_insure"});  
   conf.set(&always_insure, {"always_insure"});  
 
   verbose = false;
@@ -85,6 +102,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+new_hand+example new_hand 24998 -7609.5
       s = "new_hand " + std::to_string(p1) + " " + double_to_string_g_format(1e-3*p2);
       
+/*      
       // TODO: is this dealerHand a private member of player? if so, it should be lowercase
       // clear dealer's hand
       dealerHand.cards.clear();
@@ -98,6 +116,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
       hands.push_back(std::move(PlayerHand()));
       currentHand = hands.begin();
       currentHandId = 0;
+*/ 
     break;
 
     case lbj::Info::BetInvalid:
@@ -167,6 +186,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_player+example card_player TD 1
 ///inf+card_player+example card_player 6H 2 
       s = "card_player " + card[p1].ascii() + " " + ((p2 != 0)?(std::to_string(p2)+ " "):"") ;
+/*      
       if (p2 != static_cast<int>(currentHandId)) {
         for (currentHand = hands.begin(); currentHand != hands.end(); ++currentHand) {
           if (static_cast<int>(currentHand->id) == p2) {
@@ -176,13 +196,11 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
         currentHandId = p2;
       }
       currentHand->cards.push_back(p1);
+ */
       break;
     break;
 
-    case lbj::Info::CardDealer:
-      if (p1 > 0) {
-        switch (dealerHand.cards.size()) {
-          case 0:
+    case lbj::Info::CardDealerUp:
 ///inf+card_dealer_up+usage `card_dealer_up` $rs$
 ///inf+card_dealer_up+details The dealer informs that the dealer has been dealt the up card (i.e.
 ///inf+card_dealer_up+details the first card facing up). This message is issued only once per hand.
@@ -193,9 +211,10 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_dealer_up+example card_dealer_up KH
 ///inf+card_dealer_up+example card_dealer_up QD
 ///inf+card_dealer_up+example card_dealer_up 6C
-            s = "card_dealer_up " + card[p1].ascii();
-          break;
-          default:
+      s = "card_dealer_up " + card[p1].ascii();
+    break;
+
+    case lbj::Info::CardDealer:
 ///inf+card_dealer+usage `card_dealer` $rs$
 ///inf+card_dealer+details The dealer informs that the dealer has been dealt a card.
 ///inf+card_dealer+details The card is given as the two-character ASCII representation discussed
@@ -205,14 +224,9 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_dealer+example card_dealer 5D
 ///inf+card_dealer+example card_dealer 5H
 ///inf+card_dealer+example card_dealer QH
-            s = "card_dealer " + card[p1].ascii();;
-          break;
-        }
-      } else {
-        s = "card_dealer " + card[p1].ascii();;
-      }
-      dealerHand.cards.push_back(p1);
-      currentHandId = 0;
+      s = "card_dealer " + card[p1].ascii();;
+//      dealerHand.cards.push_back(p1);
+//      currentHandId = 0;
     break;
 
     case lbj::Info::CardDealerRevealsHole:
@@ -228,8 +242,8 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_dealer_hole+example card_dealer_hole 5D
 ///inf+card_dealer_hole+example card_dealer_hole 7H
       s = "card_dealer_hole " + card[p1].ascii();;
-      *(++(dealerHand.cards.begin())) = p1;
-      currentHandId = 0;
+//      *(++(dealerHand.cards.begin())) = p1;
+//      currentHandId = 0;
     break;
 
     case lbj::Info::DealerBlackjack:
@@ -271,18 +285,18 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+player_split_ok+example player_split_ok 2
 ///inf+player_split_ok+example player_split_ok 3
       s = "player_split_ok" + ((p1 != 0)?std::to_string(p1):"");
-      handToSplit = p1;
+      hand_to_split = p1;
     break;
 
     case lbj::Info::PlayerSplitIds:
-
+/*
       {
         bool found = false;
         for (auto hand = hands.begin(); hand != hands.end(); ++hand) {
-          if (hand->id == handToSplit) {
+          if (hand->id == hand_to_split) {
             found = true;
             hand->id = p1;
-            cardToSplit = *(++(hand->cards.begin()));
+            card_to_split = *(++(hand->cards.begin()));
             hand->cards.pop_back();
             break;
           }
@@ -294,12 +308,12 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
         // create a new hand
         PlayerHand newHand;
         newHand.id = p2;
-        newHand.cards.push_back(cardToSplit);
+        newHand.cards.push_back(card_to_split);
         hands.push_back(std::move(newHand));
       }
-
-      currentHandId = p1;  
-      s = "new_split_hand " + std::to_string(p2) + " " + card[cardToSplit].ascii();
+*/
+//      currentHandId = p1;  
+      s = "new_split_hand " + std::to_string(p2) + " " + card[card_to_split].ascii();
     break;
 
     case lbj::Info::PlayerDoubleInvalid:
@@ -317,17 +331,17 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
     break;
     
     case lbj::Info::PlayerPushes:
-      s = "player_pushes " + std::to_string(playerValue) + " " + std::to_string(dealerValue);;
+      s = "player_pushes " + std::to_string(value_player) + " " + std::to_string(value_dealer);;
     break;
     
     case lbj::Info::PlayerLosses:
-      s = "player_losses " + std::to_string(playerValue) + " " + std::to_string(dealerValue);
+      s = "player_losses " + std::to_string(value_player) + " " + std::to_string(value_dealer);
     break;
     case lbj::Info::PlayerBlackjack:
       s = "blackjack_player";
     break;
     case lbj::Info::PlayerWins:
-      s = "player_wins " + std::to_string(playerValue) + " " + std::to_string(dealerValue);;
+      s = "player_wins " + std::to_string(value_player) + " " + std::to_string(value_dealer);;
     break;
     
     case lbj::Info::NoBlackjacks:
@@ -335,7 +349,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
     break;
 
     case lbj::Info::DealerBusts:
-      s = "dealer_busts " + std::to_string(playerValue) + " " + std::to_string(dealerValue);;
+      s = "dealer_busts " + std::to_string(value_player) + " " + std::to_string(value_dealer);;
     break;  
     
     case lbj::Info::Help:
@@ -409,7 +423,7 @@ int StdInOut::play(void) {
 ///int+play?+example play? -16 10
 ///int+play?+example play? 16 5
 ///int+play?+example play? 7 7
-      s = "play? " + std::to_string(playerValue) + " " + std::to_string(dealerValue);
+      s = "play? " + std::to_string(value_player) + " " + std::to_string(value_dealer);
     break;  
 
     case lbj::PlayerActionRequired::None:
@@ -449,7 +463,7 @@ int StdInOut::play(void) {
 
         case lbj::PlayerActionRequired::Bet:
           if (isdigit(command[0])) {
-            currentBet = std::stoi(command);
+            current_bet = std::stoi(command);
             actionTaken = lbj::PlayerActionTaken::Bet;
           }
         break;

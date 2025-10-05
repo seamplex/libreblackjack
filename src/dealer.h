@@ -78,6 +78,7 @@ namespace lbj {
     NewHand,
     Shuffle,
     CardPlayer,
+    CardDealerUp,
     CardDealer,
     CardDealerRevealsHole,
     DealerBlackjack,
@@ -193,9 +194,9 @@ class PlayerHand : public Hand {
 class Player {
   public:
     Player(Configuration &conf) {
-      conf.set(&flat_bet, {"flat_bet", "flatbet"});  
-      conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});  
-      conf.set(&always_insure, {"always_insure"});  
+//      conf.set(&flat_bet, {"flat_bet", "flatbet"});  
+//      conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});
+//      conf.set(&always_insure, {"always_insure"});  
     };
     virtual ~Player() = default;
     // delete copy and move constructors
@@ -210,24 +211,17 @@ class Player {
     lbj::PlayerActionRequired actionRequired = lbj::PlayerActionRequired::None;
     lbj::PlayerActionTaken    actionTaken    = lbj::PlayerActionTaken::None;
 
-    int dealerValue = 0;
-    int playerValue = 0;
-    bool canDouble = false;
-    bool canSplit = false;
-    
     bool verbose = false;
     bool flat_bet = false;
     bool no_insurance = false;
     bool always_insure = false;
-    
-    unsigned int currentBet = 0;
-    
-  protected:
-    std::list<PlayerHand> hands;
-    std::list<PlayerHand>::iterator currentHand;
-    std::size_t currentHandId = 0;
 
-    Hand dealerHand;
+    bool can_double = false;
+    bool can_split = false;
+
+    int value_dealer = 0;
+    int value_player = 0;
+    unsigned int current_bet = 0;
 };
 
 struct reportItem {

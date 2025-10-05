@@ -300,7 +300,7 @@ int Tty::play() {
     
     case lbj::PlayerActionRequired::Play:
       renderTable();  
-      s = "Play? " + std::to_string(playerValue) + " " + std::to_string(dealerValue);
+      s = "Play? " + std::to_string(value_player) + " " + std::to_string(value_dealer);
     break;  
     
     case lbj::PlayerActionRequired::None:
@@ -359,7 +359,7 @@ int Tty::play() {
 
       case lbj::PlayerActionRequired::Bet:
         if (isdigit(command[0])) {
-          currentBet = std::stoi(command);
+          current_bet = std::stoi(command);
           actionTaken = lbj::PlayerActionTaken::Bet;
         }
       break;

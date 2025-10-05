@@ -42,8 +42,14 @@ class StdInOut : public Player {
   private:
     std::string input_buffer;
     
-    std::size_t handToSplit;
-    unsigned int cardToSplit;
+    std::size_t hand_to_split;
+    unsigned int card_to_split;
+/*    
+    std::list<PlayerHand> hands;
+    std::list<PlayerHand>::iterator currentHand;
+    std::size_t currentHandId = 0;
+    Hand dealerHand;
+*/
     
     inline void ltrim(std::string &s) {
       s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));

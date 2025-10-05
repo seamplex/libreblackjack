@@ -220,7 +220,7 @@ int Basic::play() {
   
   switch (actionRequired) {
     case lbj::PlayerActionRequired::Bet:
-      currentBet = 1;
+      current_bet = 1;
       actionTaken = lbj::PlayerActionTaken::Bet;
     break;
 
@@ -231,22 +231,22 @@ int Basic::play() {
     case lbj::PlayerActionRequired::Play:
 
 #ifdef BJDEBUG
-      std::cout << "player " << playerValue << " dealer " << dealerValue << std::endl;
+      std::cout << "player " << value_player << " dealer " << value_dealer << std::endl;
 #endif      
-      value = std::abs(playerValue);
-      upcard = std::abs(dealerValue);
+      value = std::abs(value_player);
+      upcard = std::abs(value_dealer);
       
       // first, we see if we can and shold split
-      if (canSplit &&
-           ((playerValue == -12 &&    pair[11][upcard] == lbj::PlayerActionTaken::Split) ||
+      if (can_split &&
+           ((value_player == -12 &&    pair[11][upcard] == lbj::PlayerActionTaken::Split) ||
                                    pair[value][upcard] == lbj::PlayerActionTaken::Split)) {
           actionTaken = lbj::PlayerActionTaken::Split;
 
       } else {
       
-        actionTaken = (playerValue < 0) ? soft[value][upcard] : hard[value][upcard];
+        actionTaken = (value_player < 0) ? soft[value][upcard] : hard[value][upcard];
         
-        if (canDouble == false) {
+        if (can_double == false) {
           if (actionTaken == lbj::PlayerActionTaken::Double) {
             actionTaken = lbj::PlayerActionTaken::Hit;
           }

@@ -48,6 +48,10 @@ class Tty : public Player {
     static int len;  
     
   private:
+    std::list<PlayerHand> hands;
+    std::list<PlayerHand>::iterator currentHand;
+    std::size_t currentHandId = 0;
+    Hand dealerHand;
 
     void renderHand(Hand *, bool = false);
     void renderTable(void);
