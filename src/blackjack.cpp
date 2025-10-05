@@ -68,13 +68,28 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 ///conf+maximum_bet+example maximum_bet = 20
   conf.set(&max_bet, {"maximum_bet", "max_bet", "maxbet"});
 
-///conf+rules+usage `rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | da9 ]`
-///conf+rules+details Defines the rules of the game. 
+///conf+rules+usage `rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]`
+///conf+rules+details Defines the rules of the game.
+///conf+rules+details @
+///conf+rules+details | Rule                                     |   Yes   |   No    |
+///conf+rules+details |:-----------------------------------------|:-------:|:-------:|
+///conf+rules+details | Dealer peeks for blackjack               |  `ahc`  |  `enhc` |
+///conf+rules+details | Dealer has to hit a soft 17              |  `h17`  |  `s17`  |
+///conf+rules+details | Player can double after splitting        |  `das`  |  `ndas` |
+///conf+rules+details | Player can double on any first two cards |  `doa`  |  `do9`  |
+///conf+rules+details @
+///conf+rules+details  * When playing `ahc` (default), the dealer has a hole card.
+///conf+rules+details  If the upcard is an ace, he checks for possible blackjack before
+///conf+rules+details  allowing for the player to split nor double down.
+///conf+rules+details  When playing `enhc` the dealer does not draw a hole card and
+///conf+rules+details  check for blackjack after the player has played.
+///conf+rules+details  * The `do9` rules means that the player can only double if the
+///conf+rules+details  first two cards sum up nine, ter or eleven.
+///conf+rules+details @
 ///conf+rules+default Empty, meaning `ahc`, `h17`, `das`, `doa`.
-///conf+rules+example maximum_bet = 0
-///conf+rules+example maximum_bet = 1
-///conf+rules+example maximum_bet = 20
-  // rules are base, particular options take precedence
+///conf+rules+example rules = ahc h17 das doa
+///conf+rules+example rules = enhc s17 ndas
+///conf+rules+example rules = s17 do9
   if (conf.exists("rules")) {
     std::istringstream iss(conf.getString("rules"));
     std::string token;
@@ -94,7 +109,7 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
         das = false;
       } else if (token == "doa" || token == "DOA") {
         doa = true;
-      } else if (token == "da9" || token == "DA9") {
+      } else if (token == "do9" || token == "DO9") {
         doa = false;
 /*        
       } else if (token == "rsa" || token == "RSA") {
@@ -110,11 +125,8 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
     conf.markUsed("rules");
   }
 
-  conf.set(&h17, {"h17", "hit_soft_17"});
-  conf.set(&das, {"das", "double_after_split"});
-  conf.set(&doa, {"doa", "double_on_any"});
 //  conf.set(&rsa, {"rsa", "resplit_aces"});
-  conf.set(&enhc, {"enhc", "european_no_hole_card"});
+
   conf.set(&blackjack_pays, {"blackjack_pays"});
 
   conf.set(&playerStats.bankroll, {"bankroll", "initial_bankroll"});
@@ -183,6 +195,29 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 
 Blackjack::~Blackjack() {
   return;    
+}
+
+Player::Player(Configuration &conf) {
+///conf+flat_bet+usage `flat_bet = ` $b$
+///conf+flat_bet+details Tells both the dealer and the player that the betting scheme is flat or not.
+///conf+flat_bet+details The dealer will not ask for bets and the internal player, if asked, always says `1`.
+///conf+flat_bet+details The value can be either `false` or `true` or `0` or `1`.
+///conf+flat_bet+default $false$
+///conf+flat_bet+example flat_bet = false
+///conf+flat_bet+example flat_bet = true
+///conf+flat_bet+example flat_bet = 1
+  conf.set(&flat_bet, {"flat_bet", "flatbet"});  
+
+///conf+no_insurance+usage `no_insurance = ` $b$
+///conf+no_insurance+details If $b$ is `true`, the dealer will not ask for insurance and assume
+///conf+no_insurance+details the player will never take it when the dealer shows an ace.
+///conf+no_insurance+details The value can be either `false` or `true` or `0` or `1`.
+///conf+no_insurance+default $false$
+///conf+no_insurance+example no_insurance = false
+///conf+no_insurance+example no_insurance = true
+///conf+no_insurance+example no_insurance = 1
+  conf.set(&no_insurance, {"no_insurance", "never_insurance", "never_insure", "dont_insure"});  
+  conf.set(&always_insure, {"always_insure"});  
 }
 
 int Blackjack::read_arranged_cards(std::istringstream iss) {
@@ -260,7 +295,7 @@ void Blackjack::can_double_split(void) {
     player->can_double &= (value == 9 || value == 10 || value == 11);
   }
 
-  player->can_split = n_cards == 2 && (card[*(playerStats.currentHand->cards.begin())].value == card[*(++playerStats.currentHand->cards.begin())].value);
+  player->can_split = (n_cards == 2) && (card[*(playerStats.currentHand->cards.begin())].value == card[*(++playerStats.currentHand->cards.begin())].value) && (playerStats.splits < resplits);
   return;
 }
 
@@ -840,10 +875,8 @@ int Blackjack::process(void) {
       secondCard = *(++playerStats.currentHand->cards.begin());
       
       // up to three splits (i.e. four hands)
-      // TODO: choose through conf how many max splits are available
       // TODO: check bankroll to see if player can split
-//      if (playerStats.splits < 3 && playerStats.currentHand->cards.size() == 2 && card[firstCard].value == card[secondCard].value) {
-      if (playerStats.currentHand->cards.size() == 2 && card[firstCard].value == card[secondCard].value) {
+      if (playerStats.splits < resplits && playerStats.currentHand->cards.size() == 2 && card[firstCard].value == card[secondCard].value) {
         
         // take player's money
         playerStats.bankroll -= playerStats.currentHand->bet;
@@ -1050,8 +1083,9 @@ std::string Blackjack::rules(void) {
   return ((enhc) ? "enhc" : "ahc")  + std::string(" ") +
          ((h17)  ? "h17"  : "s17")  + std::string(" ") +
          ((das)  ? "das"  : "ndas") + std::string(" ") +
-         ((doa)  ? "doa"  : "da9")  + std::string(" ") +
+         ((doa)  ? "doa"  : "do9")  + std::string(" ") +
 //         ((rsa)  ? "rsa"  : "nrsa") + std::string(" ") +
+         std::to_string(resplits) + "rsp " +
          std::to_string(n_decks) + "decks" ;
 }
 }

@@ -70,6 +70,7 @@ class Blackjack : public Dealer {
     size_t n_arranged_cards = 0; // just to prevent calling size() each time we draw a card
     size_t i_arranged_cards = 0;
 
+    unsigned int resplits = 3;
     unsigned int max_bet = 0;
     unsigned int number_of_burnt_cards = 0;
     

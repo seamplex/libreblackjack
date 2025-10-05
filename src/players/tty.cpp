@@ -344,8 +344,6 @@ int Tty::play() {
     actionTaken = lbj::PlayerActionTaken::Quit;
   } else if (command == "help") {
     actionTaken = lbj::PlayerActionTaken::Help;
-  //    } else if (command == "count" || command == "c") {
-  //      actionTaken = lbj::PlayerActionTaken::Count;
   } else if (command == "upcard" || command == "u") {
     actionTaken = lbj::PlayerActionTaken::UpcardValue;
   } else if (command == "bankroll" || command == "b") {

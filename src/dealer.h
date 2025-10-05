@@ -193,11 +193,7 @@ class PlayerHand : public Hand {
 
 class Player {
   public:
-    Player(Configuration &conf) {
-//      conf.set(&flat_bet, {"flat_bet", "flatbet"});  
-//      conf.set(&no_insurance, {"never_insurance", "never_insure", "no_insurance", "dont_insure"});
-//      conf.set(&always_insure, {"always_insure"});  
-    };
+    Player(Configuration &conf);
     virtual ~Player() = default;
     // delete copy and move constructors
     Player(Player&) = delete;

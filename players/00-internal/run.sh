@@ -1,1 +1,1 @@
-blackjack -i
+blackjack -ip

@@ -43,27 +43,6 @@ std::string double_to_string_g_format(double value) {
 
 StdInOut::StdInOut(Configuration &conf) : Player(conf) {
 
-///conf+flat_bet+usage `flat_bet = ` $b$
-///conf+flat_bet+details Tells both the dealer and the player that the betting scheme is flat or not.
-///conf+flat_bet+details The dealer will not ask for bets and the internal player, if asked, always says `1`.
-///conf+flat_bet+details The value can be either `false` or `true` or `0` or `1`.
-///conf+flat_bet+default $false$
-///conf+flat_bet+example flat_bet = false
-///conf+flat_bet+example flat_bet = true
-///conf+flat_bet+example flat_bet = 1
-  conf.set(&flat_bet, {"flat_bet", "flatbet"});  
-
-///conf+no_insurance+usage `no_insurance = ` $b$
-///conf+no_insurance+details If $b$ is `true`, the dealer will not ask for insurance and assume
-///conf+no_insurance+details the player will never take it when the dealer shows an ace.
-///conf+no_insurance+details The value can be either `false` or `true` or `0` or `1`.
-///conf+no_insurance+default $false$
-///conf+no_insurance+example no_insurance = false
-///conf+no_insurance+example no_insurance = true
-///conf+no_insurance+example no_insurance = 1
-  conf.set(&no_insurance, {"no_insurance", "never_insurance", "never_insure", "dont_insure"});  
-  conf.set(&always_insure, {"always_insure"});  
-
   verbose = false;
   if (conf.exists("verbose")) {
     conf.set(&verbose, {"verbose"});
@@ -101,22 +80,6 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+new_hand+example new_hand 22 -8
 ///inf+new_hand+example new_hand 24998 -7609.5
       s = "new_hand " + std::to_string(p1) + " " + double_to_string_g_format(1e-3*p2);
-      
-/*      
-      // TODO: is this dealerHand a private member of player? if so, it should be lowercase
-      // clear dealer's hand
-      dealerHand.cards.clear();
-
-      // erase all of our hands
-      for (auto &hand : hands) {
-        hand.cards.clear();
-      }
-      // create one, add and make it the current one
-      hands.clear();
-      hands.push_back(std::move(PlayerHand()));
-      currentHand = hands.begin();
-      currentHandId = 0;
-*/ 
     break;
 
     case lbj::Info::BetInvalid:
@@ -186,17 +149,6 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_player+example card_player TD 1
 ///inf+card_player+example card_player 6H 2 
       s = "card_player " + card[p1].ascii() + " " + ((p2 != 0)?(std::to_string(p2)+ " "):"") ;
-/*      
-      if (p2 != static_cast<int>(currentHandId)) {
-        for (currentHand = hands.begin(); currentHand != hands.end(); ++currentHand) {
-          if (static_cast<int>(currentHand->id) == p2) {
-            break;
-          }
-        }
-        currentHandId = p2;
-      }
-      currentHand->cards.push_back(p1);
- */
       break;
     break;
 
@@ -225,8 +177,6 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_dealer+example card_dealer 5H
 ///inf+card_dealer+example card_dealer QH
       s = "card_dealer " + card[p1].ascii();;
-//      dealerHand.cards.push_back(p1);
-//      currentHandId = 0;
     break;
 
     case lbj::Info::CardDealerRevealsHole:
@@ -289,30 +239,6 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
     break;
 
     case lbj::Info::PlayerSplitIds:
-/*
-      {
-        bool found = false;
-        for (auto hand = hands.begin(); hand != hands.end(); ++hand) {
-          if (hand->id == hand_to_split) {
-            found = true;
-            hand->id = p1;
-            card_to_split = *(++(hand->cards.begin()));
-            hand->cards.pop_back();
-            break;
-          }
-        }
-        if (found == false) {
-          exit(0); 
-        }
-
-        // create a new hand
-        PlayerHand newHand;
-        newHand.id = p2;
-        newHand.cards.push_back(card_to_split);
-        hands.push_back(std::move(newHand));
-      }
-*/
-//      currentHandId = p1;  
       s = "new_split_hand " + std::to_string(p2) + " " + card[card_to_split].ascii();
     break;
 
@@ -320,7 +246,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+player_double_invalid+usage `player_double_invalid`
 ///inf+player_double_invalid+details The dealer complains that the doubling-down request cannot be
 ///inf+player_double_invalid+details fulfilled. Doubling down is only possible when exactly two
-///inf+player_double_invalid+details cards have been dealt in a hand and the `doa` or `da9` option is met.
+///inf+player_double_invalid+details cards have been dealt in a hand and the `doa` or `do9` option is met.
 ///inf+player_double_invalid+details The player will receive a new `play?` message.
 ///inf+player_double_invalid+example player_double_invalid
       s = "player_double_invalid";
@@ -408,10 +334,11 @@ int StdInOut::play(void) {
 ///int+play?+usage `play?` $p$ $d$
 ///int+play?+details The dealer asks the user to play, i.e. to choose wether to
 ///int+play?+details @
-///int+play?+details  * `pair` (or `p`)
+///int+play?+details  * `pair` (or `p`) or `split`
 ///int+play?+details  * `double` (or `d`)
 ///int+play?+details  * `hit` (or `h`)
 ///int+play?+details  * `stand` (or `s`)
+///int+play?+details  * `quit` (or `q`)
 ///int+play?+details @
 ///int+play?+details given that the value of the player's hand id $p$ and that the value of the dealer's hand is $d$,
 ///int+play?+details where $p$ and $d$ are integers. If $p$ is negative, the hand is soft with a value equal to $|p|$.
@@ -443,64 +370,61 @@ int StdInOut::play(void) {
   trim(command);
   actionTaken = lbj::PlayerActionTaken::None;
     
-    // check common commands first
-           if (command == "quit" || command == "q") {
-      actionTaken = lbj::PlayerActionTaken::Quit;
-    } else if (command == "help") {
-      actionTaken = lbj::PlayerActionTaken::Help;
-//    } else if (command == "count" || command == "c") {
-//      actionTaken = lbj::PlayerActionTaken::Count;
-    } else if (command == "upcard" || command == "u") {
-      actionTaken = lbj::PlayerActionTaken::UpcardValue;
-    } else if (command == "bankroll" || command == "b") {
-      actionTaken = lbj::PlayerActionTaken::Bankroll;
-    } else if (command == "hands") {
-      actionTaken = lbj::PlayerActionTaken::Hands;
-    }
-    
-    if (actionTaken == lbj::PlayerActionTaken::None) {
-      switch (actionRequired) {
-
-        case lbj::PlayerActionRequired::Bet:
-          if (isdigit(command[0])) {
-            current_bet = std::stoi(command);
-            actionTaken = lbj::PlayerActionTaken::Bet;
-          }
-        break;
-
-        case lbj::PlayerActionRequired::Insurance:
-          if (command == "y" || command == "yes") {
-            actionTaken = lbj::PlayerActionTaken::Insure;
-          } else if (command == "n" || command == "no") {
-            actionTaken = lbj::PlayerActionTaken::DontInsure;
-          } else {
-            // TODO: chosse if we allow not(yes) == no
-            actionTaken = lbj::PlayerActionTaken::None;  
-          }
-        break;
-
-        case lbj::PlayerActionRequired::Play:
-          // TODO: sort by higher-expected response first
-                 if (command == "h" || command =="hit") {
-            actionTaken = lbj::PlayerActionTaken::Hit;
-          } else if (command == "s" || command == "stand") {
-            actionTaken = lbj::PlayerActionTaken::Stand;
-          } else if (command == "d" || command == "double") {
-            actionTaken = lbj::PlayerActionTaken::Double;
-          } else if (command == "p" || command == "split" || command == "pair") {
-            actionTaken = lbj::PlayerActionTaken::Split;
-          } else {
-            actionTaken = lbj::PlayerActionTaken::None;
-          }
-        break;
-        
-        case lbj::PlayerActionRequired::None:
-        break;
-        
-      }
-    }
-
+  // check common commands first
+         if (command == "quit" || command == "q") {
+    actionTaken = lbj::PlayerActionTaken::Quit;
+  } else if (command == "help") {
+    actionTaken = lbj::PlayerActionTaken::Help;
+  } else if (command == "upcard" || command == "u") {
+    actionTaken = lbj::PlayerActionTaken::UpcardValue;
+  } else if (command == "bankroll" || command == "b") {
+    actionTaken = lbj::PlayerActionTaken::Bankroll;
+  } else if (command == "hands") {
+    actionTaken = lbj::PlayerActionTaken::Hands;
+  }
   
+  if (actionTaken == lbj::PlayerActionTaken::None) {
+    switch (actionRequired) {
+
+      case lbj::PlayerActionRequired::Bet:
+        if (isdigit(command[0])) {
+          current_bet = std::stoi(command);
+          actionTaken = lbj::PlayerActionTaken::Bet;
+        }
+      break;
+
+      case lbj::PlayerActionRequired::Insurance:
+        if (command == "y" || command == "yes") {
+          actionTaken = lbj::PlayerActionTaken::Insure;
+        } else if (command == "n" || command == "no") {
+          actionTaken = lbj::PlayerActionTaken::DontInsure;
+        } else {
+          // TODO: chosse if we allow not(yes) == no
+          actionTaken = lbj::PlayerActionTaken::None;  
+        }
+      break;
+
+      case lbj::PlayerActionRequired::Play:
+        // TODO: sort by higher-expected response first
+               if (command == "h" || command =="hit") {
+          actionTaken = lbj::PlayerActionTaken::Hit;
+        } else if (command == "s" || command == "stand") {
+          actionTaken = lbj::PlayerActionTaken::Stand;
+        } else if (command == "d" || command == "double") {
+          actionTaken = lbj::PlayerActionTaken::Double;
+        } else if (command == "p" || command == "split" || command == "pair") {
+          actionTaken = lbj::PlayerActionTaken::Split;
+        } else {
+          actionTaken = lbj::PlayerActionTaken::None;
+        }
+      break;
+      
+      case lbj::PlayerActionRequired::None:
+      break;
+      
+    }
+  }
+
   return 0;
 
 }
