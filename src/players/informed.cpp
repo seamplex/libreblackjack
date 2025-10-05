@@ -109,21 +109,29 @@ int Informed::play() {
       // compute the expected values
       // -------------------------------------------------------
       init();
-      for (int i = 0; i < 8; i++) {
+      for (int i = 0; i < 100; i++) {
         dealer_bust_european_iteration();
       }
       dealer_european_to_american();
 
       stand(upcard);
 
-      for (int i = 0; i < 8; i++) {
+      for (int i = 0; i < 100; i++) {
         hit_iteration();
       }
       double_down();
       // -------------------------------------------------------      
 
-//#define BJDEBUG
+#define BJDEBUG
 #ifdef BJDEBUG
+      for (int i = 0; i < SIZE; i++) {
+        double s = 0;
+        for (int f = 0; f < SIZE; f++) {
+          s += dealer_hard[f][i];
+        }
+        std::cout << i << " " << s << std::endl;
+      } 
+              
       // for (int f = 0; f < 23; f++) {
       //   std::cout << f << "\t";
       //   for (int i = 0; i < 31; i++) {
