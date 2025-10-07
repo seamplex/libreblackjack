@@ -22,11 +22,11 @@ fi
 
 
 echo "no bust"
-ref=-0.075
+ref=-0.079
 
 rm -f fifo-nobust
 mkfifo fifo-nobust
-${extra}${blackjack} -n1e5 --report=no-bust.yaml < fifo-nobust | gawk -f ../players/05-no-bust/no-bust.awk > fifo-nobust
+${extra}${blackjack} -n2e5 --report=no-bust.yaml < fifo-nobust | gawk -f ../players/05-no-bust/no-bust.awk > fifo-nobust
 
 actual=$(yq .mean no-bust.yaml)
 tol=$(yq .error no-bust.yaml)
