@@ -1,14 +1,36 @@
 
+* `blackjack_pays` (@sec:blackjack_pays)
 * `dealer` (@sec:dealer)
 * `decks` (@sec:decks)
 * `flat_bet` (@sec:flat_bet)
 * `hands` (@sec:hands)
 * `maximum_bet` (@sec:maximum_bet)
 * `max_incorrect_commands` (@sec:max_incorrect_commands)
+* `new_hand_reset_cards` (@sec:new_hand_reset_cards)
 * `no_insurance` (@sec:no_insurance)
+* `number_of_burnt_cards` (@sec:number_of_burnt_cards)
+* `penetration` (@sec:penetration)
+* `penetration_sigma` (@sec:penetration_sigma)
 * `player` (@sec:player)
+* `quit_when_arranged_cards_run_out` (@sec:quit_when_arranged_cards_run_out)
 * `rules` (@sec:rules)
+* `shuffle_every_hand` (@sec:shuffle_every_hand)
 
+
+# `blackjack_pays = ` $r$ {#sec:blackjack_pays}
+
+Defines how much a natural pays.
+The real number $r$ has to be a decimal number such as `1.5` or `1.2`.
+
+**Default**
+$1.5$
+
+**Examples**
+
+~~~
+blackjack_pays = 1.5
+blackjack_pays = 1.2
+~~~
 
 # `dealer = ` *game* {#sec:dealer}
 
@@ -109,6 +131,36 @@ that do not make sense (such as garbage) or that are not valid (such as doubling
 max_incorrect_commands = 20
 ~~~
 
+# `new_hand_reset_cards_out = ` $b$ {#sec:new_hand_reset_cards}
+
+If the are arranged cards (either with `cards` or `cards_file`) and $b$ is `true`
+then when a hand is finished, the next hand starts with the arranged cards from the very beginning.
+Otherwise, if there are enough arranged cards, they will be drawn from the list in the
+specified order. If there are no more cards in the arranged list, cards will be drawn from
+a randomnly-shuffled shoe or from an infinite set of random cards, depending on the value of `decks`.
+This setting only makes sense when arranging cards with either `cards` or `cards_file`.
+
+A usage for $b = \text{true}$ is to give just three cards in `cards` (say the dealer upcard and
+the two player’s cards) to study what happens randonly after this intial condition.
+In this scenario, all hands will start with the three prescribed cards and the rest of the hand
+will be random, either from a shoe with the three already-dealt cards missing or from an infinite set of cards.
+
+A usage for $b = \text{false}$ is to study what happens when the same shoe is played under
+different circunstances. In this case, the program should be run several times with the same
+arranged cards (most likely using `cards_file` because there are expected a lot of cards to be arranged)
+and different hitting/standing strategies to compare outcomes.
+If the actual dealt cards are not important but only reproducibility, it is easier to fix `rng_seed`.
+
+**Default**
+`true`
+
+**Examples**
+
+~~~
+quit_when_arranged_cards_run_out = false
+quit_when_arranged_cards_run_out = true
+~~~
+
 # `no_insurance = ` $b$ {#sec:no_insurance}
 
 If $b$ is `true`, the dealer will not ask for insurance and assume
@@ -124,6 +176,61 @@ $false$
 no_insurance = false
 no_insurance = true
 no_insurance = 1
+~~~
+
+# `number_of_burnt_cards = ` $n$ {#sec:number_of_burnt_cards}
+
+Indicates the number $n$ of cards that have to be burnt after shuffling a shoe.
+This value only makes sense when playing shoe games, i.e. non-zero `decks`.
+
+**Default**
+$0$
+
+**Examples**
+
+~~~
+number_of_burnt_cards = 0
+number_of_burnt_cards = 1
+number_of_burnt_cards = 2
+~~~
+
+# `penetration = ` $r$ {#sec:penetration}
+
+When playing a shoe game, sets the penetration of the shoe.
+That is to say, the fraction $0 < $r$ < 1$ of the total number of cards on the decks
+that have to be played before re-shuffling the shoe.
+If the penetration is achieved in the middle of a hand (i.e. the cut card is dealt),
+the hand is finished and the shoe is shuffled before the next hand.
+Note that if the penetration is too large (i.e. $r lesssim 1$) the shoe might
+run out of cards triggering an error and exiting the program
+
+**Default**
+`0.75`
+
+**Examples**
+
+~~~
+penetration = 0.75
+penetration = 0.5
+penetration = 0.85
+~~~
+
+# `penetration_sigma = ` $r$ {#sec:penetration_sigma}
+
+If $r \neq 0$ then the penetration given in `penetration` is not deterministic but random.
+That is to say, the actual penetration fraction will be sampled from a 
+gaussian random number generator after shuffling the shoe. This variable `penetration_sigma`
+ controls the standard deviation of the distribution.
+
+**Default**
+`0`
+
+**Examples**
+
+~~~
+penetration_sigma = 0.01
+penetration_sigma = 0.05
+penetration_sigma = 0.1
 ~~~
 
 # `player =  ` *player* {#sec:player}
@@ -156,6 +263,26 @@ player = stdio
 player = internal
 ~~~
 
+# `quit_when_arranged_cards_run_out = ` $b$ {#sec:quit_when_arranged_cards_run_out}
+
+If the are arranged cards (either with `cards` or `cards_file`) and $b$ is `true`
+then the program quits when the list of cards ends.
+If it is false, the dealer continues drawing cards from a randomnly-shuffled shoe
+(where the first cards have been arranged) or from an infinite set of random cards,
+depending on the value of `decks` until the either dealer receives a `quit` message or
+the maximum number of hands given in `hands` have been played.
+This setting only makes sense when arranging cards with either `cards` or `cards_file`.
+
+**Default**
+`false`
+
+**Examples**
+
+~~~
+quit_when_arranged_cards_run_out = false
+quit_when_arranged_cards_run_out = true
+~~~
+
 # `rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]` {#sec:rules}
 
 Defines the rules of the game.
@@ -185,6 +312,23 @@ Empty, meaning `ahc`, `h17`, `das`, `doa`.
 rules = ahc h17 das doa
 rules = enhc s17 ndas
 rules = s17 do9
+~~~
+
+# `shuffle_every_hand = ` $b$ {#sec:shuffle_every_hand}
+
+Defines whether the dealer has to re-shuffle the shoe after finishing a hand or not.
+If $b$ is `true`, each hand starts from a fresh shoe of size `decks`.
+If $b$ is `false`, the shoe is only re-shuffled when the fraction given in `penetration` is achieved.
+This setting only makes sense when playing a shoe game, i.e. non-zero `decks`.
+
+**Default**
+`false`
+
+**Examples**
+
+~~~
+shuffle_every_hand = false
+shuffle_every_hand = true
 ~~~
 
 

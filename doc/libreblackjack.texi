@@ -947,36 +947,71 @@ decks = 1             # number of decks, negative means infinite
 @section Reference
 @itemize
 @item
-@code{dealer} (sec.@ 4.1.1)
+@code{blackjack_pays} (sec.@ 4.1.1)
 @item
-@code{decks} (sec.@ 4.1.2)
+@code{dealer} (sec.@ 4.1.2)
 @item
-@code{flat_bet} (sec.@ 4.1.3)
+@code{decks} (sec.@ 4.1.3)
 @item
-@code{hands} (sec.@ 4.1.4)
+@code{flat_bet} (sec.@ 4.1.4)
 @item
-@code{maximum_bet} (sec.@ 4.1.5)
+@code{hands} (sec.@ 4.1.5)
 @item
-@code{max_incorrect_commands} (sec.@ 4.1.6)
+@code{maximum_bet} (sec.@ 4.1.6)
 @item
-@code{no_insurance} (sec.@ 4.1.7)
+@code{max_incorrect_commands} (sec.@ 4.1.7)
 @item
-@code{player} (sec.@ 4.1.8)
+@code{new_hand_reset_cards} (sec.@ 4.1.8)
 @item
-@code{rules} (sec.@ 4.1.9)
+@code{no_insurance} (sec.@ 4.1.9)
+@item
+@code{number_of_burnt_cards} (sec.@ 4.1.10)
+@item
+@code{penetration} (sec.@ 4.1.11)
+@item
+@code{penetration_sigma} (sec.@ 4.1.12)
+@item
+@code{player} (sec.@ 4.1.13)
+@item
+@code{quit_when_arranged_cards_run_out} (sec.@ 4.1.14)
+@item
+@code{rules} (sec.@ 4.1.15)
+@item
+@code{shuffle_every_hand} (sec.@ 4.1.16)
 @end itemize
 
 @menu
+* @code{blackjack_pays =} @math{r}::
 * @code{dealer =} @emph{game}::
 * @code{decks =} @math{n}::
 * @code{flat_bet =} @math{b}::
 * @code{hands =} @math{n}::
 * @code{maximum_bet =} @math{n}::
 * @code{max_incorrect_commands =} @math{n}::
+* @code{new_hand_reset_cards_out =} @math{b}::
 * @code{no_insurance =} @math{b}::
+* @code{number_of_burnt_cards =} @math{n}::
+* @code{penetration =} @math{r}::
+* @code{penetration_sigma =} @math{r}::
 * @code{player =} @emph{player}::
+* @code{quit_when_arranged_cards_run_out =} @math{b}::
 * @code{rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]}::
+* @code{shuffle_every_hand =} @math{b}::
 @end menu
+
+@node @code{blackjack_pays =} @math{r}
+@subsection @code{blackjack_pays =} @math{r}
+Defines how much a natural pays. The real number @math{r} has to be a
+decimal number such as @code{1.5} or @code{1.2}.
+
+@strong{Default} @math{1.5}
+
+@strong{Examples}
+
+@verbatim
+blackjack_pays = 1.5
+blackjack_pays = 1.2
+@end verbatim
 
 @node @code{dealer =} @emph{game}
 @subsection @code{dealer =} @emph{game}
@@ -1074,6 +1109,42 @@ or that are not valid (such as doubling when not allowed).
 max_incorrect_commands = 20
 @end verbatim
 
+@node @code{new_hand_reset_cards_out =} @math{b}
+@subsection @code{new_hand_reset_cards_out =} @math{b}
+If the are arranged cards (either with @code{cards} or
+@code{cards_file}) and @math{b} is @code{true} then when a hand is
+finished, the next hand starts with the arranged cards from the very
+beginning. Otherwise, if there are enough arranged cards, they will be
+drawn from the list in the specified order. If there are no more cards
+in the arranged list, cards will be drawn from a randomnly-shuffled shoe
+or from an infinite set of random cards, depending on the value of
+@code{decks}. This setting only makes sense when arranging cards with
+either @code{cards} or @code{cards_file}.
+
+A usage for @math{b = \text{true}} is to give just three cards in
+@code{cards} (say the dealer upcard and the two player's cards) to study
+what happens randonly after this intial condition. In this scenario, all
+hands will start with the three prescribed cards and the rest of the
+hand will be random, either from a shoe with the three already-dealt
+cards missing or from an infinite set of cards.
+
+A usage for @math{b = \text{false}} is to study what happens when the
+same shoe is played under different circunstances. In this case, the
+program should be run several times with the same arranged cards (most
+likely using @code{cards_file} because there are expected a lot of cards
+to be arranged) and different hitting/standing strategies to compare
+outcomes. If the actual dealt cards are not important but only
+reproducibility, it is easier to fix @code{rng_seed}.
+
+@strong{Default} @code{true}
+
+@strong{Examples}
+
+@verbatim
+quit_when_arranged_cards_run_out = false
+quit_when_arranged_cards_run_out = true
+@end verbatim
+
 @node @code{no_insurance =} @math{b}
 @subsection @code{no_insurance =} @math{b}
 If @math{b} is @code{true}, the dealer will not ask for insurance and
@@ -1088,6 +1159,61 @@ value can be either @code{false} or @code{true} or @code{0} or @code{1}.
 no_insurance = false
 no_insurance = true
 no_insurance = 1
+@end verbatim
+
+@node @code{number_of_burnt_cards =} @math{n}
+@subsection @code{number_of_burnt_cards =} @math{n}
+Indicates the number @math{n} of cards that have to be burnt after
+shuffling a shoe. This value only makes sense when playing shoe games,
+i.e.@ non-zero @code{decks}.
+
+@strong{Default} @math{0}
+
+@strong{Examples}
+
+@verbatim
+number_of_burnt_cards = 0
+number_of_burnt_cards = 1
+number_of_burnt_cards = 2
+@end verbatim
+
+@node @code{penetration =} @math{r}
+@subsection @code{penetration =} @math{r}
+When playing a shoe game, sets the penetration of the shoe. That is to
+say, the fraction $0 < @math{r} < 1$ of the total number of cards on the
+decks that have to be played before re-shuffling the shoe. If the
+penetration is achieved in the middle of a hand (i.e.@ the cut card is
+dealt), the hand is finished and the shoe is shuffled before the next
+hand. Note that if the penetration is too large
+(i.e.@ @math{r lesssim 1}) the shoe might run out of cards triggering an
+error and exiting the program
+
+@strong{Default} @code{0.75}
+
+@strong{Examples}
+
+@verbatim
+penetration = 0.75
+penetration = 0.5
+penetration = 0.85
+@end verbatim
+
+@node @code{penetration_sigma =} @math{r}
+@subsection @code{penetration_sigma =} @math{r}
+If @math{r \neq 0} then the penetration given in @code{penetration} is
+not deterministic but random. That is to say, the actual penetration
+fraction will be sampled from a gaussian random number generator after
+shuffling the shoe. This variable @code{penetration_sigma} controls the
+standard deviation of the distribution.
+
+@strong{Default} @code{0}
+
+@strong{Examples}
+
+@verbatim
+penetration_sigma = 0.01
+penetration_sigma = 0.05
+penetration_sigma = 0.1
 @end verbatim
 
 @node @code{player =} @emph{player}
@@ -1128,6 +1254,27 @@ If at least one of them is re-directed or piped, the default is
 player = tty
 player = stdio
 player = internal
+@end verbatim
+
+@node @code{quit_when_arranged_cards_run_out =} @math{b}
+@subsection @code{quit_when_arranged_cards_run_out =} @math{b}
+If the are arranged cards (either with @code{cards} or
+@code{cards_file}) and @math{b} is @code{true} then the program quits
+when the list of cards ends. If it is false, the dealer continues
+drawing cards from a randomnly-shuffled shoe (where the first cards have
+been arranged) or from an infinite set of random cards, depending on the
+value of @code{decks} until the either dealer receives a @code{quit}
+message or the maximum number of hands given in @code{hands} have been
+played. This setting only makes sense when arranging cards with either
+@code{cards} or @code{cards_file}.
+
+@strong{Default} @code{false}
+
+@strong{Examples}
+
+@verbatim
+quit_when_arranged_cards_run_out = false
+quit_when_arranged_cards_run_out = true
 @end verbatim
 
 @node @code{rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]}
@@ -1178,6 +1325,24 @@ two cards sum up nine, ter or eleven.
 rules = ahc h17 das doa
 rules = enhc s17 ndas
 rules = s17 do9
+@end verbatim
+
+@node @code{shuffle_every_hand =} @math{b}
+@subsection @code{shuffle_every_hand =} @math{b}
+Defines whether the dealer has to re-shuffle the shoe after finishing a
+hand or not. If @math{b} is @code{true}, each hand starts from a fresh
+shoe of size @code{decks}. If @math{b} is @code{false}, the shoe is only
+re-shuffled when the fraction given in @code{penetration} is achieved.
+This setting only makes sense when playing a shoe game, i.e.@ non-zero
+@code{decks}.
+
+@strong{Default} @code{false}
+
+@strong{Examples}
+
+@verbatim
+shuffle_every_hand = false
+shuffle_every_hand = true
 @end verbatim
 
 @node Internal players

@@ -127,16 +127,95 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 
 //  conf.set(&rsa, {"rsa", "resplit_aces"});
 
+///conf+blackjack_pays+usage `blackjack_pays = ` $r$
+///conf+blackjack_pays+details Defines how much a natural pays.
+///conf+blackjack_pays+details The real number $r$ has to be a decimal number such as `1.5` or `1.2`.
+///conf+blackjack_pays+default $1.5$
+///conf+blackjack_pays+example blackjack_pays = 1.5
+///conf+blackjack_pays+example blackjack_pays = 1.2
   conf.set(&blackjack_pays, {"blackjack_pays"});
 
-  conf.set(&playerStats.bankroll, {"bankroll", "initial_bankroll"});
+//  conf.set(&playerStats.bankroll, {"bankroll", "initial_bankroll"});
 
-  // parent class_
+  // parent class
+///conf+number_of_burnt_cards+usage `number_of_burnt_cards = ` $n$
+///conf+number_of_burnt_cards+details Indicates the number $n$ of cards that have to be burnt after shuffling a shoe.
+///conf+number_of_burnt_cards+details This value only makes sense when playing shoe games, i.e. non-zero `decks`.
+///conf+number_of_burnt_cards+default $0$
+///conf+number_of_burnt_cards+example number_of_burnt_cards = 0
+///conf+number_of_burnt_cards+example number_of_burnt_cards = 1
+///conf+number_of_burnt_cards+example number_of_burnt_cards = 2
   conf.set(&number_of_burnt_cards, {"number_of_burnt_cards", "n_burnt_cards", "burnt_cards"});
+  
+///conf+penetration+usage `penetration = ` $r$
+///conf+penetration+details When playing a shoe game, sets the penetration of the shoe.
+///conf+penetration+details That is to say, the fraction $0 < $r$ < 1$ of the total number of cards on the decks
+///conf+penetration+details that have to be played before re-shuffling the shoe.
+///conf+penetration+details If the penetration is achieved in the middle of a hand (i.e. the cut card is dealt),
+///conf+penetration+details the hand is finished and the shoe is shuffled before the next hand.
+///conf+penetration+details Note that if the penetration is too large (i.e. $r lesssim 1$) the shoe might
+///conf+penetration+details run out of cards triggering an error and exiting the program
+///conf+penetration+default `0.75`
+///conf+penetration+example penetration = 0.75
+///conf+penetration+example penetration = 0.5
+///conf+penetration+example penetration = 0.85
   conf.set(&penetration, {"penetration"});
+  
+///conf+penetration_sigma+usage `penetration_sigma = ` $r$
+///conf+penetration_sigma+details If $r \neq 0$ then the penetration given in `penetration` is not deterministic but random.
+///conf+penetration_sigma+details That is to say, the actual penetration fraction will be sampled from a 
+///conf+penetration_sigma+details gaussian random number generator after shuffling the shoe. This variable `penetration_sigma`
+///conf+penetration_sigma+details  controls the standard deviation of the distribution.
+///conf+penetration_sigma+default `0`
+///conf+penetration_sigma+example penetration_sigma = 0.01
+///conf+penetration_sigma+example penetration_sigma = 0.05
+///conf+penetration_sigma+example penetration_sigma = 0.1
   conf.set(&penetration_sigma, {"penetration_sigma", "penetration_dispersion"});
+  
+///conf+shuffle_every_hand+usage `shuffle_every_hand = ` $b$
+///conf+shuffle_every_hand+details Defines whether the dealer has to re-shuffle the shoe after finishing a hand or not.
+///conf+shuffle_every_hand+details If $b$ is `true`, each hand starts from a fresh shoe of size `decks`.
+///conf+shuffle_every_hand+details If $b$ is `false`, the shoe is only re-shuffled when the fraction given in `penetration` is achieved.
+///conf+shuffle_every_hand+details This setting only makes sense when playing a shoe game, i.e. non-zero `decks`.
+///conf+shuffle_every_hand+default `false`
+///conf+shuffle_every_hand+example shuffle_every_hand = false
+///conf+shuffle_every_hand+example shuffle_every_hand = true
   conf.set(&shuffle_every_hand, {"shuffle", "shuffle_every_hand"});
+  
+///conf+quit_when_arranged_cards_run_out+usage `quit_when_arranged_cards_run_out = ` $b$
+///conf+quit_when_arranged_cards_run_out+details If the are arranged cards (either with `cards` or `cards_file`) and $b$ is `true`
+///conf+quit_when_arranged_cards_run_out+details then the program quits when the list of cards ends.
+///conf+quit_when_arranged_cards_run_out+details If it is false, the dealer continues drawing cards from a randomnly-shuffled shoe
+///conf+quit_when_arranged_cards_run_out+details (where the first cards have been arranged) or from an infinite set of random cards,
+///conf+quit_when_arranged_cards_run_out+details depending on the value of `decks` until the either dealer receives a `quit` message or
+///conf+quit_when_arranged_cards_run_out+details the maximum number of hands given in `hands` have been played.
+///conf+quit_when_arranged_cards_run_out+details This setting only makes sense when arranging cards with either `cards` or `cards_file`.
+///conf+quit_when_arranged_cards_run_out+default `false`
+///conf+quit_when_arranged_cards_run_out+example quit_when_arranged_cards_run_out = false
+///conf+quit_when_arranged_cards_run_out+example quit_when_arranged_cards_run_out = true
   conf.set(&quit_when_arranged_cards_run_out, {"quit_when_arranged_cards_run_out"});
+  
+///conf+new_hand_reset_cards+usage `new_hand_reset_cards_out = ` $b$
+///conf+new_hand_reset_cards+details If the are arranged cards (either with `cards` or `cards_file`) and $b$ is `true`
+///conf+new_hand_reset_cards+details then when a hand is finished, the next hand starts with the arranged cards from the very beginning.
+///conf+new_hand_reset_cards+details Otherwise, if there are enough arranged cards, they will be drawn from the list in the
+///conf+new_hand_reset_cards+details specified order. If there are no more cards in the arranged list, cards will be drawn from
+///conf+new_hand_reset_cards+details a randomnly-shuffled shoe or from an infinite set of random cards, depending on the value of `decks`.
+///conf+new_hand_reset_cards+details This setting only makes sense when arranging cards with either `cards` or `cards_file`.
+///conf+new_hand_reset_cards+details @
+///conf+new_hand_reset_cards+details A usage for $b = \text{true}$ is to give just three cards in `cards` (say the dealer upcard and
+///conf+new_hand_reset_cards+details the two player’s cards) to study what happens randonly after this intial condition.
+///conf+new_hand_reset_cards+details In this scenario, all hands will start with the three prescribed cards and the rest of the hand
+///conf+new_hand_reset_cards+details will be random, either from a shoe with the three already-dealt cards missing or from an infinite set of cards.
+///conf+new_hand_reset_cards+details @
+///conf+new_hand_reset_cards+details A usage for $b = \text{false}$ is to study what happens when the same shoe is played under
+///conf+new_hand_reset_cards+details different circunstances. In this case, the program should be run several times with the same
+///conf+new_hand_reset_cards+details arranged cards (most likely using `cards_file` because there are expected a lot of cards to be arranged)
+///conf+new_hand_reset_cards+details and different hitting/standing strategies to compare outcomes.
+///conf+new_hand_reset_cards+details If the actual dealt cards are not important but only reproducibility, it is easier to fix `rng_seed`.
+///conf+new_hand_reset_cards+default `true`
+///conf+new_hand_reset_cards+example quit_when_arranged_cards_run_out = false
+///conf+new_hand_reset_cards+example quit_when_arranged_cards_run_out = true
   conf.set(&new_hand_reset_cards, {"new_hand_reset_cards"});
 
   // read arranged cards
