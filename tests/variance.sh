@@ -22,6 +22,7 @@ if [ ! -e play.txt ]; then
   echo "error: cannot find play.txt"
   exit 1
 fi
+rm -rf report.yaml
 ../../blackjack < play.txt
 
 mean=$(yq .mean report.yaml)
