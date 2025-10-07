@@ -103,7 +103,7 @@ card_dealer_up QD
 card_dealer_up 6C
 ~~~
 
-# `card_player` $rs$ {#sec:card_player}
+# `card_player` $rs$ `[` $h$ `]` {#sec:card_player}
 
 The dealer informs that the player has been dealt a card.
 The card is given as a two-character ASCII representation where
@@ -133,15 +133,21 @@ character $s$ gives the suit.
 |    `H`    | ♥ Hearts         |
 |    `S`    | ♠ Spades         |
 
+The optional argument $h$ indicates the id of the player's hand
+being dealt. If it not present, that means the base hand.
+When performing a splitting on the base hand, the original hand
+has id equal to zero and the new hand has id equal to one.
+Subsequent splits trigger new hands with sequential ids.
+
 **Examples**
 
 ~~~
 card_player 9C 
 card_player JD 
-card_player QC 
-card_player KS 
-card_player TD
-card_player 6H 
+card_player QC
+card_player KS
+card_player TD 1
+card_player 6H 2 
 ~~~
 
 # `dealer_blackjack` {#sec:dealer_blackjack}
@@ -185,7 +191,7 @@ player_blackjack_also
 
 The dealer complains that the doubling-down request cannot be
 fulfilled. Doubling down is only possible when exactly two
-cards have been dealt in a hand and the `doa` or `da9` option is met.
+cards have been dealt in a hand and the `doa` or `do9` option is met.
 The player will receive a new `play?` message.
 
 **Examples**

@@ -12,7 +12,7 @@ CYAN="\e[0;36m"
 
 NC="\033[0m" # No Color
 
-for i in grep awk printf blackjack; do
+for i in grep awk printf; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -141,7 +141,7 @@ EOF
      cat hard.txt soft.txt pair-no.txt > bs.txt
      
      # play!
-     blackjack
+     ../../blackjack
     
      # evaluate the results
      ev[${t}${hand},${upcard},${play}]=$(grep mean ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')
@@ -340,7 +340,7 @@ EOF
     cat hard.txt soft.txt pair.txt > bs.txt
 
     # play!
-    blackjack
+    ../../blackjack
 
     # evaluate the results
     ev[${t}${hand},${upcard},${play}]=$(grep mean ${t}${hand}-${upcard}-${play}.yaml | awk '{printf("%g", $2)}')

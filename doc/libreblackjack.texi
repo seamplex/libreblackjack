@@ -3,7 +3,7 @@
 @documentencoding UTF-8
 
 @setfilename blackjack.info
-@set UPDATED 2025-09-30
+@set UPDATED 2025-10-07
 @set VERSION 
 
 @copying
@@ -31,7 +31,7 @@ Texts.  A copy of the license is included in the section entitled
 @titlepage
 @title Libre@ Blackjack
 @author Jeremy Theler
-2025-09-30
+2025-10-07
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -161,12 +161,15 @@ Do not ask for the amount to bet before starting a new hand and use a
 flat unit bet. Corresponds to the @code{flat_bet} variable in the
 configuration file.
 
-@item @code{-i} or @code{--internal}
+@end table
 
-Use the internal player to play against the dealer. See the manual for
+@code{-i} or @code{--internal} @code{-p} or @code{--progress}
+
+: Use the internal player to play against the dealer. See the manual for
 details and instructions to define the rules and optionally, the playing
-strategy and/or arranged shoes.
+strategy and/or arranged shoes. Show a progress bar.
 
+@table @asis
 @item @code{-h} or @code{--help}
 
 Print this informative help message into standard output and exit
@@ -476,13 +479,15 @@ The dealer asks the user to play, i.e.@ to choose wether to
 
 @itemize
 @item
-@code{pair} (or @code{p})
+@code{pair} (or @code{p}) or @code{split}
 @item
 @code{double} (or @code{d})
 @item
 @code{hit} (or @code{h})
 @item
 @code{stand} (or @code{s})
+@item
+@code{quit} (or @code{q})
 @end itemize
 
 given that the value of the player's hand id @math{p} and that the value
@@ -549,7 +554,7 @@ can be ignored.
 * @code{card_dealer} @math{rs}::
 * @code{card_dealer_hole} @math{rs}::
 * @code{card_dealer_up} @math{rs}::
-* @code{card_player} @math{rs}::
+* @code{card_player} @math{rs} @code{[} @math{h} @code{]}::
 * @code{dealer_blackjack}::
 * @code{new_hand} @math{n} @math{b}::
 * @code{player_blackjack_also}::
@@ -646,8 +651,8 @@ card_dealer_up QD
 card_dealer_up 6C
 @end verbatim
 
-@node @code{card_player} @math{rs}
-@subsubsection @code{card_player} @math{rs}
+@node @code{card_player} @math{rs} @code{[} @math{h} @code{]}
+@subsubsection @code{card_player} @math{rs} @code{[} @math{h} @code{]}
 The dealer informs that the player has been dealt a card. The card is
 given as a two-character ASCII representation where the first
 character@ @math{r} indicates the rank and the second
@@ -716,15 +721,21 @@ Character
  @tab ♠ Spades
 @end multitable
 
+The optional argument @math{h} indicates the id of the player's hand
+being dealt. If it not present, that means the base hand. When
+performing a splitting on the base hand, the original hand has id equal
+to zero and the new hand has id equal to one. Subsequent splits trigger
+new hands with sequential ids.
+
 @strong{Examples}
 
 @verbatim
 card_player 9C 
 card_player JD 
-card_player QC 
-card_player KS 
-card_player TD
-card_player 6H 
+card_player QC
+card_player KS
+card_player TD 1
+card_player 6H 2 
 @end verbatim
 
 @node @code{dealer_blackjack}
@@ -768,7 +779,7 @@ player_blackjack_also
 @subsubsection @code{player_double_invalid}
 The dealer complains that the doubling-down request cannot be fulfilled.
 Doubling down is only possible when exactly two cards have been dealt in
-a hand and the @code{doa} or @code{da9} option is met. The player will
+a hand and the @code{doa} or @code{do9} option is met. The player will
 receive a new @code{play?} message.
 
 @strong{Examples}
@@ -938,15 +949,33 @@ decks = 1             # number of decks, negative means infinite
 @item
 @code{dealer} (sec.@ 4.1.1)
 @item
-@code{max_incorrect_commands} (sec.@ 4.1.2)
+@code{decks} (sec.@ 4.1.2)
 @item
-@code{player} (sec.@ 4.1.3)
+@code{flat_bet} (sec.@ 4.1.3)
+@item
+@code{hands} (sec.@ 4.1.4)
+@item
+@code{maximum_bet} (sec.@ 4.1.5)
+@item
+@code{max_incorrect_commands} (sec.@ 4.1.6)
+@item
+@code{no_insurance} (sec.@ 4.1.7)
+@item
+@code{player} (sec.@ 4.1.8)
+@item
+@code{rules} (sec.@ 4.1.9)
 @end itemize
 
 @menu
 * @code{dealer =} @emph{game}::
+* @code{decks =} @math{n}::
+* @code{flat_bet =} @math{b}::
+* @code{hands =} @math{n}::
+* @code{maximum_bet =} @math{n}::
 * @code{max_incorrect_commands =} @math{n}::
+* @code{no_insurance =} @math{b}::
 * @code{player =} @emph{player}::
+* @code{rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]}::
 @end menu
 
 @node @code{dealer =} @emph{game}
@@ -962,6 +991,74 @@ is @code{blackjack}.
 dealer = blackjack
 @end verbatim
 
+@node @code{decks =} @math{n}
+@subsection @code{decks =} @math{n}
+Sets the number of decks used in the game. If @math{n} is zero, the
+program draws cards from an infinte set. For a finite @math{n}, the
+cards are drawn from a shoe.
+
+@strong{Default} @math{0}
+
+@strong{Examples}
+
+@verbatim
+decks = 1
+decks = 2
+decks = 8
+@end verbatim
+
+@node @code{flat_bet =} @math{b}
+@subsection @code{flat_bet =} @math{b}
+Tells both the dealer and the player that the betting scheme is flat or
+not. The dealer will not ask for bets and the internal player, if asked,
+always says @code{1}. The value can be either @code{false} or
+@code{true} or @code{0} or @code{1}.
+
+@strong{Default} @math{false}
+
+@strong{Examples}
+
+@verbatim
+flat_bet = false
+flat_bet = true
+flat_bet = 1
+@end verbatim
+
+@node @code{hands =} @math{n}
+@subsection @code{hands =} @math{n}
+Sets the number of hands to play before quiting. If @math{n} is zero,
+the program keeps playing until it receives the command @code{quit}.
+Otherwise it plays @math{n} hands and quits. This parameter can be set
+on the command line with the option @code{-n}@math{n} or
+@code{--hands=}@math{n}.
+
+@strong{Default} @math{0}
+
+@strong{Examples}
+
+@verbatim
+hands = 1
+hands = 1000000
+hands = 1e6
+@end verbatim
+
+@node @code{maximum_bet =} @math{n}
+@subsection @code{maximum_bet =} @math{n}
+Sets a limit on the size of the bet. If a bet larger than the limit is
+placed, the dealer answers @code{bet_maximum} and asks again. A value of
+0 means no limit. This is only useful when modeling variable-betting
+schemes.
+
+@strong{Default} @math{0}
+
+@strong{Examples}
+
+@verbatim
+maximum_bet = 0
+maximum_bet = 1
+maximum_bet = 20
+@end verbatim
+
 @node @code{max_incorrect_commands =} @math{n}
 @subsection @code{max_incorrect_commands =} @math{n}
 Tells the dealer how many consecutive incorrect or invalid commands to
@@ -975,6 +1072,22 @@ or that are not valid (such as doubling when not allowed).
 
 @verbatim
 max_incorrect_commands = 20
+@end verbatim
+
+@node @code{no_insurance =} @math{b}
+@subsection @code{no_insurance =} @math{b}
+If @math{b} is @code{true}, the dealer will not ask for insurance and
+assume the player will never take it when the dealer shows an ace. The
+value can be either @code{false} or @code{true} or @code{0} or @code{1}.
+
+@strong{Default} @math{false}
+
+@strong{Examples}
+
+@verbatim
+no_insurance = false
+no_insurance = true
+no_insurance = 1
 @end verbatim
 
 @node @code{player =} @emph{player}
@@ -1015,6 +1128,56 @@ If at least one of them is re-directed or piped, the default is
 player = tty
 player = stdio
 player = internal
+@end verbatim
+
+@node @code{rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]}
+@subsection @code{rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]}
+Defines the rules of the game.
+
+@multitable {Player can double on any first two cards} {@code{doa}} {@code{ndas}} 
+@headitem 
+Rule
+ @tab Yes
+ @tab No
+@item 
+Dealer peeks for blackjack
+ @tab @code{ahc}
+ @tab @code{enhc}
+@item 
+Dealer has to hit a soft 17
+ @tab @code{h17}
+ @tab @code{s17}
+@item 
+Player can double after splitting
+ @tab @code{das}
+ @tab @code{ndas}
+@item 
+Player can double on any first two cards
+ @tab @code{doa}
+ @tab @code{do9}
+@end multitable
+
+@itemize
+@item
+When playing @code{ahc} (default), the dealer has a hole card. If the
+upcard is an ace, he checks for possible blackjack before allowing for
+the player to split nor double down. When playing @code{enhc} the dealer
+does not draw a hole card and check for blackjack after the player has
+played.
+@item
+The @code{do9} rules means that the player can only double if the first
+two cards sum up nine, ter or eleven.
+@end itemize
+
+@strong{Default} Empty, meaning @code{ahc}, @code{h17}, @code{das},
+@code{doa}.
+
+@strong{Examples}
+
+@verbatim
+rules = ahc h17 das doa
+rules = enhc s17 ndas
+rules = s17 do9
 @end verbatim
 
 @node Internal players

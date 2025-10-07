@@ -2,7 +2,7 @@
   -n<n> or --hands=n         Specify the number of hands to play. Corresponds to the hands variable in the configuration file.
   -d<n> or --decks=n         Specify the number of decks to use in the shoe. Corresponds to the decks variable in the configuration file.
   -f or --flatbet            Do not ask for the amount to bet before starting a new hand and use a flat unit bet. Corresponds to the flat_bet variable in the configuration file.
-  -i or --internal           Use the internal player to play against the dealer. See the manual for details and instructions to define the rules and optionally, the playing strategy and/or arranged shoes.
+  -i or --internal -p or --progressUse the internal player to play against the dealer. See the manual for details and instructions to define the rules and optionally, the playing strategy and/or arranged shoes. Show a progress bar.
   -h or --help               Print this informative help message into standard output and exit successfully.
   -v or --version            Print the version number and licensing information into standard output and then exit successfully.
   --configuration_variable[=value]Any configuration variable from the configuration file can be set from the command line. For example, passing --no_insurance is like setting no_insurance = 1 in the configuration file. Command-line options override setting in the configuration file.

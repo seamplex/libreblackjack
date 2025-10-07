@@ -6,7 +6,7 @@ echo "informative messages"
 ./reference.sh ../src/players/stdinout.cpp inf > commands-inf.md
 
 echo "configuration"
-./reference.sh ../src/conf.cpp conf > conf.md
+./reference.sh "../src/conf.cpp ../src/blackjack.cpp ../src/players/stdinout.cpp" conf > conf.md
 
 
 

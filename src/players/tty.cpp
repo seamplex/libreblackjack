@@ -50,7 +50,8 @@ Tty::Tty(Configuration &conf) : Player(conf) {
   conf.set(&delay, {"delay"});  
 
   if (commands.size() == 0) {
-//    commands.push_back("help");
+    commands.push_back("help");
+    commands.push_back("rules");
     commands.push_back("hit");
     commands.push_back("stand");
     commands.push_back("double");
@@ -251,8 +252,18 @@ void Tty::info(lbj::Info msg, int p1, int p2) {
       s = "Dealer busts with " + std::to_string(p1);
     break;  
     
+    case lbj::Info::Rules:
+      s = rules;
+    break;
+    
     case lbj::Info::Help:
-      std::cout << "help yourself" << std::endl;        
+      std::cout << "When asked for play, give either" << std::endl;        
+      std::cout << " * pair   (or 'p')" << std::endl;        
+      std::cout << " * double (or 'd')" << std::endl;        
+      std::cout << " * hit    (or 'h')" << std::endl;        
+      std::cout << " * stand  (or 's')" << std::endl;        
+      std::cout << " * rules  (or 'r')" << std::endl;        
+      std::cout << " * quit   (or 'q')" << std::endl;        
     break;
 
     case lbj::Info::Bankroll:
@@ -342,6 +353,8 @@ int Tty::play() {
   // check common commands first
          if (command == "quit" || command == "q") {
     actionTaken = lbj::PlayerActionTaken::Quit;
+  } else if (command == "rules") {
+    actionTaken = lbj::PlayerActionTaken::Rules;
   } else if (command == "help") {
     actionTaken = lbj::PlayerActionTaken::Help;
   } else if (command == "upcard" || command == "u") {

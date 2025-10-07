@@ -738,9 +738,15 @@ int Blackjack::process(void) {
       return 0;
     break;  
 
-///ig+bankroll+name help
-///ig+bankroll+desc Ask for help
-///ig+bankroll+detail Ask for the bankroll.
+///ig+rules+name rules
+///ig+rules+desc Ask what the current rules are
+    case lbj::PlayerActionTaken::Rules:
+      info(lbj::Info::Rules);  
+      return 0;
+    break;  
+    
+///ig+bankroll+name bankroll
+///ig+bankroll+desc Ask for the player’s current bankroll
     case lbj::PlayerActionTaken::Bankroll:
       info(lbj::Info::Bankroll, 1e3*playerStats.bankroll);  
       return 0;

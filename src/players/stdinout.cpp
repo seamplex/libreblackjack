@@ -176,7 +176,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_dealer+example card_dealer 5D
 ///inf+card_dealer+example card_dealer 5H
 ///inf+card_dealer+example card_dealer QH
-      s = "card_dealer " + card[p1].ascii();;
+      s = "card_dealer " + card[p1].ascii();
     break;
 
     case lbj::Info::CardDealerRevealsHole:
@@ -191,7 +191,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_dealer_hole+example card_dealer_hole 4H
 ///inf+card_dealer_hole+example card_dealer_hole 5D
 ///inf+card_dealer_hole+example card_dealer_hole 7H
-      s = "card_dealer_hole " + card[p1].ascii();;
+      s = "card_dealer_hole " + card[p1].ascii();
 //      *(++(dealerHand.cards.begin())) = p1;
 //      currentHandId = 0;
     break;
@@ -257,7 +257,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
     break;
     
     case lbj::Info::PlayerPushes:
-      s = "player_pushes " + std::to_string(value_player) + " " + std::to_string(value_dealer);;
+      s = "player_pushes " + std::to_string(value_player) + " " + std::to_string(value_dealer);
     break;
     
     case lbj::Info::PlayerLosses:
@@ -267,7 +267,7 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
       s = "blackjack_player";
     break;
     case lbj::Info::PlayerWins:
-      s = "player_wins " + std::to_string(value_player) + " " + std::to_string(value_dealer);;
+      s = "player_wins " + std::to_string(value_player) + " " + std::to_string(value_dealer);
     break;
     
     case lbj::Info::NoBlackjacks:
@@ -275,16 +275,15 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
     break;
 
     case lbj::Info::DealerBusts:
-      s = "dealer_busts " + std::to_string(value_player) + " " + std::to_string(value_dealer);;
+      s = "dealer_busts " + std::to_string(value_player) + " " + std::to_string(value_dealer);
     break;  
     
-    case lbj::Info::Help:
-      // TODO: help
-      std::cout << "help yourself" << std::endl;        
+    case lbj::Info::Rules:
+      s = rules;
     break;
 
     case lbj::Info::Bankroll:
-      std::cout << "bankroll " << std::to_string(1e-3*p1) << std::endl;        
+      s = "bankroll " + std::to_string(1e-3*p1);
     break;
     
     
@@ -373,6 +372,8 @@ int StdInOut::play(void) {
   // check common commands first
          if (command == "quit" || command == "q") {
     actionTaken = lbj::PlayerActionTaken::Quit;
+  } else if (command == "rules") {
+    actionTaken = lbj::PlayerActionTaken::Rules;
   } else if (command == "help") {
     actionTaken = lbj::PlayerActionTaken::Help;
   } else if (command == "upcard" || command == "u") {

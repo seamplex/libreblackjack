@@ -1,8 +1,10 @@
 for dir in */; do
   if [ -d "${dir}" ]; then
-    echo "$dir"
-    cd "${dir}"
-    ./run.sh
-    cd ..
+    if [ -e "${dir}/run.sh" ]; then
+      echo "$dir"
+      cd "${dir}"
+      ./run.sh
+      cd ..
+    fi
   fi
 done

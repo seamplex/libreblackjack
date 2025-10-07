@@ -1,7 +1,13 @@
 
 * `dealer` (@sec:dealer)
+* `decks` (@sec:decks)
+* `flat_bet` (@sec:flat_bet)
+* `hands` (@sec:hands)
+* `maximum_bet` (@sec:maximum_bet)
 * `max_incorrect_commands` (@sec:max_incorrect_commands)
+* `no_insurance` (@sec:no_insurance)
 * `player` (@sec:player)
+* `rules` (@sec:rules)
 
 
 # `dealer = ` *game* {#sec:dealer}
@@ -18,6 +24,76 @@ Currently, the only valid choice is `blackjack`.
 dealer = blackjack
 ~~~
 
+# `decks = ` $n$ {#sec:decks}
+
+Sets the number of decks used in the game.
+If $n$ is zero, the program draws cards from an infinte set.
+For a finite $n$, the cards are drawn from a shoe.
+
+**Default**
+$0$
+
+**Examples**
+
+~~~
+decks = 1
+decks = 2
+decks = 8
+~~~
+
+# `flat_bet = ` $b$ {#sec:flat_bet}
+
+Tells both the dealer and the player that the betting scheme is flat or not.
+The dealer will not ask for bets and the internal player, if asked, always says `1`.
+The value can be either `false` or `true` or `0` or `1`.
+
+**Default**
+$false$
+
+**Examples**
+
+~~~
+flat_bet = false
+flat_bet = true
+flat_bet = 1
+~~~
+
+# `hands = ` $n$ {#sec:hands}
+
+Sets the number of hands to play before quiting.
+If $n$ is zero, the program keeps playing until it receives the command `quit`.
+Otherwise it plays $n$ hands and quits.
+This parameter can be set on the command line with the option `-n`$n$ or `--hands=`$n$.
+
+**Default**
+$0$
+
+**Examples**
+
+~~~
+hands = 1
+hands = 1000000
+hands = 1e6
+~~~
+
+# `maximum_bet = ` $n$ {#sec:maximum_bet}
+
+Sets a limit on the size of the bet.
+If a bet larger than the limit is placed, the dealer answers
+`bet_maximum` and asks again. A value of 0 means no limit.
+This is only useful when modeling variable-betting schemes.
+
+**Default**
+$0$
+
+**Examples**
+
+~~~
+maximum_bet = 0
+maximum_bet = 1
+maximum_bet = 20
+~~~
+
 # `max_incorrect_commands = ` $n$ {#sec:max_incorrect_commands}
 
 Tells the dealer how many consecutive incorrect or invalid commands to accept before quitting.
@@ -31,6 +107,23 @@ that do not make sense (such as garbage) or that are not valid (such as doubling
 
 ~~~
 max_incorrect_commands = 20
+~~~
+
+# `no_insurance = ` $b$ {#sec:no_insurance}
+
+If $b$ is `true`, the dealer will not ask for insurance and assume
+the player will never take it when the dealer shows an ace.
+The value can be either `false` or `true` or `0` or `1`.
+
+**Default**
+$false$
+
+**Examples**
+
+~~~
+no_insurance = false
+no_insurance = true
+no_insurance = 1
 ~~~
 
 # `player =  ` *player* {#sec:player}
@@ -61,6 +154,37 @@ If at least one of them is re-directed or piped, the default is `stdio`.
 player = tty
 player = stdio
 player = internal
+~~~
+
+# `rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]` {#sec:rules}
+
+Defines the rules of the game.
+
+| Rule                                     |   Yes   |   No    |
+|:-----------------------------------------|:-------:|:-------:|
+| Dealer peeks for blackjack               |  `ahc`  |  `enhc` |
+| Dealer has to hit a soft 17              |  `h17`  |  `s17`  |
+| Player can double after splitting        |  `das`  |  `ndas` |
+| Player can double on any first two cards |  `doa`  |  `do9`  |
+
+ * When playing `ahc` (default), the dealer has a hole card.
+ If the upcard is an ace, he checks for possible blackjack before
+ allowing for the player to split nor double down.
+ When playing `enhc` the dealer does not draw a hole card and
+ check for blackjack after the player has played.
+ * The `do9` rules means that the player can only double if the
+ first two cards sum up nine, ter or eleven.
+
+
+**Default**
+Empty, meaning `ahc`, `h17`, `das`, `doa`.
+
+**Examples**
+
+~~~
+rules = ahc h17 das doa
+rules = enhc s17 ndas
+rules = s17 do9
 ~~~
 
 

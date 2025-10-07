@@ -58,6 +58,7 @@ namespace lbj {
   // common  
     Quit,
     Help,
+    Rules,
     UpcardValue,
     Bankroll,
     Hands,
@@ -96,6 +97,7 @@ namespace lbj {
     NoBlackjacks,
     DealerBusts,
     Bankroll,
+    Rules,
     Help,
     CommandInvalid,
     Bye,
@@ -207,6 +209,9 @@ class Player {
     lbj::PlayerActionRequired actionRequired = lbj::PlayerActionRequired::None;
     lbj::PlayerActionTaken    actionTaken    = lbj::PlayerActionTaken::None;
 
+    // TODO: getters and setters
+    std::string rules;
+    
     bool verbose = false;
     bool flat_bet = false;
     bool no_insurance = false;

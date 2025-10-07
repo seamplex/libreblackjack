@@ -25,6 +25,7 @@
 #include "conf.h"
 #include "dealer.h"
 #include "blackjack.h"
+
 #include "players/tty.h"
 #include "players/stdinout.h"
 #include "players/basic.h"
@@ -85,6 +86,8 @@ int main(int argc, char **argv) {
     std::cerr << "error: unknown player '" << player_name <<"'" << std::endl;
     return 1;
   }
+  // tell the player what the rules are
+  player->rules = dealer->rules();
 
   // complain if there are configuration options which are not used
   if (conf.checkUsed() != 0) {

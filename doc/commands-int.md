@@ -33,10 +33,11 @@ insurance?
 
 The dealer asks the user to play, i.e. to choose wether to
 
- * `pair` (or `p`)
+ * `pair` (or `p`) or `split`
  * `double` (or `d`)
  * `hit` (or `h`)
  * `stand` (or `s`)
+ * `quit` (or `q`)
 
 given that the value of the player's hand id $p$ and that the value of the dealer's hand is $d$,
 where $p$ and $d$ are integers. If $p$ is negative, the hand is soft with a value equal to $|p|$.

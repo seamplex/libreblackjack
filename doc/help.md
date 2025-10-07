@@ -24,9 +24,11 @@ Corresponds to the `flat_bet` variable in the configuration file.
 
 
 `-i` or `--internal`
+`-p` or `--progress`
 
 :    Use the internal player to play against the dealer. See the manual for details
 and instructions to define the rules and optionally, the playing strategy and/or arranged shoes.
+Show a progress bar.
 
 
 `-h` or `--help`
