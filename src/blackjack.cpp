@@ -214,11 +214,36 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 ///conf+new_hand_reset_cards+details and different hitting/standing strategies to compare outcomes.
 ///conf+new_hand_reset_cards+details If the actual dealt cards are not important but only reproducibility, it is easier to fix `rng_seed`.
 ///conf+new_hand_reset_cards+default `true`
-///conf+new_hand_reset_cards+example quit_when_arranged_cards_run_out = false
-///conf+new_hand_reset_cards+example quit_when_arranged_cards_run_out = true
+///conf+new_hand_reset_cards+example new_hand_reset_cards = false
+///conf+new_hand_reset_cards+example new_hand_reset_cards = true
   conf.set(&new_hand_reset_cards, {"new_hand_reset_cards"});
 
   // read arranged cards
+///conf+cards+usage `cards = ` $\text{list of cards}
+///conf+cards+details If this option is given, the dealer draws the cards specified on the list.
+///conf+cards+details In the first hand, the order of the dealt cards
+///conf+cards+details @
+///conf+cards+details  1. Player’s first card
+///conf+cards+details  2. Dealer’s first card
+///conf+cards+details  3. Player’s second card
+///conf+cards+details  4. ...
+///conf+cards+details @
+///conf+cards+details where the ellipsis dots indicate continuation of the game (i.e. dealer's hole card for `ahc` or player’s hit card for `enhc).
+///conf+cards+details @
+///conf+cards+details These cards will be the ones specified on the list in the prescribed order.
+///conf+cards+details Each card is given by a two-character string, explained in @tbl:rank and @tbl:suit respectively.
+///conf+cards+details Cards should be separated by spaces.  
+///conf+cards+details @
+///conf+cards+details The dealer will continue drawing from the list of arranged cards until either
+///conf+cards+details @
+///conf+cards+details   a. there are no more cards in the list, in which case the dealer will continue drawing cards from either
+///conf+cards+details     i. a shoe with the already-dealt cards removed, if `decks` is non-zero, or
+///conf+cards+details     ii. a set of infinite cards , if `decks` is zero.
+///conf+cards+details   b. the hand is over and `new_hand_reset_cards` is `true`, or
+///conf+cards+details   c. `quit_when_arranged_cards_run_out` is true, in which case the program exits.
+///conf+cards+default Empty list
+///conf+cards+example cards = TH JD 6C
+///conf+cards+example cards = 2S 5D QS Ac
   if (conf.exists("cards")) {
     if (conf.exists("cards_file")) {
       std::cerr << "error: cannot have both cards and cards_file" << std::endl;
