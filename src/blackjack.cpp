@@ -219,7 +219,7 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
   conf.set(&new_hand_reset_cards, {"new_hand_reset_cards"});
 
   // read arranged cards
-///conf+cards+usage `cards = ` $\text{list of cards}
+///conf+cards+usage `cards = ` $\text{list of cards}$
 ///conf+cards+details If this option is given, the dealer draws the cards specified on the list.
 ///conf+cards+details In the first hand, the order of the dealt cards
 ///conf+cards+details @
@@ -243,7 +243,8 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 ///conf+cards+details   c. `quit_when_arranged_cards_run_out` is true, in which case the program exits.
 ///conf+cards+default Empty list
 ///conf+cards+example cards = TH JD 6C
-///conf+cards+example cards = 2S 5D QS Ac
+///conf+cards+example cards = 2S 5D QS AC
+///conf+cards+example cards = 8D QH TC 2C KD 7S 8S TD AH 5C
   if (conf.exists("cards")) {
     if (conf.exists("cards_file")) {
       std::cerr << "error: cannot have both cards and cards_file" << std::endl;
@@ -256,6 +257,13 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
     conf.markUsed("cards");
   }
 
+///conf+cards_file+usage `cards_file = ` $\text{path to file}$
+///conf+cards_file+details This option is exactly the same as `cards` but the cards are given in a text file instead 
+///conf+cards_file+details of directly in the configuration file.
+///conf+cards_file+default No path
+///conf+cards_file+example cards_file = cards.txt
+///conf+cards_file+example cards_file = ../arranged_cards.txt
+///conf+cards_file+example cards = /var/games/cards.txt
   if (conf.exists("cards_file")) {
     if (conf.exists("cards")) {
       std::cerr << "error: cannot have both cards and cards_file" << std::endl;
@@ -276,9 +284,18 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
     }
     conf.markUsed("cards_file");
   }
-
   n_arranged_cards = arranged_cards.size();
 
+///conf+rng_seed+usage `rng_seed = ` $n$
+///conf+rng_seed+details This option sets the seed of the random number generator used by the dealer to draw cards.
+///conf+rng_seed+details This is used to get deterministic results. That is to say, the cards draw by two dealers using
+///conf+rng_seed+details the same seed (and the same number of decks) will be the same.
+///conf+rng_seed+details It is not possible to guess what the cards will be given a certain seed $n$.
+///conf+rng_seed+details But the cards will be the same for two executions of the program with the same seed $n$.
+///conf+rng_seed+details If this option is not set, the seed itself is as random as possible.
+///conf+rng_seed+default Entropic non-deterministic random seed from C++'s `std::random_device` (most likely `/dev/random`).
+///conf+rng_seed+example rng_seed = 1
+///conf+rng_seed+example rng_seed = 123456
   bool explicit_seed = conf.set(&rng_seed, {"rng_seed", "seed"});
   if (explicit_seed) {
     rng = std::mt19937(rng_seed);

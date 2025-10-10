@@ -3,7 +3,7 @@
 @documentencoding UTF-8
 
 @setfilename blackjack.info
-@set UPDATED 2025-10-07
+@set UPDATED 2025-10-10
 @set VERSION 
 
 @copying
@@ -31,7 +31,7 @@ Texts.  A copy of the license is included in the section entitled
 @titlepage
 @title Libre@ Blackjack
 @author Jeremy Theler
-2025-10-07
+2025-10-10
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -658,6 +658,7 @@ given as a two-character ASCII representation where the first
 character@ @math{r} indicates the rank and the second
 character@ @math{s} gives the suit.
 
+@float Table
 @multitable {Character} {Queen} 
 @headitem 
 Character
@@ -702,7 +703,9 @@ Character
 @code{J}
  @tab King
 @end multitable
-
+@caption{Table 1: Rank (first) character of a card}
+@end float
+@float Table
 @multitable {Character} {♦ Diamonds} 
 @headitem 
 Character
@@ -720,7 +723,8 @@ Character
 @code{S}
  @tab ♠ Spades
 @end multitable
-
+@caption{Table 2: Suit (second) character of a card}
+@end float
 The optional argument @math{h} indicates the id of the player's hand
 being dealt. If it not present, that means the base hand. When
 performing a splitting on the base hand, the original hand has id equal
@@ -949,39 +953,47 @@ decks = 1             # number of decks, negative means infinite
 @item
 @code{blackjack_pays} (sec.@ 4.1.1)
 @item
-@code{dealer} (sec.@ 4.1.2)
+@code{cards} (sec.@ 4.1.2)
 @item
-@code{decks} (sec.@ 4.1.3)
+@code{cards_file} (sec.@ 4.1.3)
 @item
-@code{flat_bet} (sec.@ 4.1.4)
+@code{dealer} (sec.@ 4.1.4)
 @item
-@code{hands} (sec.@ 4.1.5)
+@code{decks} (sec.@ 4.1.5)
 @item
-@code{maximum_bet} (sec.@ 4.1.6)
+@code{flat_bet} (sec.@ 4.1.6)
 @item
-@code{max_incorrect_commands} (sec.@ 4.1.7)
+@code{hands} (sec.@ 4.1.7)
 @item
-@code{new_hand_reset_cards} (sec.@ 4.1.8)
+@code{maximum_bet} (sec.@ 4.1.8)
 @item
-@code{no_insurance} (sec.@ 4.1.9)
+@code{max_incorrect_commands} (sec.@ 4.1.9)
 @item
-@code{number_of_burnt_cards} (sec.@ 4.1.10)
+@code{new_hand_reset_cards} (sec.@ 4.1.10)
 @item
-@code{penetration} (sec.@ 4.1.11)
+@code{no_insurance} (sec.@ 4.1.11)
 @item
-@code{penetration_sigma} (sec.@ 4.1.12)
+@code{number_of_burnt_cards} (sec.@ 4.1.12)
 @item
-@code{player} (sec.@ 4.1.13)
+@code{penetration} (sec.@ 4.1.13)
 @item
-@code{quit_when_arranged_cards_run_out} (sec.@ 4.1.14)
+@code{penetration_sigma} (sec.@ 4.1.14)
 @item
-@code{rules} (sec.@ 4.1.15)
+@code{player} (sec.@ 4.1.15)
 @item
-@code{shuffle_every_hand} (sec.@ 4.1.16)
+@code{quit_when_arranged_cards_run_out} (sec.@ 4.1.16)
+@item
+@code{rng_seed} (sec.@ 4.1.17)
+@item
+@code{rules} (sec.@ 4.1.18)
+@item
+@code{shuffle_every_hand} (sec.@ 4.1.19)
 @end itemize
 
 @menu
 * @code{blackjack_pays =} @math{r}::
+* @code{cards =} @math{\text{list of cards}}::
+* @code{cards_file =} @math{\text{path to file}}::
 * @code{dealer =} @emph{game}::
 * @code{decks =} @math{n}::
 * @code{flat_bet =} @math{b}::
@@ -995,6 +1007,7 @@ decks = 1             # number of decks, negative means infinite
 * @code{penetration_sigma =} @math{r}::
 * @code{player =} @emph{player}::
 * @code{quit_when_arranged_cards_run_out =} @math{b}::
+* @code{rng_seed =} @math{n}::
 * @code{rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]}::
 * @code{shuffle_every_hand =} @math{b}::
 @end menu
@@ -1011,6 +1024,71 @@ decimal number such as @code{1.5} or @code{1.2}.
 @verbatim
 blackjack_pays = 1.5
 blackjack_pays = 1.2
+@end verbatim
+
+@node @code{cards =} @math{\text{list of cards}}
+@subsection @code{cards =} @math{\text{list of cards}}
+If this option is given, the dealer draws the cards specified on the
+list. In the first hand, the order of the dealt cards
+
+@enumerate 
+@item
+Player's first card
+@item
+Dealer's first card
+@item
+Player's second card
+@item
+@dots{}
+@end enumerate
+
+where the ellipsis dots indicate continuation of the game
+(i.e.@ dealer's hole card for @code{ahc} or player's hit card for
+`enhc).
+
+These cards will be the ones specified on the list in the prescribed
+order. Each card is given by a two-character string, explained in
+tbl.@ 1 and tbl.@ 2 respectively. Cards should be separated by spaces.
+
+The dealer will continue drawing from the list of arranged cards until
+either
+
+@enumerate a
+@item
+there are no more cards in the list, in which case the dealer will
+continue drawing cards from either i. a shoe with the already-dealt
+cards removed, if @code{decks} is non-zero, or ii. a set of infinite
+cards , if @code{decks} is zero.
+@item
+the hand is over and @code{new_hand_reset_cards} is @code{true}, or
+@item
+@code{quit_when_arranged_cards_run_out} is true, in which case the
+program exits.
+@end enumerate
+
+@strong{Default} Empty list
+
+@strong{Examples}
+
+@verbatim
+cards = TH JD 6C
+cards = 2S 5D QS AC
+cards = 8D QH TC 2C KD 7S 8S TD AH 5C
+@end verbatim
+
+@node @code{cards_file =} @math{\text{path to file}}
+@subsection @code{cards_file =} @math{\text{path to file}}
+This option is exactly the same as @code{cards} but the cards are given
+in a text file instead of directly in the configuration file.
+
+@strong{Default} No path
+
+@strong{Examples}
+
+@verbatim
+cards_file = cards.txt
+cards_file = ../arranged_cards.txt
+cards = /var/games/cards.txt
 @end verbatim
 
 @node @code{dealer =} @emph{game}
@@ -1141,8 +1219,8 @@ reproducibility, it is easier to fix @code{rng_seed}.
 @strong{Examples}
 
 @verbatim
-quit_when_arranged_cards_run_out = false
-quit_when_arranged_cards_run_out = true
+new_hand_reset_cards = false
+new_hand_reset_cards = true
 @end verbatim
 
 @node @code{no_insurance =} @math{b}
@@ -1275,6 +1353,26 @@ played. This setting only makes sense when arranging cards with either
 @verbatim
 quit_when_arranged_cards_run_out = false
 quit_when_arranged_cards_run_out = true
+@end verbatim
+
+@node @code{rng_seed =} @math{n}
+@subsection @code{rng_seed =} @math{n}
+This option sets the seed of the random number generator used by the
+dealer to draw cards. This is used to get deterministic results. That is
+to say, the cards draw by two dealers using the same seed (and the same
+number of decks) will be the same. It is not possible to guess what the
+cards will be given a certain seed@ @math{n}. But the cards will be the
+same for two executions of the program with the same seed@ @math{n}. If
+this option is not set, the seed itself is as random as possible.
+
+@strong{Default} Entropic non-deterministic random seed from C++'s
+@code{std::random_device} (most likely @code{/dev/random}).
+
+@strong{Examples}
+
+@verbatim
+rng_seed = 1
+rng_seed = 123456
 @end verbatim
 
 @node @code{rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]}

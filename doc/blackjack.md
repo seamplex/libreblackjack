@@ -247,7 +247,7 @@ The location of the configuration file can be given in the command line. If none
 > It is thus recommended to run each monte-carlo simulation that needs a particular configuration---and possibly other files such as card arrangements, strategies and/or results---in a different directory (a.k.a. folder) with a `blackjack.conf` file  in it.
 
 Individual variables can be set from the command line by passing one or more times
-the option `--configuration_variable[=value]` as explained in @sec-invocation.
+the option `--configuration_variable[=value]` as explained in @sec:invocation.
 
 Comments can be inserted using either a hash `#` or a colon `;` at any position in the line.
 The following configuration file is the default provided in the main distribution tarball:

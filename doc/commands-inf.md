@@ -125,6 +125,7 @@ character $s$ gives the suit.
 |    `J`    | Jack             |
 |    `Q`    | Queen            |
 |    `J`    | King             |
+: Rank (first) character of a card {#tbl:rank}
 
 | Character |  Suit            |
 |:---------:|------------------|
@@ -132,6 +133,7 @@ character $s$ gives the suit.
 |    `D`    | ♦ Diamonds       |
 |    `H`    | ♥ Hearts         |
 |    `S`    | ♠ Spades         |
+: Suit (second) character of a card {#tbl:suit}
 
 The optional argument $h$ indicates the id of the player's hand
 being dealt. If it not present, that means the base hand.

@@ -1,5 +1,7 @@
 
 * `blackjack_pays` (@sec:blackjack_pays)
+* `cards` (@sec:cards)
+* `cards_file` (@sec:cards_file)
 * `dealer` (@sec:dealer)
 * `decks` (@sec:decks)
 * `flat_bet` (@sec:flat_bet)
@@ -13,6 +15,7 @@
 * `penetration_sigma` (@sec:penetration_sigma)
 * `player` (@sec:player)
 * `quit_when_arranged_cards_run_out` (@sec:quit_when_arranged_cards_run_out)
+* `rng_seed` (@sec:rng_seed)
 * `rules` (@sec:rules)
 * `shuffle_every_hand` (@sec:shuffle_every_hand)
 
@@ -30,6 +33,57 @@ $1.5$
 ~~~
 blackjack_pays = 1.5
 blackjack_pays = 1.2
+~~~
+
+# `cards = ` $\text{list of cards}$ {#sec:cards}
+
+If this option is given, the dealer draws the cards specified on the list.
+In the first hand, the order of the dealt cards
+
+ 1. Player’s first card
+ 2. Dealer’s first card
+ 3. Player’s second card
+ 4. ...
+
+where the ellipsis dots indicate continuation of the game (i.e. dealer's hole card for `ahc` or player’s hit card for `enhc).
+
+These cards will be the ones specified on the list in the prescribed order.
+Each card is given by a two-character string, explained in @tbl:rank and @tbl:suit respectively.
+Cards should be separated by spaces.  
+
+The dealer will continue drawing from the list of arranged cards until either
+
+  a. there are no more cards in the list, in which case the dealer will continue drawing cards from either
+    i. a shoe with the already-dealt cards removed, if `decks` is non-zero, or
+    ii. a set of infinite cards , if `decks` is zero.
+  b. the hand is over and `new_hand_reset_cards` is `true`, or
+  c. `quit_when_arranged_cards_run_out` is true, in which case the program exits.
+
+**Default**
+Empty list
+
+**Examples**
+
+~~~
+cards = TH JD 6C
+cards = 2S 5D QS AC
+cards = 8D QH TC 2C KD 7S 8S TD AH 5C
+~~~
+
+# `cards_file = ` $\text{path to file}$ {#sec:cards_file}
+
+This option is exactly the same as `cards` but the cards are given in a text file instead 
+of directly in the configuration file.
+
+**Default**
+No path
+
+**Examples**
+
+~~~
+cards_file = cards.txt
+cards_file = ../arranged_cards.txt
+cards = /var/games/cards.txt
 ~~~
 
 # `dealer = ` *game* {#sec:dealer}
@@ -157,8 +211,8 @@ If the actual dealt cards are not important but only reproducibility, it is easi
 **Examples**
 
 ~~~
-quit_when_arranged_cards_run_out = false
-quit_when_arranged_cards_run_out = true
+new_hand_reset_cards = false
+new_hand_reset_cards = true
 ~~~
 
 # `no_insurance = ` $b$ {#sec:no_insurance}
@@ -281,6 +335,25 @@ This setting only makes sense when arranging cards with either `cards` or `cards
 ~~~
 quit_when_arranged_cards_run_out = false
 quit_when_arranged_cards_run_out = true
+~~~
+
+# `rng_seed = ` $n$ {#sec:rng_seed}
+
+This option sets the seed of the random number generator used by the dealer to draw cards.
+This is used to get deterministic results. That is to say, the cards draw by two dealers using
+the same seed (and the same number of decks) will be the same.
+It is not possible to guess what the cards will be given a certain seed $n$.
+But the cards will be the same for two executions of the program with the same seed $n$.
+If this option is not set, the seed itself is as random as possible.
+
+**Default**
+Entropic non-deterministic random seed from C++'s `std::random_device` (most likely `/dev/random`).
+
+**Examples**
+
+~~~
+rng_seed = 1
+rng_seed = 123456
 ~~~
 
 # `rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]` {#sec:rules}

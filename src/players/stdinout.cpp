@@ -129,19 +129,17 @@ void StdInOut::info(lbj::Info msg, int p1, int p2) {
 ///inf+card_player+details |    `J`    | Jack             |
 ///inf+card_player+details |    `Q`    | Queen            |
 ///inf+card_player+details |    `J`    | King             |
+///inf+card_player+details : Rank (first) character of a card {#tbl:rank}
 ///inf+card_player+details @
-///inf+card_player+details : #tbl:rank Valid rank (first) character
-      
 ///inf+card_player+details | Character |  Suit            |
 ///inf+card_player+details |:---------:|------------------|
 ///inf+card_player+details |    `C`    | ♣ Clubs          |
 ///inf+card_player+details |    `D`    | ♦ Diamonds       |
 ///inf+card_player+details |    `H`    | ♥ Hearts         |
 ///inf+card_player+details |    `S`    | ♠ Spades         |
+///inf+card_player+details : Suit (second) character of a card {#tbl:suit}
 ///inf+card_player+details @
-///inf+card_player+details : #tbl:suit Valid suit (second) character
-///inf+card_player+details @
-///inf+card_player+details The optional argument $h$ indicates the id of the player's hand
+///inf+card_player+details The optional argument $h$ indicates the id of the player's hand
 ///inf+card_player+details being dealt. If it not present, that means the base hand.
 ///inf+card_player+details When performing a splitting on the base hand, the original hand
 ///inf+card_player+details has id equal to zero and the new hand has id equal to one.
