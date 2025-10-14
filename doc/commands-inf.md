@@ -135,7 +135,7 @@ character $s$ gives the suit.
 |    `S`    | ♠ Spades         |
 : Suit (second) character of a card {#tbl:suit}
 
-The optional argument $h$ indicates the id of the player's hand
+The optional argument $h$ indicates the id of the player's hand
 being dealt. If it not present, that means the base hand.
 When performing a splitting on the base hand, the original hand
 has id equal to zero and the new hand has id equal to one.

@@ -24,11 +24,14 @@ Corresponds to the `flat_bet` variable in the configuration file.
 
 
 `-i` or `--internal`
-`-p` or `--progress`
 
 :    Use the internal player to play against the dealer. See the manual for details
 and instructions to define the rules and optionally, the playing strategy and/or arranged shoes.
-Show a progress bar.
+
+
+`-p` or `--progress`
+
+:    Show a progress bar when playing a fixed number of hands.
 
 
 `-h` or `--help`
@@ -50,6 +53,5 @@ Command-line options override setting in the configuration file.
 
 If no configuration file is given, a file named `blackjack.conf`
 in the current directory is used, provided it exists.
-
 See the full documentation for the available options and the default values.
 

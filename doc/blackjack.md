@@ -86,15 +86,93 @@ Proper quotation migh be needed if the value contains spaces. For example,
 blackjack --internal --cards="TH JS 6D"
 ```
 
-With no command-line options and no configuration file, `blackjack` starts in interactive mode and it is ready to start a blackjack game (see @sec:interactive for details).
+With no command-line options and no configuration file, `blackjack` starts in interactive mode and it is ready to start an ASCII blackjack game (see @sec:interactive).
 
 ## Results {#sec:results}
 
-TBD
+Before exiting, the program prints a summary of the results in YAML format:
 
-In YAML
+```terminal
+---
+result: "(-0.8 ± 0.3)"
+rules: "ahc h17 das doa 3rsp 0decks"
+mean: -0.008237
+error: 0.00348378
+hands: 1e+06
+bankroll: -8237
+busts_player: 0.139315
+busts_dealer: 0.239251
+wins: 0.447443
+pushes: 0.086111
+losses: 0.495896
+total_money_waged: 1.13708e+06
+blackjacks_player: 0.047392
+blackjacks_dealer: 0.047318
+variance: 1.34853
+deviation: 1.16126
+...
+```
 
-`yq`
+By default, the results are written in the standard error, as the standard output is typically used to send dealer's messages to the player.
+Therefore, if you are not using stdout (e.g. because you used the internal player `-i`) and want to use the results with Unix pipes, you have to redirect the standard error to the standard output:
+
+```terminal
+$ blackjack -i 2>&1 | yq .
+{
+  "result": "(-0.8 ± 0.3)",
+  "rules": "ahc h17 das doa 3rsp 0decks",
+  "mean": -0.007579,
+  "error": 0.00348416,
+  "hands": 1000000.0,
+  "bankroll": -7579,
+  "busts_player": 0.139308,
+  "busts_dealer": 0.239262,
+  "wins": 0.447834,
+  "pushes": 0.085761,
+  "losses": 0.495561,
+  "total_money_waged": 1136900.0,
+  "blackjacks_player": 0.047427,
+  "blackjacks_dealer": 0.047433,
+  "variance": 1.34882,
+  "deviation": 1.16139
+}
+```
+
+The YAML results can be written to a file by setting the variable `report` in the configuration file, where `stdout` is a valid file name.
+So the redirection above can be also performed as
+
+```terminal
+$ blackjack -i --report=stdout | yq .
+{
+  "result": "(-0.9 ± 0.3)",
+  "rules": "ahc h17 das doa 3rsp 0decks",
+  "mean": -0.00889,
+  "error": 0.00348549,
+  "hands": 1000000.0,
+  "bankroll": -8890,
+  "busts_player": 0.139248,
+  "busts_dealer": 0.239346,
+  "wins": 0.447292,
+  "pushes": 0.085985,
+  "losses": 0.495988,
+  "total_money_waged": 1136880.0,
+  "blackjacks_player": 0.047253,
+  "blackjacks_dealer": 0.047674,
+  "variance": 1.34985,
+  "deviation": 1.16183
+}
+```
+
+## Progress
+
+If the number of played hands exceeds a couple dozen million, one might want to track the progress.
+In that case, pass the option `-p` (or `--progress`) to get an ASCII progress bar in the standard error (remember standard output is used to play blackack).
+
+
+```terminal
+$ blackjack -i --progress
+[==================>                               ] 36 %
+```
 
 ## Interactive game {#sec:interactive}
 

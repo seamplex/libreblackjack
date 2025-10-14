@@ -25,7 +25,7 @@ namespace lbj {
 Dealer::Dealer(Configuration &conf) {
     
   conf.set(&error_standard_deviations, {"error_standard_deviations"});
-  conf.set(report_file_path, {"report_file_path", "report_file", "report"});
+  conf.set(report_file_path, {"report", "report_file", "report_file_path"});
   conf.set(&report_verbosity, {"report_verbosity", "report_level"});
     
 }

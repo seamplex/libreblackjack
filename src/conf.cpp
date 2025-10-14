@@ -37,7 +37,6 @@ Configuration::Configuration(int argc, char **argv) {
 
 ///help+extra+desc If no configuration file is given, a file named `blackjack.conf`
 ///help+extra+desc in the current directory is used, provided it exists.
-///help+extra+desc @
 ///help+extra+desc See the full documentation for the available options and the default values.
   
   const struct option longopts[] = {
@@ -63,8 +62,8 @@ Configuration::Configuration(int argc, char **argv) {
 ///op+internal+desc and instructions to define the rules and optionally, the playing strategy and/or arranged shoes.
     {"internal", no_argument, NULL, 'i'},
 
-///op+internal+option `-p` or `--progress`
-///op+internal+desc Show a progress bar.
+///op+progress+option `-p` or `--progress`
+///op+progress+desc Show a progress bar when playing a fixed number of hands.
     {"progress", no_argument, NULL, 'p'},
     
 ///op+help+option `-h` or `--help`

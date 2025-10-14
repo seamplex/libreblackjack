@@ -64,6 +64,8 @@ void help(const char *program_name) {
   std::cout << "                           See the manual for details and instructions to define the rules" << std::endl;
   std::cout << "                           and optionally, the playing strategy and/or arranged shoes." << std::endl;
   std::cout << std::endl;
+  std::cout << "-p or --progress           Show a progress bar when playing a fixed number of hands." << std::endl;
+  std::cout << std::endl;
   std::cout << "-h or --help               Print this informative help message into standard output" << std::endl;
   std::cout << "                           and exit successfully." << std::endl;
   std::cout << std::endl;

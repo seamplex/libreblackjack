@@ -15,6 +15,7 @@
 * `penetration_sigma` (@sec:penetration_sigma)
 * `player` (@sec:player)
 * `quit_when_arranged_cards_run_out` (@sec:quit_when_arranged_cards_run_out)
+* `resplits` (@sec:resplits)
 * `rng_seed` (@sec:rng_seed)
 * `rules` (@sec:rules)
 * `shuffle_every_hand` (@sec:shuffle_every_hand)
@@ -335,6 +336,21 @@ This setting only makes sense when arranging cards with either `cards` or `cards
 ~~~
 quit_when_arranged_cards_run_out = false
 quit_when_arranged_cards_run_out = true
+~~~
+
+# `resplits = ` $n$ {#sec:resplits}
+
+Sets the maximum number of re-split hands.
+Default is three, meaning the dealer allows the player to play up to four hands.
+
+**Default**
+$3$
+
+**Examples**
+
+~~~
+resplits = 1
+resplits = 8
 ~~~
 
 # `rng_seed = ` $n$ {#sec:rng_seed}

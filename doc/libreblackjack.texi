@@ -3,7 +3,7 @@
 @documentencoding UTF-8
 
 @setfilename blackjack.info
-@set UPDATED 2025-10-10
+@set UPDATED 2025-10-14
 @set VERSION 
 
 @copying
@@ -31,7 +31,7 @@ Texts.  A copy of the license is included in the section entitled
 @titlepage
 @title Libre@ Blackjack
 @author Jeremy Theler
-2025-10-10
+2025-10-14
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -127,6 +127,7 @@ sd, etc.
 @menu
 * Invocation::
 * Results::
+* Progress::
 * Interactive game::
 @end menu
 
@@ -161,15 +162,16 @@ Do not ask for the amount to bet before starting a new hand and use a
 flat unit bet. Corresponds to the @code{flat_bet} variable in the
 configuration file.
 
-@end table
+@item @code{-i} or @code{--internal}
 
-@code{-i} or @code{--internal} @code{-p} or @code{--progress}
-
-: Use the internal player to play against the dealer. See the manual for
+Use the internal player to play against the dealer. See the manual for
 details and instructions to define the rules and optionally, the playing
-strategy and/or arranged shoes. Show a progress bar.
+strategy and/or arranged shoes.
 
-@table @asis
+@item @code{-p} or @code{--progress}
+
+Show a progress bar when playing a fixed number of hands.
+
 @item @code{-h} or @code{--help}
 
 Print this informative help message into standard output and exit
@@ -190,10 +192,8 @@ options override setting in the configuration file.
 @end table
 
 If no configuration file is given, a file named @code{blackjack.conf} in
-the current directory is used, provided it exists.
-
-See the full documentation for the available options and the default
-values.
+the current directory is used, provided it exists. See the full
+documentation for the available options and the default values.
 
 Sec.@ 4 contains the details about the settings which can be used in the
 configuration file. As already stated, the options which can be given in
@@ -220,16 +220,100 @@ blackjack --internal --cards="TH JS 6D"
 @end verbatim
 
 With no command-line options and no configuration file, @code{blackjack}
-starts in interactive mode and it is ready to start a blackjack game
-(see sec.@ 2.3 for details).
+starts in interactive mode and it is ready to start an ASCII blackjack
+game (see sec.@ 2.4).
 
 @node Results
 @section Results
-TBD
+Before exiting, the program prints a summary of the results in YAML
+format:
 
-In YAML
+@verbatim
+---
+result: "(-0.8 ± 0.3)"
+rules: "ahc h17 das doa 3rsp 0decks"
+mean: -0.008237
+error: 0.00348378
+hands: 1e+06
+bankroll: -8237
+busts_player: 0.139315
+busts_dealer: 0.239251
+wins: 0.447443
+pushes: 0.086111
+losses: 0.495896
+total_money_waged: 1.13708e+06
+blackjacks_player: 0.047392
+blackjacks_dealer: 0.047318
+variance: 1.34853
+deviation: 1.16126
+...
+@end verbatim
 
-@code{yq}
+By default, the results are written in the standard error, as the
+standard output is typically used to send dealer's messages to the
+player. Therefore, if you are not using stdout (e.g.@ because you used
+the internal player @code{-i}) and want to use the results with Unix
+pipes, you have to redirect the standard error to the standard output:
+
+@verbatim
+$ blackjack -i 2>&1 | yq .
+{
+  "result": "(-0.8 ± 0.3)",
+  "rules": "ahc h17 das doa 3rsp 0decks",
+  "mean": -0.007579,
+  "error": 0.00348416,
+  "hands": 1000000.0,
+  "bankroll": -7579,
+  "busts_player": 0.139308,
+  "busts_dealer": 0.239262,
+  "wins": 0.447834,
+  "pushes": 0.085761,
+  "losses": 0.495561,
+  "total_money_waged": 1136900.0,
+  "blackjacks_player": 0.047427,
+  "blackjacks_dealer": 0.047433,
+  "variance": 1.34882,
+  "deviation": 1.16139
+}
+@end verbatim
+
+The YAML results can be written to a file by setting the variable
+@code{report} in the configuration file, where @code{stdout} is a valid
+file name. So the redirection above can be also performed as
+
+@verbatim
+$ blackjack -i --report=stdout | yq .
+{
+  "result": "(-0.9 ± 0.3)",
+  "rules": "ahc h17 das doa 3rsp 0decks",
+  "mean": -0.00889,
+  "error": 0.00348549,
+  "hands": 1000000.0,
+  "bankroll": -8890,
+  "busts_player": 0.139248,
+  "busts_dealer": 0.239346,
+  "wins": 0.447292,
+  "pushes": 0.085985,
+  "losses": 0.495988,
+  "total_money_waged": 1136880.0,
+  "blackjacks_player": 0.047253,
+  "blackjacks_dealer": 0.047674,
+  "variance": 1.34985,
+  "deviation": 1.16183
+}
+@end verbatim
+
+@node Progress
+@section Progress
+If the number of played hands exceeds a couple dozen million, one might
+want to track the progress. In that case, pass the option @code{-p} (or
+@code{--progress}) to get an ASCII progress bar in the standard error
+(remember standard output is used to play blackack).
+
+@verbatim
+$ blackjack -i --progress
+[==================>                               ] 36 %
+@end verbatim
 
 @node Interactive game
 @section Interactive game
@@ -725,7 +809,7 @@ Character
 @end multitable
 @caption{Table 2: Suit (second) character of a card}
 @end float
-The optional argument @math{h} indicates the id of the player's hand
+The optional argument@ @math{h} indicates the id of the player's hand
 being dealt. If it not present, that means the base hand. When
 performing a splitting on the base hand, the original hand has id equal
 to zero and the new hand has id equal to one. Subsequent splits trigger
@@ -928,7 +1012,7 @@ arrangements, strategies and/or results---in a different directory
 @end quotation
 Individual variables can be set from the command line by passing one or
 more times the option @code{--configuration_variable[=value]} as
-explained in [@@sec-invocation].
+explained in sec.@ 2.1.
 
 Comments can be inserted using either a hash @code{#} or a colon
 @code{;} at any position in the line. The following configuration file
@@ -983,11 +1067,13 @@ decks = 1             # number of decks, negative means infinite
 @item
 @code{quit_when_arranged_cards_run_out} (sec.@ 4.1.16)
 @item
-@code{rng_seed} (sec.@ 4.1.17)
+@code{resplits} (sec.@ 4.1.17)
 @item
-@code{rules} (sec.@ 4.1.18)
+@code{rng_seed} (sec.@ 4.1.18)
 @item
-@code{shuffle_every_hand} (sec.@ 4.1.19)
+@code{rules} (sec.@ 4.1.19)
+@item
+@code{shuffle_every_hand} (sec.@ 4.1.20)
 @end itemize
 
 @menu
@@ -1007,6 +1093,7 @@ decks = 1             # number of decks, negative means infinite
 * @code{penetration_sigma =} @math{r}::
 * @code{player =} @emph{player}::
 * @code{quit_when_arranged_cards_run_out =} @math{b}::
+* @code{resplits =} @math{n}::
 * @code{rng_seed =} @math{n}::
 * @code{rules = [ ahc | enhc ] [ h17 | s17 ] [ das | ndas ] [ doa | do9 ]}::
 * @code{shuffle_every_hand =} @math{b}::
@@ -1353,6 +1440,20 @@ played. This setting only makes sense when arranging cards with either
 @verbatim
 quit_when_arranged_cards_run_out = false
 quit_when_arranged_cards_run_out = true
+@end verbatim
+
+@node @code{resplits =} @math{n}
+@subsection @code{resplits =} @math{n}
+Sets the maximum number of re-split hands. Default is three, meaning the
+dealer allows the player to play up to four hands.
+
+@strong{Default} @math{3}
+
+@strong{Examples}
+
+@verbatim
+resplits = 1
+resplits = 8
 @end verbatim
 
 @node @code{rng_seed =} @math{n}

@@ -14,7 +14,7 @@
 \definecolor{fino_fondo}{rgb}{0.90,0.95,0.90}
 \definecolor{gmsh_fondo}{rgb}{0.90,0.90,0.95}
 \definecolor{terminal_fondo}{rgb}{0.2,0.2,0.2}
-\definecolor{awk_fondo}{rgb}{0.95,0.90,0.95}
+\definecolor{awk_fondo}{rgb}{0.98,0.98,0.98}
 \definecolor{bash_fondo}{rgb}{0.90,0.90,0.90}
 
 \definecolor{terminal_fore}{rgb}{1.0,1.0,1.0}
@@ -210,14 +210,19 @@
 
 \lstdefinestyle{ini}
 {
-    basicstyle=\ttfamily\small,
-    columns=fullflexible,
-    morecomment=[s][\color{Orchid}\bfseries]{[}{]},
-    morecomment=[l]{\#},
-    morecomment=[l]{;},
-    commentstyle=\color{gray}\ttfamily,
-    morekeywords={},
-    otherkeywords={=,:},
-    keywordstyle={\color{green}\bfseries}
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  morecomment=[s][\color{Orchid}\bfseries]{[}{]},
+  morecomment=[l]{\#},
+  morecomment=[l]{;},
+  commentstyle=\color{gray}\ttfamily,
+  morekeywords={},
+  otherkeywords={=,:},
+  keywordstyle={\color{bash_keyword1}\bfseries},
+  backgroundcolor=\color{awk_fondo},
+  xleftmargin=0.6cm,
+  xrightmargin=0.6cm,
+  framesep=0.4cm,
+  frame=single,
 }
 

@@ -86,15 +86,18 @@ int Dealer::writeReportYAML(void) {
   std::ostream* out = &std::cerr;
   std::ofstream file_stream;
 
-  if (report_file_path != "") {
+  if (report_file_path.empty() || report_file_path == "stderr") {
+    out = &std::cerr;
+  } else if (report_file_path == "stdout") {
+    out = &std::cout;
+  } else {
     file_stream.open(report_file_path);
     if (!file_stream.is_open()) {
-      // Handle error - file couldn't be opened
-      std::cerr << "Error: could not open file " << report_file_path << std::endl;
-      return -1;  // or throw exception, or handle error as appropriate
+        std::cerr << "Error: could not open file " << report_file_path << std::endl;
+        return -1;  // or throw exception, or handle error as appropriate
     }
     out = &file_stream;
-  }
+  }  
 
   // TODO: choose if comments with explanations are to be added
   *out << "---" << std::endl; 

@@ -127,6 +127,14 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 
 //  conf.set(&rsa, {"rsa", "resplit_aces"});
 
+///conf+resplits+usage `resplits = ` $n$
+///conf+resplits+details Sets the maximum number of re-split hands.
+///conf+resplits+details Default is three, meaning the dealer allows the player to play up to four hands.
+///conf+resplits+default $3$
+///conf+resplits+example resplits = 1
+///conf+resplits+example resplits = 8
+  conf.set(&resplits, {"resplits"});
+
 ///conf+blackjack_pays+usage `blackjack_pays = ` $r$
 ///conf+blackjack_pays+details Defines how much a natural pays.
 ///conf+blackjack_pays+details The real number $r$ has to be a decimal number such as `1.5` or `1.2`.

@@ -1,5 +1,3 @@
 If no configuration file is given, a file named blackjack.conf in the
-current directory is used, provided it exists.
-
-See the full documentation for the available options and the default
-values.
+current directory is used, provided it exists. See the full
+documentation for the available options and the default values.

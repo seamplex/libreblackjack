@@ -34,12 +34,12 @@ void progress_bar(size_t n, size_t N, int bar_width) {
   float progress = float(n) / N;
   int pos = bar_width * progress;
 
-  std::cout << "\r[";
+  std::cerr << "\r[";
   for (int i = 0; i < bar_width; ++i) {
-    std::cout << ((i < pos) ? "=" : ((i == pos) ? ">" : " "));
+    std::cerr << ((i < pos) ? "=" : ((i == pos) ? ">" : " "));
   }
-  std::cout << "] " << int(progress * 100.0) << " %";
-  std::cout.flush();  
+  std::cerr << "] " << int(progress * 100.0) << " %";
+  std::cerr.flush();  
 }
 
 int main(int argc, char **argv) {
@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
   
   if (progress_bar_width > 0) {
     progress_bar(dealer->n_hands, dealer->n_hands, progress_bar_width);  
-    std::cout << std::endl;
+    std::cerr << std::endl;
   }
   
   player->info(lbj::Info::Bye);
