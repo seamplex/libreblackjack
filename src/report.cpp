@@ -59,15 +59,21 @@ void Dealer::prepareReport(void) {
   report.push_back(reportItem(2, "hands",     n_hand));
   report.push_back(reportItem(2, "bankroll",  playerStats.bankroll));
 
-  report.push_back(reportItem(3, "busts_player", playerStats.bustsPlayer / (double) n_hand));
-  report.push_back(reportItem(3, "busts_dealer", playerStats.bustsDealer / (double) n_hand));
+  report.push_back(reportItem(3, "busts_player",       playerStats.bustsPlayer / (double) n_hand));
+  report.push_back(reportItem(3, "busts_dealer",       playerStats.bustsDealer / (double) n_hand));
+  report.push_back(reportItem(3, "busts_dealer_real",  playerStats.bustsDealer / (double) (n_hand - playerStats.bustsPlayerAllHands)));
+  
   report.push_back(reportItem(3, "wins",         playerStats.wins / (double) n_hand));
   report.push_back(reportItem(3, "pushes",       playerStats.pushes / (double) n_hand));
   report.push_back(reportItem(3, "losses",       playerStats.losses / (double) n_hand));
 
-  report.push_back(reportItem(4, "total_money_waged", playerStats.totalMoneyWaged));
-  report.push_back(reportItem(4, "blackjacks_player", playerStats.blackjacksPlayer / (double) n_hand));
-  report.push_back(reportItem(4, "blackjacks_dealer", playerStats.blackjacksDealer / (double) n_hand));
+  report.push_back(reportItem(4, "total_money_waged",      playerStats.totalMoneyWaged));
+  report.push_back(reportItem(4, "blackjacks_player",      playerStats.blackjacksPlayer / (double) n_hand));
+  report.push_back(reportItem(4, "blackjacks_dealer",      playerStats.blackjacksDealer / (double) n_hand));
+//  if (playerStats.bustsPlayerAllHands != 0) {
+    report.push_back(reportItem(4, "blackjacks_dealer_real1", playerStats.blackjacksDealer / (double) (n_hand - playerStats.bustsPlayerAllHands)));
+    report.push_back(reportItem(4, "blackjacks_dealer_real2", playerStats.blackjacksDealer / (double) (n_hand - playerStats.bustsPlayer)));
+//  }
 
   report.push_back(reportItem(5, "variance",  playerStats.variance));
   report.push_back(reportItem(5, "deviation", sqrt(playerStats.variance)));

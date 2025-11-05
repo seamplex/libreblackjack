@@ -310,6 +310,7 @@ class Dealer {
       unsigned int blackjacksDealer = 0;
     
       unsigned int bustsPlayer = 0;
+      unsigned int bustsPlayerAllHands = 0; // this is incremented only if all hands were busted (only for enhc)
       unsigned int bustsDealer = 0;
         
       unsigned int wins = 0;

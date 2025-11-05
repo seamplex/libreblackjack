@@ -33,9 +33,9 @@ Basic::Basic(Configuration &conf) : Player(conf) {
 
   for (int value = 0; value < 21; value++) {
     for (int upcard = 0; upcard < 12; upcard++) {
-      hard[value][upcard] = lbj::PlayerActionTaken::None;
-      soft[value][upcard] = lbj::PlayerActionTaken::None;
-      pair[value][upcard] = lbj::PlayerActionTaken::None;
+      hard[value][upcard] = PlayerActionTaken::None;
+      soft[value][upcard] = PlayerActionTaken::None;
+      pair[value][upcard] = PlayerActionTaken::None;
     }
   }
   
@@ -89,13 +89,13 @@ Basic::Basic(Configuration &conf) : Player(conf) {
       if (default_hard[value] != "") {
         switch (default_hard[value][upcard]) {
           case 'h':
-            hard[value][upcard] = lbj::PlayerActionTaken::Hit;  
+            hard[value][upcard] = PlayerActionTaken::Hit;  
           break;
           case 's':
-            hard[value][upcard] = lbj::PlayerActionTaken::Stand;  
+            hard[value][upcard] = PlayerActionTaken::Stand;  
           break;
           case 'd':
-            hard[value][upcard] = lbj::PlayerActionTaken::Double;  
+            hard[value][upcard] = PlayerActionTaken::Double;  
           break;  
         }
       }
@@ -103,19 +103,19 @@ Basic::Basic(Configuration &conf) : Player(conf) {
       if (default_soft[value] != "") {
         switch (default_soft[value][upcard]) {
           case 'h':
-            soft[value][upcard] = lbj::PlayerActionTaken::Hit;  
+            soft[value][upcard] = PlayerActionTaken::Hit;  
           break;
           case 's':
-            soft[value][upcard] = lbj::PlayerActionTaken::Stand;  
+            soft[value][upcard] = PlayerActionTaken::Stand;  
           break;
           case 'd':
-            soft[value][upcard] = lbj::PlayerActionTaken::Double;  
+            soft[value][upcard] = PlayerActionTaken::Double;  
           break;  
         }
       }
       
       if (default_pair[value] != "" && default_pair[value][upcard] == 'y') {
-        pair[value][upcard] = lbj::PlayerActionTaken::Split;  
+        pair[value][upcard] = PlayerActionTaken::Split;  
       }
     }
   }  
@@ -143,7 +143,7 @@ Basic::Basic(Configuration &conf) : Player(conf) {
       stream >> token;
       
       int value = 0;
-      lbj::PlayerActionTaken (*strategy)[21][12] = nullptr;
+      PlayerActionTaken (*strategy)[21][12] = nullptr;
       switch (token[0]) {
         case 'h':
         case 'H':
@@ -181,26 +181,26 @@ Basic::Basic(Configuration &conf) : Player(conf) {
         // TODO: check error
         stream >> token;
         if (token == "h" || token == "H") {
-          (*strategy)[value][upcard] = lbj::PlayerActionTaken::Hit;  
+          (*strategy)[value][upcard] = PlayerActionTaken::Hit;  
         } else if (token == "s" || token == "S") {
-          (*strategy)[value][upcard] = lbj::PlayerActionTaken::Stand;  
+          (*strategy)[value][upcard] = PlayerActionTaken::Stand;  
         } else if (token == "d" || token == "D") {
-          (*strategy)[value][upcard] = lbj::PlayerActionTaken::Double;  
+          (*strategy)[value][upcard] = PlayerActionTaken::Double;  
         } else if (token == "y" || token == "Y") {
           // the pair data is different as it is not written as a function of the value
           // but of the value of the individual cards,
           // i.e. p8 means split a pair of eights and not a hand with two fours
           // to avoid clashing a pair of aces with a pair of sixes, we treat the former differently
           if (value != 11) {
-            (*strategy)[2*value][upcard] = lbj::PlayerActionTaken::Split;  
+            (*strategy)[2*value][upcard] = PlayerActionTaken::Split;  
           } else {
-            (*strategy)[11][upcard] = lbj::PlayerActionTaken::Split;  
+            (*strategy)[11][upcard] = PlayerActionTaken::Split;  
           }
         } else if (token == "n" || token == "N") {
           if (value != 11) {
-            (*strategy)[2*value][upcard] = lbj::PlayerActionTaken::None;  
+            (*strategy)[2*value][upcard] = PlayerActionTaken::None;  
           } else {
-            (*strategy)[11][upcard] = lbj::PlayerActionTaken::None;  
+            (*strategy)[11][upcard] = PlayerActionTaken::None;  
           }
         } else {
           std::cerr << "error: unknown command '" << token << "' in " << strategy_file_path << ":" << line_num << std::endl;
@@ -219,16 +219,16 @@ int Basic::play() {
   std::size_t upcard;
   
   switch (actionRequired) {
-    case lbj::PlayerActionRequired::Bet:
+    case PlayerActionRequired::Bet:
       current_bet = 1;
-      actionTaken = lbj::PlayerActionTaken::Bet;
+      actionTaken = PlayerActionTaken::Bet;
     break;
 
-    case lbj::PlayerActionRequired::Insurance:
-      actionTaken = lbj::PlayerActionTaken::DontInsure;
+    case PlayerActionRequired::Insurance:
+      actionTaken = PlayerActionTaken::DontInsure;
     break;
     
-    case lbj::PlayerActionRequired::Play:
+    case PlayerActionRequired::Play:
 
 #ifdef BJDEBUG
       std::cout << "player " << value_player << " dealer " << value_dealer << std::endl;
@@ -238,27 +238,27 @@ int Basic::play() {
       
       // first, we see if we can and shold split
       if (can_split &&
-           ((value_player == -12 &&    pair[11][upcard] == lbj::PlayerActionTaken::Split) ||
-                                   pair[value][upcard] == lbj::PlayerActionTaken::Split)) {
-          actionTaken = lbj::PlayerActionTaken::Split;
+           ((value_player == -12 &&    pair[11][upcard] == PlayerActionTaken::Split) ||
+                                   pair[value][upcard] == PlayerActionTaken::Split)) {
+          actionTaken = PlayerActionTaken::Split;
 
       } else {
       
         actionTaken = (value_player < 0) ? soft[value][upcard] : hard[value][upcard];
         
         if (can_double == false) {
-          if (actionTaken == lbj::PlayerActionTaken::Double) {
-            actionTaken = lbj::PlayerActionTaken::Hit;
+          if (actionTaken == PlayerActionTaken::Double) {
+            actionTaken = PlayerActionTaken::Hit;
           }
         }
       }
       
 #ifdef BJDEBUG
-      if (actionTaken == lbj::PlayerActionTaken::Hit) {
+      if (actionTaken == PlayerActionTaken::Hit) {
         std::cout << "hit" << std::endl;
-      } else if (actionTaken == lbj::PlayerActionTaken::Stand) {
+      } else if (actionTaken == PlayerActionTaken::Stand) {
         std::cout << "stand" << std::endl;
-      } else if (actionTaken == lbj::PlayerActionTaken::Split) {
+      } else if (actionTaken == PlayerActionTaken::Split) {
         std::cout << "split" << std::endl;
       } else {
         std::cout << "none" << std::endl;
@@ -268,7 +268,7 @@ int Basic::play() {
       
     break;  
     
-    case lbj::PlayerActionRequired::None:
+    case PlayerActionRequired::None:
     break;  
     
   }

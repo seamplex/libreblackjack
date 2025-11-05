@@ -570,12 +570,11 @@ void Blackjack::deal(void) {
           return;
         }
       } else {
-        // in ENHC, if the player has 21.. 
+        // in ENHC, if the player has 21...
         if (player->value_player == -21) {
           if (card[dealer_up_card].value == 10 || card[dealer_up_card].value == 11) {
             // and the dealer shows an ace or a face she has to draw
             // (actually she should ask for insurance)
-            // but if the dealer does show an ace or a face the she has to hit
             dealer_hole_card = draw(&hand);
             info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
           }
@@ -701,22 +700,25 @@ void Blackjack::deal(void) {
         }
       } else {
         // assume the player busted in all the hands
-        bool bustedAllHands = true;
+        bool player_busted_all_hands = true;
         for (auto playerHand = playerStats.hands.begin(); playerHand != playerStats.hands.end(); playerHand++) {
           // if he (she) did not bust, set to false
           if (playerHand->busted() == false) {
-            bustedAllHands = false;
+            player_busted_all_hands = false;
             break;
           }
         }
 
-        if (bustedAllHands) {
+        if (player_busted_all_hands) {
           if (enhc == false) {  
             info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
 #ifdef BJDEBUG
             std::cout << "hole " << card[dealer_hole_card].utf8() << std::endl;
 #endif
           }
+//          } else {
+            playerStats.bustsPlayerAllHands++;
+//          }
           
           player->actionRequired = lbj::PlayerActionRequired::None;
           nextAction = lbj::DealerAction::StartNewHand;
