@@ -3,7 +3,7 @@
 @documentencoding UTF-8
 
 @setfilename blackjack.info
-@set UPDATED 2025-10-14
+@set UPDATED 2025-10-15
 @set VERSION 
 
 @copying
@@ -31,7 +31,7 @@ Texts.  A copy of the license is included in the section entitled
 @titlepage
 @title Libre@ Blackjack
 @author Jeremy Theler
-2025-10-14
+2025-10-15
 @page
 @vskip 0pt plus 1filll
 @insertcopying
