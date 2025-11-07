@@ -362,7 +362,7 @@ int Blackjack::read_arranged_cards(std::istringstream iss) {
     int n = 0;
     if (number) {
       n = std::stoi(token);
-      if (n <= 0 || n > 52) {
+      if (n > 52) {
         // TODO: negative values are placeholders for random cards
         std::cerr << "error: invalid integer card " << token << std::endl;
         return 1;
@@ -370,7 +370,9 @@ int Blackjack::read_arranged_cards(std::istringstream iss) {
     } else {
       char rank = token[0];
       char suit = token[1];
-      if (rank == 'A') {
+      if (rank == 'X') {    // placeholder for random
+        n = 0;
+      } else if (rank == 'A') {
         n = 1;    
       } else if (rank == 'T') {
         n = 10;    
@@ -402,10 +404,6 @@ int Blackjack::read_arranged_cards(std::istringstream iss) {
           return 1;
         }
       }
-    }
-
-    if (n == 0) {
-      std::cerr << "error: invalid card " << token << std::endl;
     }
 
     arranged_cards.push_back(n);

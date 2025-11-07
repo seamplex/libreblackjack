@@ -22,15 +22,19 @@ void Dealer::updateMeanAndVariance(void) {
 
 
 void Dealer::prepareReport(void) {
-  
+
+  // TODO: if n_hand is one the error is NaN
+/*  
   if (n_hand <= 1) {
     return;
   }
+*/
 
   // we need to update these statistics after the last played hand
   updateMeanAndVariance();  
     
-  double error = error_standard_deviations * sqrt (playerStats.variance / (double) n_hand);
+  double total = static_cast<double>(n_hand);
+  double error = error_standard_deviations * sqrt (playerStats.variance / total);
 
   int precision = 0;
   if (error > 0) {
@@ -59,16 +63,34 @@ void Dealer::prepareReport(void) {
   report.push_back(reportItem(2, "hands",     n_hand));
   report.push_back(reportItem(2, "bankroll",  playerStats.bankroll));
 
-  report.push_back(reportItem(3, "busts_player",       playerStats.bustsPlayer / (double) n_hand));
-  report.push_back(reportItem(3, "busts_dealer",       playerStats.bustsDealer / (double) (n_hand - playerStats.bustsPlayerAllHands - playerStats.blackjacksDealer)));
+
+  report.push_back(reportItem(3, "busts_player_n",     playerStats.bustsPlayer));
+  report.push_back(reportItem(3, "busts_dealer_n",     playerStats.bustsDealer));
   
-  report.push_back(reportItem(3, "wins",         playerStats.wins / (double) n_hand));
-  report.push_back(reportItem(3, "pushes",       playerStats.pushes / (double) n_hand));
-  report.push_back(reportItem(3, "losses",       playerStats.losses / (double) n_hand));
+  report.push_back(reportItem(3, "busts_player",       playerStats.bustsPlayer / total));
+  report.push_back(reportItem(3, "busts_player_nobj",  playerStats.bustsPlayer / (total - playerStats.blackjacksPlayer)));
+
+  double b1 = playerStats.bustsDealer / total;
+  double b2 = playerStats.bustsDealer / (total - playerStats.bustsPlayerAllHands);
+  double b3 = playerStats.bustsDealer / (total - playerStats.blackjacksDealer);
+  double b4 = playerStats.bustsDealer / (total - playerStats.bustsPlayerAllHands - playerStats.blackjacksDealer);
+  
+//  double b2 = b1 * (1 + (double)playerStats.bustsPlayerAllHands/total);
+//  double b3 = b2 * (1 + (double)playerStats.blackjacksDealer/total);
+  report.push_back(reportItem(3, "busts_dealer1",          b1));
+  // report.push_back(reportItem(3, "busts_dealer2old",       playerStats.bustsDealer / (double) (n_hand - playerStats.bustsPlayerAllHands)));
+  report.push_back(reportItem(3, "busts_dealer2",       b2));
+  // report.push_back(reportItem(3, "busts_dealer3old",       playerStats.bustsDealer / (double) (n_hand - playerStats.bustsPlayerAllHands - playerStats.blackjacksDealer)));
+  report.push_back(reportItem(3, "busts_dealer3",       b3));
+  report.push_back(reportItem(3, "busts_dealer3",       b4));
+  
+  report.push_back(reportItem(3, "wins",         playerStats.wins / total));
+  report.push_back(reportItem(3, "pushes",       playerStats.pushes / total));
+  report.push_back(reportItem(3, "losses",       playerStats.losses / total));
 
   report.push_back(reportItem(4, "total_money_waged",      playerStats.totalMoneyWaged));
-  report.push_back(reportItem(4, "blackjacks_player",      playerStats.blackjacksPlayer / (double) n_hand));
-  report.push_back(reportItem(4, "blackjacks_dealer",      playerStats.blackjacksDealer / (double) n_hand));
+  report.push_back(reportItem(4, "blackjacks_player",      playerStats.blackjacksPlayer / total));
+  report.push_back(reportItem(4, "blackjacks_dealer",      playerStats.blackjacksDealer / total));
 //  if (playerStats.bustsPlayerAllHands != 0) {
     report.push_back(reportItem(4, "blackjacks_dealer_real1", playerStats.blackjacksDealer / (double) (n_hand - playerStats.bustsPlayerAllHands)));
     report.push_back(reportItem(4, "blackjacks_dealer_real2", playerStats.blackjacksDealer / (double) (n_hand - playerStats.bustsPlayer)));
@@ -83,9 +105,9 @@ void Dealer::prepareReport(void) {
 
 int Dealer::writeReportYAML(void) {
     
-  if (n_hand <= 1) {
-    return 0;
-  }  
+  // if (n_hand <= 1) {
+  //   return 0;
+  // }  
 
 
   std::ostream* out = &std::cerr;
