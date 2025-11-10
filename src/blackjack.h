@@ -65,6 +65,7 @@ class Blackjack : public Dealer {
     bool shuffle_every_hand = false;
     bool quit_when_arranged_cards_run_out = false;
     bool new_hand_reset_cards = true;
+    bool dealer_draws_even_if_player_busted = false;
     
     std::vector<int> arranged_cards;
     size_t n_arranged_cards = 0; // just to prevent calling size() each time we draw a card

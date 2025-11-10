@@ -66,35 +66,26 @@ void Dealer::prepareReport(void) {
 
   report.push_back(reportItem(3, "busts_player_n",     playerStats.bustsPlayer));
   report.push_back(reportItem(3, "busts_dealer_n",     playerStats.bustsDealer));
-  
-  report.push_back(reportItem(3, "busts_player",       playerStats.bustsPlayer / total));
-  report.push_back(reportItem(3, "busts_player_nobj",  playerStats.bustsPlayer / (total - playerStats.blackjacksPlayer)));
 
-  double b1 = playerStats.bustsDealer / total;
-  double b2 = playerStats.bustsDealer / (total - playerStats.bustsPlayerAllHands);
-  double b3 = playerStats.bustsDealer / (total - playerStats.blackjacksDealer);
-  double b4 = playerStats.bustsDealer / (total - playerStats.bustsPlayerAllHands - playerStats.blackjacksDealer);
-  
-//  double b2 = b1 * (1 + (double)playerStats.bustsPlayerAllHands/total);
-//  double b3 = b2 * (1 + (double)playerStats.blackjacksDealer/total);
-  report.push_back(reportItem(3, "busts_dealer1",          b1));
-  // report.push_back(reportItem(3, "busts_dealer2old",       playerStats.bustsDealer / (double) (n_hand - playerStats.bustsPlayerAllHands)));
-  report.push_back(reportItem(3, "busts_dealer2",       b2));
-  // report.push_back(reportItem(3, "busts_dealer3old",       playerStats.bustsDealer / (double) (n_hand - playerStats.bustsPlayerAllHands - playerStats.blackjacksDealer)));
-  report.push_back(reportItem(3, "busts_dealer3",       b3));
-  report.push_back(reportItem(3, "busts_dealer3",       b4));
+  report.push_back(reportItem(3, "busts_player",       playerStats.bustsPlayer / total));
+  report.push_back(reportItem(3, "busts_player_all",   playerStats.bustsPlayerAllHands / total));
+  report.push_back(reportItem(3, "busts_dealer",       playerStats.bustsDealer / total));
+
+  report.push_back(reportItem(3, "busts_player_nobust",       playerStats.bustsPlayer / (total - playerStats.blackjacksDealer)));
+  report.push_back(reportItem(3, "busts_dealer_nobust",       playerStats.bustsDealer / (total - playerStats.blackjacksPlayer)));
+
+  report.push_back(reportItem(4, "blackjacks_player",      playerStats.blackjacksPlayer / total));
+  report.push_back(reportItem(4, "blackjacks_dealer",      playerStats.blackjacksDealer / total));
+//  if (playerStats.bustsPlayerAllHands != 0) {
+    // report.push_back(reportItem(4, "blackjacks_dealer_real1", playerStats.blackjacksDealer / (double) (n_hand - playerStats.bustsPlayerAllHands)));
+    // report.push_back(reportItem(4, "blackjacks_dealer_real2", playerStats.blackjacksDealer / (double) (n_hand - playerStats.bustsPlayer)));
+//  }
   
   report.push_back(reportItem(3, "wins",         playerStats.wins / total));
   report.push_back(reportItem(3, "pushes",       playerStats.pushes / total));
   report.push_back(reportItem(3, "losses",       playerStats.losses / total));
 
   report.push_back(reportItem(4, "total_money_waged",      playerStats.totalMoneyWaged));
-  report.push_back(reportItem(4, "blackjacks_player",      playerStats.blackjacksPlayer / total));
-  report.push_back(reportItem(4, "blackjacks_dealer",      playerStats.blackjacksDealer / total));
-//  if (playerStats.bustsPlayerAllHands != 0) {
-    report.push_back(reportItem(4, "blackjacks_dealer_real1", playerStats.blackjacksDealer / (double) (n_hand - playerStats.bustsPlayerAllHands)));
-    report.push_back(reportItem(4, "blackjacks_dealer_real2", playerStats.blackjacksDealer / (double) (n_hand - playerStats.bustsPlayer)));
-//  }
 
   report.push_back(reportItem(5, "variance",  playerStats.variance));
   report.push_back(reportItem(5, "deviation", sqrt(playerStats.variance)));

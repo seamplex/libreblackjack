@@ -154,36 +154,36 @@ class Hand {
     std::list<unsigned int> cards;
 
     // inline on purpose
-    int value() {
+    int value() const {
       unsigned int soft = 0;
       unsigned int n = 0;
       unsigned int value = 0;
-      for (auto tag : cards) {
+      for (const auto &tag : cards) {
         value = card[tag].value;
         n += value;
         soft += (value == 11);
       }
-     
+
       // this loop should be only executed once if everything works fine
       while (n > 21 && soft > 0){
         n -= 10;
         soft--;
       }
-      
+
       return (soft)?(-n):(n);
     };
-    
+
     // inline on purpose
-    bool blackjack() {
+    bool blackjack() const {
       return (std::abs(value()) == 21 && cards.size() == 2);
     };
-    
+
     // inline on purpose
-    bool busted() {
+    bool busted() const {
       return (std::abs(value()) > 21);
     }
-};    
-    
+};
+
 class PlayerHand : public Hand {
   public:
     PlayerHand(std::size_t i = 0) : id(i) { };

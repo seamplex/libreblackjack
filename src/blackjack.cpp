@@ -202,7 +202,7 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 ///conf+quit_when_arranged_cards_run_out+example quit_when_arranged_cards_run_out = false
 ///conf+quit_when_arranged_cards_run_out+example quit_when_arranged_cards_run_out = true
   conf.set(&quit_when_arranged_cards_run_out, {"quit_when_arranged_cards_run_out"});
-  
+
 ///conf+new_hand_reset_cards+usage `new_hand_reset_cards_out = ` $b$
 ///conf+new_hand_reset_cards+details If the are arranged cards (either with `cards` or `cards_file`) and $b$ is `true`
 ///conf+new_hand_reset_cards+details then when a hand is finished, the next hand starts with the arranged cards from the very beginning.
@@ -225,6 +225,19 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 ///conf+new_hand_reset_cards+example new_hand_reset_cards = false
 ///conf+new_hand_reset_cards+example new_hand_reset_cards = true
   conf.set(&new_hand_reset_cards, {"new_hand_reset_cards"});
+
+///conf+dealer_draws_even_if_player_busted+usage `dealer_draws_even_if_player_busted = ` $b$
+///conf+dealer_draws_even_if_player_busted+details The usual rule in casinos is that if all player busted all hands (including split hands),
+///conf+dealer_draws_even_if_player_busted+details the dealer does not have to draw until sixteen (or soft seventeen) but the hand is finihsed
+///conf+dealer_draws_even_if_player_busted+details and the next card in the shoe (or shuffler) is the player's first card of the next hand.
+///conf+dealer_draws_even_if_player_busted+details Yet, this rule may distort some statistics such as dealer's bust rate because for sure
+///conf+dealer_draws_even_if_player_busted+details he will not bust that hand.
+///conf+dealer_draws_even_if_player_busted+details This flag can modify the dealer's behavior and, if true, the dealer will draw cards
+///conf+dealer_draws_even_if_player_busted+details as normal even if the player had busted all her hands.
+///conf+dealer_draws_even_if_player_busted+default `false`
+///conf+dealer_draws_even_if_player_busted+example dealer_draws_even_if_player_busted = false
+///conf+dealer_draws_even_if_player_busted+example dealer_draws_even_if_player_busted = true
+  conf.set(&dealer_draws_even_if_player_busted, {"dealer_draws_even_if_player_busted"});
 
   // read arranged cards
 ///conf+cards+usage `cards = ` $\text{list of cards}$
@@ -249,10 +262,14 @@ Blackjack::Blackjack(Configuration &conf) : Dealer(conf), rng(dev_random()), fif
 ///conf+cards+details     ii. a set of infinite cards , if `decks` is zero.
 ///conf+cards+details   b. the hand is over and `new_hand_reset_cards` is `true`, or
 ///conf+cards+details   c. `quit_when_arranged_cards_run_out` is true, in which case the program exits.
+///conf+cards+details @
+///conf+cards+details A zero or `XX` means a placeholder for an actual random card. So for example `JS XX AC` will give
+///conf+cards+details the Jack of Spades, a random card and te Ace of Clubs.
+///conf+cards+details @
 ///conf+cards+default Empty list
 ///conf+cards+example cards = TH JD 6C
-///conf+cards+example cards = 2S 5D QS AC
-///conf+cards+example cards = 8D QH TC 2C KD 7S 8S TD AH 5C
+///conf+cards+example cards = 2S XX QS AC
+///conf+cards+example cards = 8D QH XX 2C KD 7S XX TD AH 5C
   if (conf.exists("cards")) {
     if (conf.exists("cards_file")) {
       std::cerr << "error: cannot have both cards and cards_file" << std::endl;
@@ -373,25 +390,27 @@ int Blackjack::read_arranged_cards(std::istringstream iss) {
       if (rank == 'X') {    // placeholder for random
         n = 0;
       } else if (rank == 'A') {
-        n = 1;    
+        n = 1;
       } else if (rank == 'T') {
-        n = 10;    
+        n = 10;
       } else if (rank == 'J') {
-        n = 11;    
+        n = 11;
       } else if (rank == 'Q') {
-        n = 12;    
+        n = 12;
       } else if (rank == 'K') {
-        n = 13;    
+        n = 13;
       } else {
         n = rank - '0';
       }
-      if (n < 1 || n > 13) {
+      if (n < 0 || n > 13) {
         std::cerr << "error: invalid ASCII card rank " << token << std::endl;
         return 1;
       }
 
       if (suit != '\0') {
-        if (suit == 'C') {
+        if (suit == 'X') {
+          n += 0;
+        } else if (suit == 'C') {
           n += static_cast<int>(lbj::Suit::Clubs) * 13;
         } else if (suit == 'D') {
           n += static_cast<int>(lbj::Suit::Diamonds) * 13;
@@ -699,38 +718,42 @@ void Blackjack::deal(void) {
       } else {
         // assume the player busted in all the hands
         bool player_busted_all_hands = true;
-        for (auto playerHand = playerStats.hands.begin(); playerHand != playerStats.hands.end(); playerHand++) {
+        for (const auto &player_hand : playerStats.hands) {
           // if he (she) did not bust, set to false
-          if (playerHand->busted() == false) {
+          if (player_hand.busted() == false) {
             player_busted_all_hands = false;
             break;
           }
         }
 
         if (player_busted_all_hands) {
-          if (enhc == false) {  
+          if (enhc == false) {
             info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
 #ifdef BJDEBUG
             std::cout << "hole " << card[dealer_hole_card].utf8() << std::endl;
 #endif
           }
-//          } else {
-            playerStats.bustsPlayerAllHands++;
-//          }
-          
-          player->actionRequired = lbj::PlayerActionRequired::None;
-          nextAction = lbj::DealerAction::StartNewHand;
-          return;
+          playerStats.bustsPlayerAllHands++;
+
+          if (dealer_draws_even_if_player_busted) {
+            player->actionRequired = lbj::PlayerActionRequired::None;
+            nextAction = lbj::DealerAction::HitDealerHand;
+            return;
+          } else {
+            player->actionRequired = lbj::PlayerActionRequired::None;
+            nextAction = lbj::DealerAction::StartNewHand;
+            return;
+          }
         }  else {
           player->actionRequired = lbj::PlayerActionRequired::None;
           nextAction = lbj::DealerAction::HitDealerHand;
           return;
         }
-      }        
+      }
     break;
-    
+
     case lbj::DealerAction::HitDealerHand:
-        
+
       if (enhc == false) {
         info(lbj::Info::CardDealerRevealsHole, dealer_hole_card);
 #ifdef BJDEBUG
@@ -740,11 +763,12 @@ void Blackjack::deal(void) {
 
       // hit while count is less than 17 (or equal to soft 17 if hit_soft_17 is true)
       player->value_dealer = hand.value();
-      while ((std::abs(player->value_dealer) < 17 || (h17 && player->value_dealer == -17)) && hand.busted() == 0) {
-        unsigned int dealerCard = draw(&hand);
-        info(lbj::Info::CardDealer, dealerCard);
+      // while ((std::abs(dealer_value) < 17 || (h17 && dealer_value == -17)) && hand.busted() == false) {
+      while (std::abs(player->value_dealer) < 17 || (h17 && player->value_dealer == -17)) {
+        unsigned int dealer_card = draw(&hand);
+        info(lbj::Info::CardDealer, dealer_card);
 #ifdef BJDEBUG
-        std::cout << "dealer " << card[dealerCard].utf8() << std::endl;
+        std::cout << "dealer " << card[dealer_card].utf8() << std::endl;
 #endif
         player->value_dealer = hand.value();
       }
@@ -780,7 +804,7 @@ void Blackjack::deal(void) {
       if (hand.busted()) {
         info(lbj::Info::DealerBusts, player->value_dealer);
         playerStats.bustsDealer++;
-        for (auto playerHand : playerStats.hands) {
+        for (const auto &playerHand : playerStats.hands) {
           if (playerHand.busted() == false) {
             // pay him (her)
             playerStats.bankroll += 2 * playerHand.bet;
