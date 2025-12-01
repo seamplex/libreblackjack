@@ -237,20 +237,18 @@ struct reportItem {
 class Dealer {
   public:
     Dealer(Configuration &);
-    Dealer() = default;
-    virtual ~Dealer() = default;
+    ~Dealer();
     // delete copy and move constructors
     Dealer(Dealer&) = delete;
     Dealer(const Dealer&) = delete;
     Dealer(Dealer &&) = delete;
     Dealer(const Dealer &&) = delete;
 
-    // maybe this first one does not need to be deleted
-    virtual void shuffle(void) = 0;
-    virtual void deal(void) = 0;
-    virtual unsigned int draw(Hand * = nullptr) = 0;
-    virtual int process(void) = 0;
-    virtual std::string rules(void) { return ""; };
+    void shuffle();
+    unsigned int draw(Hand * = nullptr);
+    void deal(void);
+    int process(void);
+    std::string rules(void);
     
     void setPlayer(Player *p) {
       player = p;
@@ -280,8 +278,9 @@ class Dealer {
     size_t n_hands = 1000000;
     size_t n_hand = 0;
     
-  protected:
+  private:
     // TODO: multiple players
+    int n_players = 1;
     Player *player;
 
     // TODO: most of the games will have a single element, but maybe
@@ -291,9 +290,12 @@ class Dealer {
 
     // how many standard deviations does the reported error mean?
     double error_standard_deviations = 3.0;
+    
     // default infinite number of decks (it's faster)
     unsigned int n_decks = 0;
+    unsigned int shoe_cards[12];  // Index 0-1 unused, 2-11 for card values (11=Ace)
     unsigned int n_shuffles = 0;
+    bool real_shoe = true;
     
     struct {
       std::list<PlayerHand> hands;
@@ -338,7 +340,53 @@ class Dealer {
     
     void updateMeanAndVariance(void);
     
+
+    
   private:
+    
+    unsigned int rng_seed;
+    std::random_device dev_random;
+    std::mt19937 rng;
+    std::uniform_int_distribution<unsigned int> fiftyTwoCards;
+    std::uniform_int_distribution<unsigned int> fakeshoe;
+    
+    std::vector<unsigned int> shoe;
+    size_t pos = 0;
+    size_t cut_card_position = 0;
+    bool last_pass = false;
+    
+    unsigned int dealer_up_card;
+    unsigned int dealer_hole_card;
+    unsigned int player_first_card;
+    unsigned int player_second_card;
+
+    bool h17 = true;
+    bool das = true;
+    bool doa = true;
+    bool enhc = false;
+//    bool rsa = false;  // TODO
+    bool shuffle_every_hand = false;
+    bool quit_when_arranged_cards_run_out = false;
+    bool new_hand_reset_cards = true;
+    bool dealer_draws_even_if_player_busted = false;
+    
+    std::vector<int> arranged_cards;
+    size_t n_arranged_cards = 0; // just to prevent calling size() each time we draw a card
+    size_t i_arranged_cards = 0;
+
+    unsigned int resplits = 3;
+    unsigned int max_bet = 0;
+    unsigned int number_of_burnt_cards = 0;
+    
+    double insurance = 0;
+    double blackjack_pays = 1.5;
+    
+    double penetration = 0.75;
+    double penetration_sigma = 0;
+    
+    int read_arranged_cards(std::istringstream iss); // maybe this should go into the parent class?
+    void can_double_split(void);
+    
     bool done = false;
     std::list<reportItem> report;
     

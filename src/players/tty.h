@@ -27,7 +27,7 @@
 #include <cctype>
 #include <locale>
 
-#include "../blackjack.h"
+#include "../dealer.h"
 
 namespace lbj {
 

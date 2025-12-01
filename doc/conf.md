@@ -3,6 +3,7 @@
 * `cards` (@sec:cards)
 * `cards_file` (@sec:cards_file)
 * `dealer` (@sec:dealer)
+* `dealer_draws_even_if_player_busted` (@sec:dealer_draws_even_if_player_busted)
 * `decks` (@sec:decks)
 * `flat_bet` (@sec:flat_bet)
 * `hands` (@sec:hands)
@@ -60,6 +61,10 @@ The dealer will continue drawing from the list of arranged cards until either
   b. the hand is over and `new_hand_reset_cards` is `true`, or
   c. `quit_when_arranged_cards_run_out` is true, in which case the program exits.
 
+A zero or `XX` means a placeholder for an actual random card. So for example `JS XX AC` will give
+the Jack of Spades, a random card and te Ace of Clubs.
+
+
 **Default**
 Empty list
 
@@ -67,8 +72,8 @@ Empty list
 
 ~~~
 cards = TH JD 6C
-cards = 2S 5D QS AC
-cards = 8D QH TC 2C KD 7S 8S TD AH 5C
+cards = 2S XX QS AC
+cards = 8D QH XX 2C KD 7S XX TD AH 5C
 ~~~
 
 # `cards_file = ` $\text{path to file}$ {#sec:cards_file}
@@ -99,6 +104,26 @@ Currently, the only valid choice is `blackjack`.
 
 ~~~
 dealer = blackjack
+~~~
+
+# `dealer_draws_even_if_player_busted = ` $b$ {#sec:dealer_draws_even_if_player_busted}
+
+The usual rule in casinos is that if all player busted all hands (including split hands),
+the dealer does not have to draw until sixteen (or soft seventeen) but the hand is finihsed
+and the next card in the shoe (or shuffler) is the player's first card of the next hand.
+Yet, this rule may distort some statistics such as dealer's bust rate because for sure
+he will not bust that hand.
+This flag can modify the dealer's behavior and, if true, the dealer will draw cards
+as normal even if the player had busted all her hands.
+
+**Default**
+`false`
+
+**Examples**
+
+~~~
+dealer_draws_even_if_player_busted = false
+dealer_draws_even_if_player_busted = true
 ~~~
 
 # `decks = ` $n$ {#sec:decks}

@@ -30,7 +30,7 @@
 #endif
 
 #include "../conf.h"
-#include "../blackjack.h"
+#include "../dealer.h"
 #include "tty.h"
 
 namespace lbj {

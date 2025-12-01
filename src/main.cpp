@@ -24,7 +24,6 @@
 
 #include "conf.h"
 #include "dealer.h"
-#include "blackjack.h"
 
 #include "players/tty.h"
 #include "players/stdinout.h"
@@ -58,15 +57,7 @@ int main(int argc, char **argv) {
     return 0;
   }  
   
-  // simple factory pattern
-  // for more dealers we might have a registration mechanism
-  lbj::Dealer *dealer = nullptr;
-  if (conf.getDealerName() == "blackjack") {
-    dealer = new lbj::Blackjack(conf);
-  } else {
-    std::cerr << "error: unknown dealer for '" << conf.getDealerName() <<"' game" << std::endl;
-    return -1;
-  }
+  lbj::Dealer dealer(conf);
 
   // simple factory pattern
   // for more players we might have a registration mechanism
@@ -87,7 +78,7 @@ int main(int argc, char **argv) {
     return 1;
   }
   // tell the player what the rules are
-  player->rules = dealer->rules();
+  player->rules = dealer.rules();
 
   // complain if there are configuration options which are not used
   if (conf.checkUsed() != 0) {
@@ -95,20 +86,20 @@ int main(int argc, char **argv) {
   }
   
   // assign player to dealer
-  dealer->setPlayer(player);
+  dealer.setPlayer(player);
 
   // set up progress bar
-  const size_t progress_step =  (progress_bar_width) ? dealer->n_hands / progress_bar_width : 0;
+  const size_t progress_step =  (progress_bar_width) ? dealer.n_hands / progress_bar_width : 0;
   size_t progress_last = 0;
   if (progress_bar_width > 0) {
-    progress_bar(0, dealer->n_hands, progress_bar_width);  
+    progress_bar(0, dealer.n_hands, progress_bar_width);  
   }  
   
   // --- let the action begin! -------------------------------------------------
   size_t n_incorrect_commands = 0;
-  dealer->nextAction = lbj::DealerAction::StartNewHand;
-  while (!dealer->finished()) {
-    dealer->deal();
+  dealer.nextAction = lbj::DealerAction::StartNewHand;
+  while (!dealer.finished()) {
+    dealer.deal();
     if (player->actionRequired != lbj::PlayerActionRequired::None) {
       n_incorrect_commands = 0;
       do {
@@ -117,29 +108,28 @@ int main(int argc, char **argv) {
           return 2;
         }
         player->play();
-      } while (dealer->process() <= 0);
+      } while (dealer.process() <= 0);
     }
     if (progress_bar_width > 0) {
-      if ((dealer->n_hand - progress_last) > progress_step) {
-        progress_bar(dealer->n_hand, dealer->n_hands, progress_bar_width);
-        progress_last = dealer->n_hand;
+      if ((dealer.n_hand - progress_last) > progress_step) {
+        progress_bar(dealer.n_hand, dealer.n_hands, progress_bar_width);
+        progress_last = dealer.n_hand;
       }
     }
   }
   // ---------------------------------------------------------------------------
   
   if (progress_bar_width > 0) {
-    progress_bar(dealer->n_hands, dealer->n_hands, progress_bar_width);  
+    progress_bar(dealer.n_hands, dealer.n_hands, progress_bar_width);  
     std::cerr << std::endl;
   }
   
   player->info(lbj::Info::Bye);
   
-  dealer->prepareReport();
-  dealer->writeReportYAML();
+  dealer.prepareReport();
+  dealer.writeReportYAML();
   
   delete player;
-  delete dealer;
   
   return 0;
 }

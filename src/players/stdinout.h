@@ -22,7 +22,7 @@
 
 #ifndef STDINOUT_H
 #define STDINOUT_H
-#include "../blackjack.h"
+#include "../dealer.h"
 
 #include <algorithm> 
 #include <functional> 

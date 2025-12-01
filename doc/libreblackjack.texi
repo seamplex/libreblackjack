@@ -3,7 +3,7 @@
 @documentencoding UTF-8
 
 @setfilename blackjack.info
-@set UPDATED 2025-10-15
+@set UPDATED 2025-11-10
 @set VERSION 
 
 @copying
@@ -31,7 +31,7 @@ Texts.  A copy of the license is included in the section entitled
 @titlepage
 @title Libre@ Blackjack
 @author Jeremy Theler
-2025-10-15
+2025-11-10
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -1043,37 +1043,39 @@ decks = 1             # number of decks, negative means infinite
 @item
 @code{dealer} (sec.@ 4.1.4)
 @item
-@code{decks} (sec.@ 4.1.5)
+@code{dealer_draws_even_if_player_busted} (sec.@ 4.1.5)
 @item
-@code{flat_bet} (sec.@ 4.1.6)
+@code{decks} (sec.@ 4.1.6)
 @item
-@code{hands} (sec.@ 4.1.7)
+@code{flat_bet} (sec.@ 4.1.7)
 @item
-@code{maximum_bet} (sec.@ 4.1.8)
+@code{hands} (sec.@ 4.1.8)
 @item
-@code{max_incorrect_commands} (sec.@ 4.1.9)
+@code{maximum_bet} (sec.@ 4.1.9)
 @item
-@code{new_hand_reset_cards} (sec.@ 4.1.10)
+@code{max_incorrect_commands} (sec.@ 4.1.10)
 @item
-@code{no_insurance} (sec.@ 4.1.11)
+@code{new_hand_reset_cards} (sec.@ 4.1.11)
 @item
-@code{number_of_burnt_cards} (sec.@ 4.1.12)
+@code{no_insurance} (sec.@ 4.1.12)
 @item
-@code{penetration} (sec.@ 4.1.13)
+@code{number_of_burnt_cards} (sec.@ 4.1.13)
 @item
-@code{penetration_sigma} (sec.@ 4.1.14)
+@code{penetration} (sec.@ 4.1.14)
 @item
-@code{player} (sec.@ 4.1.15)
+@code{penetration_sigma} (sec.@ 4.1.15)
 @item
-@code{quit_when_arranged_cards_run_out} (sec.@ 4.1.16)
+@code{player} (sec.@ 4.1.16)
 @item
-@code{resplits} (sec.@ 4.1.17)
+@code{quit_when_arranged_cards_run_out} (sec.@ 4.1.17)
 @item
-@code{rng_seed} (sec.@ 4.1.18)
+@code{resplits} (sec.@ 4.1.18)
 @item
-@code{rules} (sec.@ 4.1.19)
+@code{rng_seed} (sec.@ 4.1.19)
 @item
-@code{shuffle_every_hand} (sec.@ 4.1.20)
+@code{rules} (sec.@ 4.1.20)
+@item
+@code{shuffle_every_hand} (sec.@ 4.1.21)
 @end itemize
 
 @menu
@@ -1081,6 +1083,7 @@ decks = 1             # number of decks, negative means infinite
 * @code{cards =} @math{\text{list of cards}}::
 * @code{cards_file =} @math{\text{path to file}}::
 * @code{dealer =} @emph{game}::
+* @code{dealer_draws_even_if_player_busted =} @math{b}::
 * @code{decks =} @math{n}::
 * @code{flat_bet =} @math{b}::
 * @code{hands =} @math{n}::
@@ -1153,14 +1156,18 @@ the hand is over and @code{new_hand_reset_cards} is @code{true}, or
 program exits.
 @end enumerate
 
+A zero or @code{XX} means a placeholder for an actual random card. So
+for example @code{JS XX AC} will give the Jack of Spades, a random card
+and te Ace of Clubs.
+
 @strong{Default} Empty list
 
 @strong{Examples}
 
 @verbatim
 cards = TH JD 6C
-cards = 2S 5D QS AC
-cards = 8D QH TC 2C KD 7S 8S TD AH 5C
+cards = 2S XX QS AC
+cards = 8D QH XX 2C KD 7S XX TD AH 5C
 @end verbatim
 
 @node @code{cards_file =} @math{\text{path to file}}
@@ -1189,6 +1196,26 @@ is @code{blackjack}.
 
 @verbatim
 dealer = blackjack
+@end verbatim
+
+@node @code{dealer_draws_even_if_player_busted =} @math{b}
+@subsection @code{dealer_draws_even_if_player_busted =} @math{b}
+The usual rule in casinos is that if all player busted all hands
+(including split hands), the dealer does not have to draw until sixteen
+(or soft seventeen) but the hand is finihsed and the next card in the
+shoe (or shuffler) is the player's first card of the next hand. Yet,
+this rule may distort some statistics such as dealer's bust rate because
+for sure he will not bust that hand. This flag can modify the dealer's
+behavior and, if true, the dealer will draw cards as normal even if the
+player had busted all her hands.
+
+@strong{Default} @code{false}
+
+@strong{Examples}
+
+@verbatim
+dealer_draws_even_if_player_busted = false
+dealer_draws_even_if_player_busted = true
 @end verbatim
 
 @node @code{decks =} @math{n}

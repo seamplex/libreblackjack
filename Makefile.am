@@ -26,7 +26,6 @@ blackjack_SOURCES = \
  src/conf.cpp \
  src/report.cpp \
  src/version.cpp \
- src/blackjack.cpp \
  src/cards.cpp \
  src/players/stdinout.cpp \
  src/players/tty.cpp \
@@ -34,7 +33,6 @@ blackjack_SOURCES = \
 
 noinst_HEADERS = \
  src/dealer.h \
- src/blackjack.h \
  src/conf.h \
  src/version-conf.h \
  src/version-vcs.h \

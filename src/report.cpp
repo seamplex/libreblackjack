@@ -71,8 +71,8 @@ void Dealer::prepareReport(void) {
   report.push_back(reportItem(3, "busts_player_all",   playerStats.bustsPlayerAllHands / total));
   report.push_back(reportItem(3, "busts_dealer",       playerStats.bustsDealer / total));
 
-  report.push_back(reportItem(3, "busts_player_nobust",       playerStats.bustsPlayer / (total - playerStats.blackjacksDealer)));
-  report.push_back(reportItem(3, "busts_dealer_nobust",       playerStats.bustsDealer / (total - playerStats.blackjacksPlayer)));
+  report.push_back(reportItem(3, "busts_player_nobj",       playerStats.bustsPlayer / (total - playerStats.blackjacksDealer)));
+  report.push_back(reportItem(3, "busts_dealer_nobj",       playerStats.bustsDealer / (total - playerStats.blackjacksPlayer)));
 
   report.push_back(reportItem(4, "blackjacks_player",      playerStats.blackjacksPlayer / total));
   report.push_back(reportItem(4, "blackjacks_dealer",      playerStats.blackjacksDealer / total));

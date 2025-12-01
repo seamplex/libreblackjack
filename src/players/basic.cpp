@@ -24,7 +24,7 @@
 #include <sstream>
 
 #include "../conf.h"
-#include "../blackjack.h"
+#include "../dealer.h"
 #include "basic.h"
 
 namespace lbj {
