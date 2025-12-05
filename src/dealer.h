@@ -245,7 +245,9 @@ class Dealer {
     Dealer(const Dealer &&) = delete;
 
     void shuffle();
+    unsigned int count_shoe_cards();
     unsigned int draw(Hand * = nullptr);
+    unsigned int draw_tag(void);
     void deal(void);
     int process(void);
     std::string rules(void);
@@ -293,9 +295,8 @@ class Dealer {
     
     // default infinite number of decks (it's faster)
     unsigned int n_decks = 0;
-    unsigned int shoe_cards[12];  // Index 0-1 unused, 2-11 for card values (11=Ace)
+    unsigned int shoe_cards[53];  // index 0 not used
     unsigned int n_shuffles = 0;
-    bool real_shoe = true;
     
     struct {
       std::list<PlayerHand> hands;
@@ -347,13 +348,11 @@ class Dealer {
     unsigned int rng_seed;
     std::random_device dev_random;
     std::mt19937 rng;
-    std::uniform_int_distribution<unsigned int> fiftyTwoCards;
     std::uniform_int_distribution<unsigned int> fakeshoe;
     
-    std::vector<unsigned int> shoe;
-    size_t pos = 0;
     size_t cut_card_position = 0;
     bool last_pass = false;
+    unsigned int pos;
     
     unsigned int dealer_up_card;
     unsigned int dealer_hole_card;

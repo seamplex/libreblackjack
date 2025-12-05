@@ -34,14 +34,17 @@
 #include "dealer.h"
 
 namespace lbj {
-Dealer::Dealer(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 52), fakeshoe(0, RAND_MAX) {
+Dealer::Dealer(Configuration &conf) : rng(dev_random()), fakeshoe(0, RAND_MAX) {
+    
+  // TODO: remove
+  srand(dev_random());
+  //srand(1);
 
   conf.set(&error_standard_deviations, {"error_standard_deviations"});
   conf.set(report_file_path, {"report", "report_file", "report_file_path"});
   conf.set(&report_verbosity, {"report_verbosity", "report_level"});
 
   // TODO: explain
-  conf.set(&real_shoe, {"real_shoe"});
   conf.set(&n_players, {"n_players"});
 
   
@@ -337,12 +340,6 @@ Dealer::Dealer(Configuration &conf) : rng(dev_random()), fiftyTwoCards(1, 52), f
 
   // initialize shoe and perform initial shuffle
   if (n_decks > 0) {
-    shoe.reserve(52*n_decks);
-    for (unsigned int deck = 0; deck < n_decks; deck++) {
-      for (unsigned int tag = 1; tag <= 52; tag++) {
-        shoe.push_back(tag);
-      }
-    }
     shuffle();
     cut_card_position = static_cast<size_t>(penetration * 52 * n_decks);
   }
@@ -504,7 +501,9 @@ void Dealer::deal(void) {
         shuffle();
 
         // burn as many cards as asked
-        pos += number_of_burnt_cards;
+        for (int i = 0; i < number_of_burnt_cards; i++) {
+          draw();
+        }
         last_pass = false;
       }
       info(lbj::Info::NewHand, n_hand, 1e3*playerStats.bankroll);
@@ -560,6 +559,9 @@ void Dealer::deal(void) {
       std::cout << "up card " << card[dealer_up_card].utf8() << std::endl;
 #endif
       player->value_dealer = hand.value();
+      if (player->value_dealer == 0) {
+        std::cout << "momento" << std::endl;
+      }
 
       // step 5. deal the second card to each player
       player_second_card = draw(&(*playerStats.currentHand));
@@ -1180,109 +1182,88 @@ int Dealer::process(void) {
   return 0;
 }
 
+unsigned int Dealer::count_shoe_cards() {
+  unsigned int total_cards = 0;
+  for (auto i = 1; i <= 52; i++) {
+    total_cards += shoe_cards[i];
+  }
+  return total_cards;
+}
 
 void Dealer::shuffle() {
     
   // for infinite decks there is no need to shuffle (how would one do it?)
   // we just pick a random card when we need to deal and that's it
   if (n_decks > 0) {
-    if (real_shoe == false) {
-      for (int i = 2; i <= 9; i++) {
-        shoe_cards[i] = 4 * n_decks;
-      }
-      shoe_cards[10] = 16 * n_decks;  // 10, J, Q, K
-      shoe_cards[11] = 4 * n_decks;   // Ace
-    } else {
-      std::shuffle(shoe.begin(), shoe.end(), rng);
-      pos = 0;
+    for (int i = 1; i <= 52; i++) {
+      shoe_cards[i] = n_decks;
     }
       
     i_arranged_cards = 0;
+    pos = 0;
     n_shuffles++;
   }
   
   return;
 }
 
+unsigned int Dealer::draw_tag(void) {
+    
+  if (n_decks == 0) {
+    return 1 + fakeshoe(rng) % 52;
+  } else {
+    int total_cards = count_shoe_cards();
+    if (total_cards == 0) {
+      std::cout << "mamoncho" << std::endl;
+      shuffle();
+      total_cards = count_shoe_cards();
+    }
+      
+    pos++;
+//  unsigned int rand_pos = rand() % total_cards;
+    unsigned int rand_pos = fakeshoe(rng) % total_cards;
+    unsigned cumulative = 0;
+      
+    for (int tag = 1; tag <= 52; tag++) {
+      cumulative += shoe_cards[tag];
+      if (rand_pos < cumulative) {
+        shoe_cards[tag]--;
+        return tag;
+      }
+    }
+  }
+  
+  return 0;
+}
 
 unsigned int Dealer::draw(Hand *hand) {
     
-  unsigned int tag = 0; 
-
-  if (n_decks == 0) {
-      
-    if (n_arranged_cards == 0 || i_arranged_cards >= n_arranged_cards) {
-      tag = fiftyTwoCards(rng);
-    } else {
-      // negative (or invalid) values are placeholder for random cards  
-      if ((tag = arranged_cards[i_arranged_cards++]) <= 0 || tag > 52) {
-        tag = fiftyTwoCards(rng);
-      }
-      
-      if (quit_when_arranged_cards_run_out && i_arranged_cards == n_arranged_cards) {
-        finished(true);
-      }
-    }  
-    
-  } else {
-    if (real_shoe == false) {
-      if (n_arranged_cards == 0 || i_arranged_cards >= n_arranged_cards) {
-        int total_cards = 0;
-        for (int i = 2; i <= 11; i++) {
-          total_cards += shoe_cards[i];
-        }      
-      
-//        int rand_pos = rand() % total_cards;
-        unsigned int rand_pos = fakeshoe(rng) % total_cards;
-        unsigned cumulative = 0;
-      
-        for (int card = 2; card <= 11; card++) {
-          cumulative += shoe_cards[card];
-          if (rand_pos < cumulative) {
-            shoe_cards[card]--;
-            tag = (card == 11) ? 1 : card;
-            break;
-          }
-        }    
-      
-      } else {
-        tag = arranged_cards[i_arranged_cards++];
-        auto arranged_card = (tag == 11) ? 1 : tag;
-        shoe_cards[arranged_card]--;
-      }
-      
-    } else {
-
-      if (n_arranged_cards == 0 || i_arranged_cards >= n_arranged_cards) {
-        last_pass = (pos >= cut_card_position) || shuffle_every_hand;
-        if (pos >= 52 * n_decks) {
-          shuffle();
-        }
-      
-      } else {
-          
-        if ((tag = arranged_cards[i_arranged_cards++]) > 0 && tag < 52) {
-  
-          // find the original position of the card tag
-          auto it = std::find(shoe.begin() + pos, shoe.end(), tag);
-  
-          // Check if 'tag' was found and pos is valid
-          if (it != shoe.end()) {
-            // Get the index of the first occurrence of 'tag'
-            size_t tag_index = std::distance(shoe.begin(), it);
-      
-            // Only swap if they're different positions
-            if (pos != tag_index) {
-              std::swap(shoe[pos], shoe[tag_index]);
-            }
-          } else {
-            std::cerr << "error: no more cards " << tag << " in the shoe" << std::endl;
-            exit(1);
-          }
-        }
-      }
-      tag = shoe[pos++];
+  if (n_decks > 0) {
+    last_pass = (pos >= cut_card_position) || shuffle_every_hand;
+    if (pos >= 52 * n_decks) {
+      shuffle();
     }
+  }
+  
+  unsigned int tag = 0; 
+  if (n_arranged_cards == 0 || i_arranged_cards >= n_arranged_cards) {
+    tag = draw_tag();
+  } else {
+    if ((tag = arranged_cards[i_arranged_cards++]) == 0) {
+      // zero means random
+      tag = draw_tag();
+    }
+    if (n_decks > 0) {
+      if (shoe_cards[tag] == 0) {
+        std::cerr << "error: no more cards " << tag << " in the shoe" << std::endl;
+        exit(1);
+      }
+      shoe_cards[tag]--;
+    }
+  }
+  
+  if (quit_when_arranged_cards_run_out && i_arranged_cards == n_arranged_cards) {
+    finished(true);
   }
     
   if (hand != nullptr) {

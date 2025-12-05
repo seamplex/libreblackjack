@@ -14,7 +14,7 @@ checkyq
 ref=-0.158
 
 echo "always stand"
-yes stand | $blackjack -n5e5 --flat_bet=true --no_insurance=true --report=stand.yaml > /dev/null 
+yes stand | $blackjack -n1e6 -d2 --flat_bet=true --no_insurance=true --report=stand.yaml > /dev/null 
 actual=$(yq .mean stand.yaml)
 tol=$(yq .error stand.yaml)
 echo $actual $ref $tol

@@ -107,6 +107,9 @@ int main(int argc, char **argv) {
           std::cerr << "Too many unknown commands." << std::endl;
           return 2;
         }
+        if (n_incorrect_commands == 3) {
+          printf("mamoncho\n");
+        }
         player->play();
       } while (dealer.process() <= 0);
     }
